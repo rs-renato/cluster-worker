@@ -1,5 +1,5 @@
 # Cluster Worker - *Scale your tasks easily.* [![Build Status](https://travis-ci.org/rs-renato/cluster-worker.svg?branch=master)](https://travis-ci.org/rs-renato/cluster-worker)
-######*This version is snapshot and still in development. Some documentation inconsistence could be found here.*
+###### *This version is snapshot and still in development. Some documentation inconsistence could be found here.*
 ---
 
 *Table of Content*
