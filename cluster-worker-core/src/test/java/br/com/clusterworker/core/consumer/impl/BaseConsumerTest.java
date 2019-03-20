@@ -1,19 +1,20 @@
 package br.com.clusterworker.core.consumer.impl;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import br.com.clusterworker.core.BaseConsumer;
 import br.com.clusterworker.core.ClusterWorker;
 import br.com.clusterworker.core.ClusterWorkerFactory;
 import br.com.clusterworker.core.constants.TestConstants;
 import br.com.clusterworker.core.task.impl.MyTaskProducer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Created by renato-rs on 21/10/2016.

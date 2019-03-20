@@ -1,14 +1,15 @@
 package br.com.clusterworker.core.task.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
 import br.com.clusterworker.annotations.TaskProduceConfig;
 import br.com.clusterworker.core.TaskProduceLockable;
 import br.com.clusterworker.core.constants.TestConstants;
 import br.com.clusterworker.lock.AtomicLock;
-import org.apache.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by renato-rs on 11/10/2016.

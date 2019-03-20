@@ -1,10 +1,11 @@
 package br.com.clusterworker.core.task.impl;
 
+import org.apache.log4j.Logger;
+
 import br.com.clusterworker.annotations.TaskProcessConfig;
 import br.com.clusterworker.core.TaskProcessUnlockable;
 import br.com.clusterworker.core.constants.TestConstants;
 import br.com.clusterworker.utils.QueueStrategy;
-import org.apache.log4j.Logger;
 
 /**
  * Created by renato-rs on 13/10/2016.

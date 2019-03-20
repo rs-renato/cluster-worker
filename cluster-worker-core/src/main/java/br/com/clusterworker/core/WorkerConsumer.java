@@ -1,9 +1,11 @@
 package br.com.clusterworker.core;
 
-import br.com.clusterworker.utils.QueueStrategy;
+import org.apache.log4j.Logger;
+
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
-import org.apache.log4j.Logger;
+
+import br.com.clusterworker.utils.QueueStrategy;
 
 /**
  * Worker consumer implementation. This class consume from {@link TaskProcess} client's implementation.

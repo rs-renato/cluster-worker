@@ -1,9 +1,10 @@
 package br.com.clusterworker.lock;
 
-import com.hazelcast.core.HazelcastInstance;
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 
-import java.io.Serializable;
+import com.hazelcast.core.HazelcastInstance;
 
 /**
  * Class that represents an atomic lock in the entire cluster.

@@ -1,14 +1,15 @@
 package br.com.clusterworker.core.producer.impl;
 
 
-import br.com.clusterworker.core.BaseConsumer;
-import br.com.clusterworker.core.constants.TestConstants;
-import br.com.clusterworker.core.consumer.impl.MyWaitOnAvailableBaseConsumer;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import br.com.clusterworker.core.BaseConsumer;
+import br.com.clusterworker.core.constants.TestConstants;
+import br.com.clusterworker.core.consumer.impl.MyWaitOnAvailableBaseConsumer;
 
 /**
  * Created by renato-rs on 21/10/2016.

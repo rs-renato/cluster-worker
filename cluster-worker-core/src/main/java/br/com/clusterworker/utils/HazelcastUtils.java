@@ -1,13 +1,14 @@
 package br.com.clusterworker.utils;
 
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
 import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
-import org.apache.log4j.Logger;
-
-import java.util.Set;
 
 /**
  * Hazelcast utility class configuration.

@@ -1,8 +1,8 @@
 package br.com.clusterworker.core;
 
-import br.com.clusterworker.lock.AtomicLock;
-
 import java.util.Collection;
+
+import br.com.clusterworker.lock.AtomicLock;
 
 /**
  * Created by renato-rs on 04/11/2016.

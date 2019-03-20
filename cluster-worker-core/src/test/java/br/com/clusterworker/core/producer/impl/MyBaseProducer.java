@@ -1,9 +1,9 @@
 package br.com.clusterworker.core.producer.impl;
 
+import java.util.Collection;
+
 import br.com.clusterworker.annotations.BaseProducerConfig;
 import br.com.clusterworker.core.BaseProducer;
-
-import java.util.Collection;
 
 /**
  * Created by renatorodrigues on 23/10/16.

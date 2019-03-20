@@ -1,12 +1,14 @@
 package br.com.clusterworker.core;
 
-import br.com.clusterworker.lock.AtomicLock;
-import br.com.clusterworker.lock.LockType;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.HazelcastInstanceAware;
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 
-import java.util.Collection;
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastInstanceAware;
+
+import br.com.clusterworker.lock.AtomicLock;
+import br.com.clusterworker.lock.LockType;
 
 /**
  * Worker producer implementation. This class produce to {@link TaskProduce} client's implementation.

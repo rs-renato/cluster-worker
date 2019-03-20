@@ -1,20 +1,22 @@
 package br.com.clusterworker.core;
 
-import br.com.clusterworker.annotations.TaskProcessConfig;
-import br.com.clusterworker.annotations.TaskProduceConfig;
-import br.com.clusterworker.utils.ClusterWorkerUtils;
-import br.com.clusterworker.utils.HazelcastUtils;
-import br.com.clusterworker.utils.PropertyUtils;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IExecutorService;
-import com.hazelcast.core.Member;
-import org.apache.log4j.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.log4j.Logger;
+
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IExecutorService;
+import com.hazelcast.core.Member;
+
+import br.com.clusterworker.annotations.TaskProcessConfig;
+import br.com.clusterworker.annotations.TaskProduceConfig;
+import br.com.clusterworker.utils.ClusterWorkerUtils;
+import br.com.clusterworker.utils.HazelcastUtils;
+import br.com.clusterworker.utils.PropertyUtils;
 
 /**
  * Central core to manage hazelcast executor services and it's lifecycle.

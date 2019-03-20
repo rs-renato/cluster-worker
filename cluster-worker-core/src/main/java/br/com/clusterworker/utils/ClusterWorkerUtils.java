@@ -1,8 +1,8 @@
 package br.com.clusterworker.utils;
 
-import br.com.clusterworker.exception.MandatoryAnnotationException;
-
 import java.lang.annotation.Annotation;
+
+import br.com.clusterworker.exception.MandatoryAnnotationException;
 
 /**
  * Utils to Cluster Worker classes.

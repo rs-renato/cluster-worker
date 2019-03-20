@@ -1,15 +1,17 @@
 package br.com.clusterworker.core;
 
+import java.io.Serializable;
+import java.util.Collection;
+
+import org.apache.log4j.Logger;
+
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IQueue;
+
 import br.com.clusterworker.annotations.BaseProducerConfig;
 import br.com.clusterworker.producer.Producer;
 import br.com.clusterworker.utils.ClusterWorkerUtils;
 import br.com.clusterworker.utils.HazelcastUtils;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IQueue;
-import org.apache.log4j.Logger;
-
-import java.io.Serializable;
-import java.util.Collection;
 
 /**
  * Base class for {@Producer} implementation.

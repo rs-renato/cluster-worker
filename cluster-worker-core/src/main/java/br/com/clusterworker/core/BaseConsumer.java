@@ -1,5 +1,12 @@
 package br.com.clusterworker.core;
 
+import java.io.Serializable;
+
+import org.apache.log4j.Logger;
+
+import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IQueue;
+
 import br.com.clusterworker.annotations.BaseConsumerConfig;
 import br.com.clusterworker.consumer.Consumer;
 import br.com.clusterworker.lock.AtomicLock;
@@ -7,11 +14,6 @@ import br.com.clusterworker.lock.LockType;
 import br.com.clusterworker.utils.ClusterWorkerUtils;
 import br.com.clusterworker.utils.HazelcastUtils;
 import br.com.clusterworker.utils.QueueStrategy;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IQueue;
-import org.apache.log4j.Logger;
-
-import java.io.Serializable;
 
 /**
  * Base class for {@link Consumer} implementation.

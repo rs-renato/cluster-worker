@@ -1,8 +1,9 @@
 package br.com.clusterworker.core;
 
+import org.junit.Test;
+
 import br.com.clusterworker.core.task.impl.MyTaskProcessor;
 import br.com.clusterworker.core.task.impl.MyTaskProducer;
-import org.junit.Test;
 
 /**
  * Created by renato-rs on 04/10/2016.

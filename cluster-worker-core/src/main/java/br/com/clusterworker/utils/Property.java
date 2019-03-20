@@ -1,11 +1,11 @@
 package br.com.clusterworker.utils;
 
-import org.apache.log4j.Logger;
-
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
 
 /**
  * Property class utility.
