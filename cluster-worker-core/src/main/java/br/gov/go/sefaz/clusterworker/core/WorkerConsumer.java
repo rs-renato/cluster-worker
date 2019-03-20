@@ -14,16 +14,15 @@ import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
  */
 final class WorkerConsumer<T> extends BaseConsumer<T> implements HazelcastInstanceAware, Runnable{
 
-    private static final transient Logger logger = Logger.getLogger(WorkerConsumer.class);
+	private static final long serialVersionUID = 5404415194904610053L;
+	private static final transient Logger logger = Logger.getLogger(WorkerConsumer.class);
     static boolean stop;
 
-    private TaskAcceptable<T> taskProcess;
-    private TaskVisitorImpl<T> taskVisitor;
+    private TaskProcess<T> taskProcess;
 
     public WorkerConsumer(TaskProcess<T> taskProcess, String queueName, QueueStrategy queueStrategy, int timeout) {
         super(queueName, queueStrategy, timeout);
         this.taskProcess = taskProcess;
-        this.taskVisitor = new TaskVisitorImpl<T>(atomicLock);
     }
 
     @Override
@@ -41,9 +40,7 @@ final class WorkerConsumer<T> extends BaseConsumer<T> implements HazelcastInstan
 
                 try{
 
-                    taskVisitor.setType(type);
-
-                    taskProcess.accept(taskVisitor);
+                	taskProcess.process(type);
 
                 }catch (Exception e){
                     logger.error("Cannot process on client's implementation!", e);

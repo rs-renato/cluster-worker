@@ -9,8 +9,6 @@ import com.hazelcast.core.IQueue;
 
 import br.gov.go.sefaz.clusterworker.core.annotations.BaseConsumerConfig;
 import br.gov.go.sefaz.clusterworker.core.consumer.Consumer;
-import br.gov.go.sefaz.clusterworker.core.lock.AtomicLock;
-import br.gov.go.sefaz.clusterworker.core.lock.LockType;
 import br.gov.go.sefaz.clusterworker.core.utils.ClusterWorkerUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
@@ -21,15 +19,15 @@ import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
  */
 public class BaseConsumer<T> implements Consumer<T>, Serializable{
 
-    private static final transient Logger logger = Logger.getLogger(BaseConsumer.class);
+	private static final long serialVersionUID = 4384549432295630459L;
+
+	private static final transient Logger logger = Logger.getLogger(BaseConsumer.class);
 
     transient HazelcastInstance hazelcastInstance = HazelcastUtils.getInstance().getHazelcastInstance();
 
     private String queueName;
     private QueueStrategy queueStrategy;
     private int timeout;
-
-    AtomicLock atomicLock;
 
     /**
      * Creates an BaseConsumer instance. This constructor requires an {@link BaseConsumerConfig} annotation.
@@ -47,7 +45,6 @@ public class BaseConsumer<T> implements Consumer<T>, Serializable{
         this.queueName = queueName;
         this.queueStrategy = queueStrategy;
         this.timeout = timeout;
-        this.atomicLock = new AtomicLock(hazelcastInstance, queueName, LockType.CONSUMER);
     }
 
     @Override
@@ -95,22 +92,6 @@ public class BaseConsumer<T> implements Consumer<T>, Serializable{
      */
     public int getTimeout() {
         return timeout;
-    }
-
-    /**
-     * Locks the atomic lock of this base consumer.
-     * @return atomicLock
-     */
-    public void lock() {
-        atomicLock.lock();
-    }
-
-    /**
-     * Unlocks the atomic lock of this base consumer.
-     * @return atomicLock
-     */
-    public void unlock() {
-        atomicLock.unlock();
     }
 
     public void shutdown(){

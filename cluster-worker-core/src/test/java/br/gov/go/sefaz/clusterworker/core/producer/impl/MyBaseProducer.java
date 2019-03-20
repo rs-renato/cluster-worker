@@ -11,7 +11,9 @@ import br.gov.go.sefaz.clusterworker.core.annotations.BaseProducerConfig;
 @BaseProducerConfig(queueName = "myQueue")
 public class MyBaseProducer extends BaseProducer<Integer> {
 
-    @Override
+	private static final long serialVersionUID = 7335958515274377289L;
+
+	@Override
     public void produce(Collection<Integer> types) {
         super.produce(types);
     }

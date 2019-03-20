@@ -19,7 +19,9 @@ import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
  */
 public class BaseProducer<T> implements Producer<T>, Serializable {
 
-    private static final transient Logger logger = Logger.getLogger(BaseProducer.class);
+	static final long serialVersionUID = -3706506746207926465L;
+
+	private static final transient Logger logger = Logger.getLogger(BaseProducer.class);
 
     transient HazelcastInstance hazelcastInstance = HazelcastUtils.getInstance().getHazelcastInstance();
 

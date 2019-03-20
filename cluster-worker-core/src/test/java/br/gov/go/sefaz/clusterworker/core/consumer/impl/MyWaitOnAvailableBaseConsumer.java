@@ -11,22 +11,10 @@ import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
 @BaseConsumerConfig(queueName = TestConstants.TASK_QUEUE, strategy = QueueStrategy.WAIT_ON_AVAILABLE)
 public class MyWaitOnAvailableBaseConsumer extends BaseConsumer<Integer> {
 
-    @Override
+	private static final long serialVersionUID = 6429769717447517853L;
+
+	@Override
     public Integer consume(){
-
-        Integer integer;
-
-        if (true){
-
-            lock();
-
-            try{
-                integer = super.consume();
-            }finally {
-                unlock();
-            }
-        }
-
-        return integer;
+        return super.consume();
     }
 }

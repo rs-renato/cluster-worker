@@ -5,7 +5,9 @@ package br.gov.go.sefaz.clusterworker.core.exception;
  */
 public class MandatoryAnnotationException extends RuntimeException {
 
-    public MandatoryAnnotationException(String message) {
+	private static final long serialVersionUID = -556398177959796631L;
+
+	public MandatoryAnnotationException(String message) {
         super(message);
     }
 }
