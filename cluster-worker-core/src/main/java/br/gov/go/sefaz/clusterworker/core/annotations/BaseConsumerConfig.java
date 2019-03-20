@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import br.gov.go.sefaz.clusterworker.core.BaseConsumer;
+import br.gov.go.sefaz.clusterworker.core.consumer.BaseConsumer;
 import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
 
 /**

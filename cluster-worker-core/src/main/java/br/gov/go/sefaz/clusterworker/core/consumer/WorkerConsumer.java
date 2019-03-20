@@ -1,10 +1,12 @@
-package br.gov.go.sefaz.clusterworker.core;
+package br.gov.go.sefaz.clusterworker.core.consumer;
 
 import org.apache.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 
+import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
+import br.gov.go.sefaz.clusterworker.core.TaskProcess;
 import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
 
 /**
@@ -12,11 +14,11 @@ import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
  * The role cycle of this core is controled by {@link ClusterWorker}.
  * @param <T> Type of this core consumer.
  */
-final class WorkerConsumer<T> extends BaseConsumer<T> implements HazelcastInstanceAware, Runnable{
+public final class WorkerConsumer<T> extends BaseConsumer<T> implements HazelcastInstanceAware, Runnable{
 
 	private static final long serialVersionUID = 5404415194904610053L;
 	private static final transient Logger logger = Logger.getLogger(WorkerConsumer.class);
-    static boolean stop;
+    public static boolean stop;
 
     private TaskProcess<T> taskProcess;
 

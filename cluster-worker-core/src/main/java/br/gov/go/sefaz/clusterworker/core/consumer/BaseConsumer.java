@@ -1,4 +1,4 @@
-package br.gov.go.sefaz.clusterworker.core;
+package br.gov.go.sefaz.clusterworker.core.consumer;
 
 import java.io.Serializable;
 
@@ -8,7 +8,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IQueue;
 
 import br.gov.go.sefaz.clusterworker.core.annotations.BaseConsumerConfig;
-import br.gov.go.sefaz.clusterworker.core.consumer.Consumer;
 import br.gov.go.sefaz.clusterworker.core.utils.ClusterWorkerUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;

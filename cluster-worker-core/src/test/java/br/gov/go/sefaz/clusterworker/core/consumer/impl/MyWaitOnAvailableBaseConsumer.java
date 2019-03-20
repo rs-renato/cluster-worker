@@ -1,8 +1,8 @@
 package br.gov.go.sefaz.clusterworker.core.consumer.impl;
 
-import br.gov.go.sefaz.clusterworker.core.BaseConsumer;
 import br.gov.go.sefaz.clusterworker.core.annotations.BaseConsumerConfig;
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
+import br.gov.go.sefaz.clusterworker.core.consumer.BaseConsumer;
 import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
 
 /**

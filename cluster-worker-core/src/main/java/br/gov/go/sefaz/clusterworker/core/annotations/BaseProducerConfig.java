@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import br.gov.go.sefaz.clusterworker.core.BaseProducer;
+import br.gov.go.sefaz.clusterworker.core.producer.BaseProducer;
 
 
 /**

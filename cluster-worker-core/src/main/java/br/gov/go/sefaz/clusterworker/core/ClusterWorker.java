@@ -14,6 +14,9 @@ import com.hazelcast.core.Member;
 
 import br.gov.go.sefaz.clusterworker.core.annotations.TaskProcessConfig;
 import br.gov.go.sefaz.clusterworker.core.annotations.TaskProduceConfig;
+import br.gov.go.sefaz.clusterworker.core.consumer.WorkerConsumer;
+import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
+import br.gov.go.sefaz.clusterworker.core.producer.WorkerProducer;
 import br.gov.go.sefaz.clusterworker.core.utils.ClusterWorkerUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.PropertyUtils;

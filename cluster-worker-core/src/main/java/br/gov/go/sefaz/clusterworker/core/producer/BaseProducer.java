@@ -1,4 +1,4 @@
-package br.gov.go.sefaz.clusterworker.core;
+package br.gov.go.sefaz.clusterworker.core.producer;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -9,13 +9,12 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IQueue;
 
 import br.gov.go.sefaz.clusterworker.core.annotations.BaseProducerConfig;
-import br.gov.go.sefaz.clusterworker.core.producer.Producer;
 import br.gov.go.sefaz.clusterworker.core.utils.ClusterWorkerUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
 
 /**
  * Base class for {@Producer} implementation.
- * @param <T> type of this base consumer.
+ * @param <T> type of this base producer.
  */
 public class BaseProducer<T> implements Producer<T>, Serializable {
 
@@ -23,7 +22,7 @@ public class BaseProducer<T> implements Producer<T>, Serializable {
 
 	private static final transient Logger logger = Logger.getLogger(BaseProducer.class);
 
-    transient HazelcastInstance hazelcastInstance = HazelcastUtils.getInstance().getHazelcastInstance();
+    protected transient HazelcastInstance hazelcastInstance = HazelcastUtils.getInstance().getHazelcastInstance();
 
     private String queueName;
 

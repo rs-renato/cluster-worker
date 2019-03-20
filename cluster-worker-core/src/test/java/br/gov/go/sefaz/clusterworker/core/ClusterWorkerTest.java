@@ -2,6 +2,7 @@ package br.gov.go.sefaz.clusterworker.core;
 
 import org.junit.Test;
 
+import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.task.impl.MyTaskProcessor;
 import br.gov.go.sefaz.clusterworker.core.task.impl.MyTaskProducer;
 

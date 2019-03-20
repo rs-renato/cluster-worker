@@ -1,4 +1,4 @@
-package br.gov.go.sefaz.clusterworker.core;
+package br.gov.go.sefaz.clusterworker.core.producer;
 
 import java.util.Collection;
 
@@ -7,12 +7,15 @@ import org.apache.log4j.Logger;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 
+import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
+import br.gov.go.sefaz.clusterworker.core.TaskProduce;
+
 /**
  * Worker producer implementation. This class produce to {@link TaskProduce} client's implementation.
  * The role cycle of this core is controled by {@link ClusterWorker}.
  * @param <T> type of thos core producer.
  */
-final class WorkerProducer<T>  extends BaseProducer<T> implements HazelcastInstanceAware, Runnable{
+public final class WorkerProducer<T>  extends BaseProducer<T> implements HazelcastInstanceAware, Runnable{
 
 	private static final long serialVersionUID = 2538609461091747126L;
 
