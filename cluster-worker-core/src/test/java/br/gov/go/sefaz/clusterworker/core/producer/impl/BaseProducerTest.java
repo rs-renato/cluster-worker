@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import org.junit.Test;
 
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
-import br.gov.go.sefaz.clusterworker.core.consumer.BaseConsumer;
+import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueeConsumer;
 import br.gov.go.sefaz.clusterworker.core.consumer.impl.MyWaitOnAvailableBaseConsumer;
 
 /**
@@ -16,7 +16,7 @@ import br.gov.go.sefaz.clusterworker.core.consumer.impl.MyWaitOnAvailableBaseCon
  */
 public class BaseProducerTest {
 
-    private static BaseConsumer<Integer> baseConsumer;
+    private static HazelcastQueueeConsumer<Integer> hazelcastQueueeConsumer;
     private static MyBaseProducer baseProducer;
 
     @Test
@@ -32,16 +32,16 @@ public class BaseProducerTest {
 
         baseProducer.produce(list);
 
-        baseConsumer = new MyWaitOnAvailableBaseConsumer();
+        hazelcastQueueeConsumer = new MyWaitOnAvailableBaseConsumer();
 
         Integer result;
 
         for (int i = 0; i < TestConstants.TASK_PRODUCE_QUANTITY; i++) {
-            result = baseConsumer.consume();
+            result = hazelcastQueueeConsumer.consume();
             assertEquals(result, list.get(i));
         }
 
-        baseConsumer.shutdown();
+        hazelcastQueueeConsumer.shutdown();
         baseProducer.shutdown();
     }
 }

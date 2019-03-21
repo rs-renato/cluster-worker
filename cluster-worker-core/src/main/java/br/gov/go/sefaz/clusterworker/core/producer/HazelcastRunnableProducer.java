@@ -8,24 +8,24 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
-import br.gov.go.sefaz.clusterworker.core.TaskProduce;
+import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
 
 /**
- * Worker producer implementation. This class produce to {@link TaskProduce} client's implementation.
+ * Worker producer implementation. This class produce to {@link TaskProducer} client's implementation.
  * The role cycle of this core is controled by {@link ClusterWorker}.
  * @param <T> type of thos core producer.
  */
-public final class WorkerProducer<T>  extends BaseProducer<T> implements HazelcastInstanceAware, Runnable{
+public final class HazelcastRunnableProducer<T>  extends HazelcastQueueeProducer<T> implements Runnable, HazelcastInstanceAware{
 
 	private static final long serialVersionUID = 2538609461091747126L;
 
-	private static final transient Logger logger = Logger.getLogger(WorkerProducer.class);
+	private static final transient Logger logger = Logger.getLogger(HazelcastRunnableProducer.class);
 
-    private TaskProduce<T> taskProduce;
+    private TaskProducer<T> taskProducer;
 
-    public WorkerProducer(TaskProduce<T> taskProduce, String queueName) {
+    public HazelcastRunnableProducer(TaskProducer<T> taskProduce, String queueName) {
         super(queueName);
-        this.taskProduce = taskProduce;
+        this.taskProducer = taskProduce;
     }
 
     @Override
@@ -35,7 +35,7 @@ public final class WorkerProducer<T>  extends BaseProducer<T> implements Hazelca
 
         try{
 
-            Collection<T> types = taskProduce.produce();
+            Collection<T> types = taskProducer.produce();
 
             if (types!= null){
                 produce(types);

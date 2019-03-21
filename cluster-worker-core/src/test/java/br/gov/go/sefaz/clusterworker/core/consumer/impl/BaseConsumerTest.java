@@ -12,9 +12,10 @@ import org.junit.Test;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
-import br.gov.go.sefaz.clusterworker.core.consumer.BaseConsumer;
+import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueeConsumer;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.task.impl.MyTaskProducer;
+import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
 
 /**
  * Created by renato-rs on 21/10/2016.
@@ -24,7 +25,7 @@ public class BaseConsumerTest {
     private static ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance();
 
     private static ClusterWorker<Integer> clusterWorker;
-    private static BaseConsumer<Integer> baseConsumer;
+    private static HazelcastQueueeConsumer<Integer> hazelcastQueueeConsumer;
 
     @BeforeClass
     public static void setUp(){
@@ -40,11 +41,11 @@ public class BaseConsumerTest {
     @Test
     public void testWaitOnAvailableBaseConsumer(){
 
-        baseConsumer = new MyWaitOnAvailableBaseConsumer();
+       hazelcastQueueeConsumer = new HazelcastQueueeConsumer<Integer>(TestConstants.TASK_QUEUE, QueueStrategy.WAIT_ON_AVAILABLE);
 
        Integer result;
 
-        while ((result = baseConsumer.consume()) != TestConstants.TASK_PRODUCE_QUANTITY){
+        while ((result = hazelcastQueueeConsumer.consume()) != TestConstants.TASK_PRODUCE_QUANTITY){
             assertNotNull(result);
         }
     }
@@ -52,7 +53,7 @@ public class BaseConsumerTest {
     @Test
     public void testAcceptNullBaseConsumer(){
 
-        baseConsumer = new MyAcceptNullBaseConsumer();
+        hazelcastQueueeConsumer = new HazelcastQueueeConsumer<Integer>(TestConstants.TASK_QUEUE, QueueStrategy.ACCEPT_NULL, TestConstants.BASE_CONSUMER_TIMEOUT);;
 
         int loop = TestConstants.TASK_PRODUCE_QUANTITY * 5;
 
@@ -61,7 +62,7 @@ public class BaseConsumerTest {
         List<Integer> resultList = new ArrayList<Integer>();
 
         while (count < loop){
-            resultList.add(baseConsumer.consume());
+            resultList.add(hazelcastQueueeConsumer.consume());
             count++;
         }
 

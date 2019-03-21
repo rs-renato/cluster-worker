@@ -3,6 +3,8 @@ package br.gov.go.sefaz.clusterworker.core;
 import org.junit.Test;
 
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
+import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
+import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
 import br.gov.go.sefaz.clusterworker.core.task.impl.MyTaskProcessor;
 import br.gov.go.sefaz.clusterworker.core.task.impl.MyTaskProducer;
 
@@ -14,8 +16,8 @@ public class ClusterWorkerTest {
     @Test
     public void testClusterWorker() throws InterruptedException {
 
-        TaskProduce<Integer> taskProduce = new MyTaskProducer();
-        TaskProcess<Integer> taskProcessUnlockable = new MyTaskProcessor();
+        TaskProducer<Integer> taskProduce = new MyTaskProducer();
+        TaskProcessor<Integer> taskProcessUnlockable = new MyTaskProcessor();
 
         ClusterWorker<Integer> clusterWorker = ClusterWorkerFactory.getInstance().getClusterWorker(Integer.class);
 

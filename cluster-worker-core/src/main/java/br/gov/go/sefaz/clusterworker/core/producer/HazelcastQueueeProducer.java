@@ -8,38 +8,24 @@ import org.apache.log4j.Logger;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IQueue;
 
-import br.gov.go.sefaz.clusterworker.core.annotations.BaseProducerConfig;
-import br.gov.go.sefaz.clusterworker.core.utils.ClusterWorkerUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
 
 /**
  * Base class for {@Producer} implementation.
  * @param <T> type of this base producer.
  */
-public class BaseProducer<T> implements Producer<T>, Serializable {
+public class HazelcastQueueeProducer<T> implements Producer<T>, Serializable {
 
 	static final long serialVersionUID = -3706506746207926465L;
 
-	private static final transient Logger logger = Logger.getLogger(BaseProducer.class);
+	private static final transient Logger logger = Logger.getLogger(HazelcastQueueeProducer.class);
 
     protected transient HazelcastInstance hazelcastInstance = HazelcastUtils.getInstance().getHazelcastInstance();
 
     private String queueName;
 
-    /**
-     * Creates an BaseProducer instance. This constructor requires an {@link BaseProducerConfig} annotation.
-     */
-    public BaseProducer() {
-        BaseProducerConfig baseProducerConfig = ClusterWorkerUtils.verifyMandatoryAnotation(this, BaseProducerConfig.class);
-        init(baseProducerConfig.queueName());
-    }
-
-    public BaseProducer(String queueName) {
-        init(queueName);
-    }
-
-    private void init(String queueName) {
-        this.queueName = queueName;
+    public HazelcastQueueeProducer(String queueName) {
+    	this.queueName = queueName;
     }
 
     @Override

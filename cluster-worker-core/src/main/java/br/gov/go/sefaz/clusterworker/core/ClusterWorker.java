@@ -12,11 +12,13 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
 import com.hazelcast.core.Member;
 
-import br.gov.go.sefaz.clusterworker.core.annotations.TaskProcessConfig;
-import br.gov.go.sefaz.clusterworker.core.annotations.TaskProduceConfig;
-import br.gov.go.sefaz.clusterworker.core.consumer.WorkerConsumer;
+import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastRunnableConsumer;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
-import br.gov.go.sefaz.clusterworker.core.producer.WorkerProducer;
+import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
+import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
+import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
+import br.gov.go.sefaz.clusterworker.core.task.annotation.TaskProcessConfig;
+import br.gov.go.sefaz.clusterworker.core.task.annotation.TaskProduceConfig;
 import br.gov.go.sefaz.clusterworker.core.utils.ClusterWorkerUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.PropertyUtils;
@@ -34,13 +36,13 @@ public final class ClusterWorker<T> {
 
     private final IExecutorService executorService = hazelcastInstance.getExecutorService(PropertyUtils.getProperties("cw-config").getProperty("cw.service.task"));
     private final ClusterWorkerFactory clusterWorkerFactory = ClusterWorkerFactory.getInstance();
-    private Map<TaskProduce<T>, Timer> timerMap = new HashMap<TaskProduce<T>, Timer>();
+    private Map<TaskProducer<T>, Timer> timerMap = new HashMap<TaskProducer<T>, Timer>();
 
     /**
-     * Execute a {@link TaskProcess} client's implementation on hazelcast executor service.
+     * Execute a {@link TaskProcessor} client's implementation on hazelcast executor service.
      * @param taskProcess implementation of client task.
      */
-    public void executeTaskProccess(TaskProcess<T> taskProcess){
+    public void executeTaskProccess(TaskProcessor<T> taskProcess){
 
         TaskProcessConfig taskProcessConfig = ClusterWorkerUtils.verifyMandatoryAnotation(taskProcess, TaskProcessConfig.class);
 
@@ -59,12 +61,12 @@ public final class ClusterWorker<T> {
     }
 
     /**
-     * Execute a {@link TaskProduce} client's implementation on hazelcast executor service.
+     * Execute a {@link TaskProducer} client's implementation on hazelcast executor service.
      * @param taskProduce implementation of client task.
      */
-    public void executeTaskProduce(final TaskProduce<T> taskProduce){
+    public void executeTaskProduce(final TaskProducer<T> taskProduce){
 
-        final WorkerProducer<T> workerProducer = clusterWorkerFactory.getWorkerProducer(taskProduce);
+        final HazelcastRunnableProducer<T> workerProducer = clusterWorkerFactory.getWorkerProducer(taskProduce);
 
         final TaskProduceConfig taskProduceConfig = ClusterWorkerUtils.verifyMandatoryAnotation(taskProduce, TaskProduceConfig.class);
 
@@ -127,10 +129,10 @@ public final class ClusterWorker<T> {
     }
 
     /**
-     * Shutdown an specified timer {@link TaskProduce}
+     * Shutdown an specified timer {@link TaskProducer}
      * @param taskProduce to be canceled.
      */
-    public void shutDownTask(TaskProduce<T> taskProduce){
+    public void shutDownTask(TaskProducer<T> taskProduce){
 
         if (timerMap.containsKey(taskProduce)){
             logger.warn("Shuttingdown TaskProduce!");
@@ -150,7 +152,7 @@ public final class ClusterWorker<T> {
             logger.warn("Timer canceled: " + timer.toString());
         }
 
-        WorkerConsumer.stop = true;
+        HazelcastRunnableConsumer.stop = true;
 
         if (!executorService.isShutdown()){
             executorService.shutdownNow();

@@ -1,4 +1,4 @@
-package br.gov.go.sefaz.clusterworker.core.annotations;
+package br.gov.go.sefaz.clusterworker.core.task.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -7,8 +7,6 @@ import org.apache.log4j.Logger;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IQueue;
 
-import br.gov.go.sefaz.clusterworker.core.annotations.BaseConsumerConfig;
-import br.gov.go.sefaz.clusterworker.core.utils.ClusterWorkerUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
 import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
 
@@ -16,35 +14,32 @@ import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
  * Base class for {@link Consumer} implementation.
  * @param <T> type of this base consumer.
  */
-public class BaseConsumer<T> implements Consumer<T>, Serializable{
+public class HazelcastQueueeConsumer<T> implements Consumer<T>, Serializable{
+
+	private static final transient Logger logger = Logger.getLogger(HazelcastQueueeConsumer.class);
 
 	private static final long serialVersionUID = 4384549432295630459L;
 
-	private static final transient Logger logger = Logger.getLogger(BaseConsumer.class);
-
-    transient HazelcastInstance hazelcastInstance = HazelcastUtils.getInstance().getHazelcastInstance();
+    protected transient HazelcastInstance hazelcastInstance = HazelcastUtils.getInstance().getHazelcastInstance();
 
     private String queueName;
-    private QueueStrategy queueStrategy;
-    private int timeout;
+    private QueueStrategy queueStrategy = QueueStrategy.ACCEPT_NULL;
+    private int timeout = 1;
 
-    /**
-     * Creates an BaseConsumer instance. This constructor requires an {@link BaseConsumerConfig} annotation.
-     */
-    public BaseConsumer() {
-        BaseConsumerConfig baseConsumerConfig = ClusterWorkerUtils.verifyMandatoryAnotation(this, BaseConsumerConfig.class);
-        init(baseConsumerConfig.queueName(), baseConsumerConfig.strategy(), baseConsumerConfig.timeout());
-    }
-
-    public BaseConsumer(String queueName, QueueStrategy queueStrategy, int timeout) {
-        init(queueName, queueStrategy, timeout);
-    }
-
-    private void init(String queueName, QueueStrategy queueStrategy, int timeout) {
-        this.queueName = queueName;
-        this.queueStrategy = queueStrategy;
-        this.timeout = timeout;
-    }
+    public HazelcastQueueeConsumer(String queueName) {
+		this.queueName = queueName;
+	}
+    
+	public HazelcastQueueeConsumer(String queueName, QueueStrategy queueStrategy) {
+		this.queueName = queueName;
+		this.queueStrategy = queueStrategy;
+	}
+    
+	public HazelcastQueueeConsumer(String queueName, QueueStrategy queueStrategy, int timeout) {
+		this.queueName = queueName;
+		this.queueStrategy = queueStrategy;
+		this.timeout = timeout;
+	}
 
     @Override
     public T consume() {

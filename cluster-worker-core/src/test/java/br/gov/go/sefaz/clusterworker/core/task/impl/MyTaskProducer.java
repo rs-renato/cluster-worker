@@ -6,15 +6,15 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import br.gov.go.sefaz.clusterworker.core.TaskProduce;
-import br.gov.go.sefaz.clusterworker.core.annotations.TaskProduceConfig;
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
+import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
+import br.gov.go.sefaz.clusterworker.core.task.annotation.TaskProduceConfig;
 
 /**
  * Created by renato-rs on 11/10/2016.
  */
 @TaskProduceConfig(queueName = TestConstants.TASK_QUEUE, frequency = TestConstants.TASK_PRODUCE_FREQUENCY)
-public class MyTaskProducer implements TaskProduce<Integer> {
+public class MyTaskProducer implements TaskProducer<Integer> {
 
 	private static final long serialVersionUID = 3936335122592593550L;
 	private static final Logger logger = Logger.getLogger(MyTaskProducer.class);

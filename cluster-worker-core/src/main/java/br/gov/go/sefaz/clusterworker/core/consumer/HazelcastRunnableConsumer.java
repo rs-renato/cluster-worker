@@ -6,25 +6,25 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
-import br.gov.go.sefaz.clusterworker.core.TaskProcess;
+import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
 import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
 
 /**
- * Worker consumer implementation. This class consume from {@link TaskProcess} client's implementation.
+ * Worker consumer implementation. This class consume from {@link TaskProcessor} client's implementation.
  * The role cycle of this core is controled by {@link ClusterWorker}.
  * @param <T> Type of this core consumer.
  */
-public final class WorkerConsumer<T> extends BaseConsumer<T> implements HazelcastInstanceAware, Runnable{
+public final class HazelcastRunnableConsumer<T> extends HazelcastQueueeConsumer<T> implements Runnable, HazelcastInstanceAware{
 
 	private static final long serialVersionUID = 5404415194904610053L;
-	private static final transient Logger logger = Logger.getLogger(WorkerConsumer.class);
+	private static final transient Logger logger = Logger.getLogger(HazelcastRunnableConsumer.class);
     public static boolean stop;
 
-    private TaskProcess<T> taskProcess;
+    private TaskProcessor<T> taskProcessor;
 
-    public WorkerConsumer(TaskProcess<T> taskProcess, String queueName, QueueStrategy queueStrategy, int timeout) {
+    public HazelcastRunnableConsumer(TaskProcessor<T> taskProcess, String queueName, QueueStrategy queueStrategy, int timeout) {
         super(queueName, queueStrategy, timeout);
-        this.taskProcess = taskProcess;
+        this.taskProcessor = taskProcess;
     }
 
     @Override
@@ -42,7 +42,7 @@ public final class WorkerConsumer<T> extends BaseConsumer<T> implements Hazelcas
 
                 try{
 
-                	taskProcess.process(type);
+                	taskProcessor.process(type);
 
                 }catch (Exception e){
                     logger.error("Cannot process on client's implementation!", e);
