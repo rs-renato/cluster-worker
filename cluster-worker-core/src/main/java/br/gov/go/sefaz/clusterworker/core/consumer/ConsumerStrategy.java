@@ -1,11 +1,9 @@
-package br.gov.go.sefaz.clusterworker.core.utils;
-
-import br.gov.go.sefaz.clusterworker.core.consumer.Consumer;
+package br.gov.go.sefaz.clusterworker.core.consumer;
 
 /**
- * Queue strategy to the client's base {@link Consumer} implementation.
+ * Consummer queue strategy to the client's {@link Consumer} implementation.
  */
-public enum QueueStrategy {
+public enum ConsumerStrategy {
     /**
      * Accept null element from the queue. This is a non-blocking strategy.
      */

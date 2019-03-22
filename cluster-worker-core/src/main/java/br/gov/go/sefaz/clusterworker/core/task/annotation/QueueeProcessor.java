@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
+import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
 
 
 /**
@@ -13,7 +13,7 @@ import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface TaskProcessConfig {
+public @interface QueueeProcessor {
 
     /**
      * Queue name to the task process.
@@ -23,14 +23,14 @@ public @interface TaskProcessConfig {
 
     /**
      * Strategy to the task process.
-     * See: {@link QueueStrategy}
+     * See: {@link ConsumerStrategy}
      * @return strategy
      */
-    QueueStrategy strategy();
+    ConsumerStrategy consumerStrategy();
 
     /**
      * Timeout of execution (in seconds) to the task process.
-     * If the {@link QueueStrategy#WAIT_ON_AVAILABLE} is defined, this property there is
+     * If the {@link ConsumerStrategy#WAIT_ON_AVAILABLE} is defined, this property there is
      * no behavior, since this strategy is blocking. The default vaule is 01 second.
      * @return timeout
      */

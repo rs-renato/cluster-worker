@@ -1,4 +1,4 @@
-package br.gov.go.sefaz.clusterworker.core.utils;
+package br.gov.go.sefaz.clusterworker.core.support;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -10,21 +10,21 @@ import org.apache.log4j.Logger;
 /**
  * Property class utility.
  */
-public class Property{
+public class PropertyFile{
 
-    private static final Logger logger = Logger.getLogger(Property.class);
+    private static final Logger logger = Logger.getLogger(PropertyFile.class);
 
     private static final Map<Class<?>, Method> mapMethod = new HashMap<Class<?>, Method>();
     private static final Map<String, Object> mapCached = new HashMap<String,Object>();
 
     private final Properties properties;
 
-    public Property(Properties properties) {
+    public PropertyFile(Properties properties) {
         this.properties = properties;
     }
 
     /**
-     * Return a specified property from this {@link Property}
+     * Return a specified property from this {@link PropertyFile}
      * @param propertyName name of the property to be load form property file.
      * @param type of this property to be casted.
      * @return property if it exist.
@@ -43,7 +43,7 @@ public class Property{
     }
 
     /**
-     * Return a specified property from this {@link Property}
+     * Return a specified property from this {@link PropertyFile}
      * @param propertyName name of the property to be load form property file.
      * @return property if it exist.
      */
@@ -52,7 +52,7 @@ public class Property{
     }
 
     /**
-     * Return a specified property from this {@link Property}
+     * Return a specified property from this {@link PropertyFile}
      * @param propertyName name of the property to be load form property file.
      * @param type of this property to be casted.
      * @return property if it exist.

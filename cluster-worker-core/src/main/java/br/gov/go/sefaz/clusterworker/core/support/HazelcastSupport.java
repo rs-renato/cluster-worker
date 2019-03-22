@@ -1,4 +1,4 @@
-package br.gov.go.sefaz.clusterworker.core.utils;
+package br.gov.go.sefaz.clusterworker.core.support;
 
 import java.util.Set;
 
@@ -13,19 +13,19 @@ import com.hazelcast.core.HazelcastInstance;
 /**
  * Hazelcast utility class configuration.
  */
-public final class HazelcastUtils {
+public final class HazelcastSupport {
 
-    private static final Logger logger = Logger.getLogger(HazelcastUtils.class);
-    private static final Property property = PropertyUtils.getProperties("cw-config");
+    private static final Logger logger = Logger.getLogger(HazelcastSupport.class);
+    private static final PropertyFile propertyFile = PropertySupport.getPropertyFile("cw-config");
 
-    private static final HazelcastUtils instance = new HazelcastUtils();
+    private static final HazelcastSupport instance = new HazelcastSupport();
     private static HazelcastInstance hazelcastInstance;
 
-    private HazelcastUtils() {
+    private HazelcastSupport() {
         hazelcastInstance = Hazelcast.newHazelcastInstance(getConfig());
     }
 
-    public static HazelcastUtils getInstance() {
+    public static HazelcastSupport getInstance() {
         return instance;
     }
 
@@ -48,11 +48,11 @@ public final class HazelcastUtils {
         Config config = new Config();
         config.setInstanceName("ClusterWorker");
 
-        int port = property.getProperty("cw.network.config.port", Integer.class);
-        int portCount = property.getProperty("cw.network.config.port.count", Integer.class);
+        int port = propertyFile.getProperty("cw.network.config.port", Integer.class);
+        int portCount = propertyFile.getProperty("cw.network.config.port.count", Integer.class);
 //        int queueMaxSizwe = property.getProperty("cw.queue.config.max.size", Integer.class);
-        boolean multicastEnabled = property.getProperty("cw.multicast.config.enabled", Boolean.class);
-        String multicastInterface = property.getProperty("cw.multicast.config.interface");
+        boolean multicastEnabled = propertyFile.getProperty("cw.multicast.config.enabled", Boolean.class);
+        String multicastInterface = propertyFile.getProperty("cw.multicast.config.interface");
 
         NetworkConfig networkConfig = config.getNetworkConfig();
 

@@ -21,11 +21,11 @@ public class ClusterWorkerTest {
 
         ClusterWorker<Integer> clusterWorker = ClusterWorkerFactory.getInstance().getClusterWorker(Integer.class);
 
-        clusterWorker.executeTaskProccess(taskProcessUnlockable);
-        clusterWorker.executeTaskProduce(taskProduce);
+        clusterWorker.executeTaskProccessor(taskProcessUnlockable);
+        clusterWorker.executeTaskProducer(taskProduce);
 
         //executes for 10s
-        Thread.sleep(10 * 1000);
+        Thread.sleep(60 * 1000);
 
         clusterWorker.shutDownAll();
     }

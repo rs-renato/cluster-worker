@@ -6,25 +6,23 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.IQueue;
-
-import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
 
 /**
  * Base class for {@Producer} implementation.
  * @param <T> type of this base producer.
  */
-public class HazelcastQueueeProducer<T> implements Producer<T>, Serializable {
+public class HazelcastQueueeProducer<T> implements Producer<T>, Serializable, HazelcastInstanceAware {
 
-	static final long serialVersionUID = -3706506746207926465L;
-
+	private static final long serialVersionUID = -3706506746207926465L;
 	private static final transient Logger logger = Logger.getLogger(HazelcastQueueeProducer.class);
 
-    protected transient HazelcastInstance hazelcastInstance = HazelcastUtils.getInstance().getHazelcastInstance();
-
+    protected transient HazelcastInstance hazelcastInstance;
     private String queueName;
 
-    public HazelcastQueueeProducer(String queueName) {
+    public HazelcastQueueeProducer(HazelcastInstance hazelcastInstance, String queueName) {
+    	this.hazelcastInstance = hazelcastInstance;
     	this.queueName = queueName;
     }
 
@@ -43,6 +41,7 @@ public class HazelcastQueueeProducer<T> implements Producer<T>, Serializable {
 
             } catch (InterruptedException e) {
                 logger.error(String.format("Cannot produce to hazelcast %s queue!", queueName), e);
+                Thread.currentThread().interrupt();
             }
         }
     }
@@ -55,10 +54,9 @@ public class HazelcastQueueeProducer<T> implements Producer<T>, Serializable {
     public String getQueueName() {
         return queueName;
     }
-
-    public void shutdown(){
-        if (hazelcastInstance.getLifecycleService().isRunning()){
-            hazelcastInstance.shutdown();
-        }
+    
+    @Override
+    public void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
+        this.hazelcastInstance = hazelcastInstance;
     }
 }

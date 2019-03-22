@@ -5,39 +5,40 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.IQueue;
-
-import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
-import br.gov.go.sefaz.clusterworker.core.utils.QueueStrategy;
 
 /**
  * Base class for {@link Consumer} implementation.
  * @param <T> type of this base consumer.
  */
-public class HazelcastQueueeConsumer<T> implements Consumer<T>, Serializable{
+public class HazelcastQueueeConsumer<T> implements Consumer<T>, Serializable, HazelcastInstanceAware{
 
 	private static final transient Logger logger = Logger.getLogger(HazelcastQueueeConsumer.class);
 
 	private static final long serialVersionUID = 4384549432295630459L;
 
-    protected transient HazelcastInstance hazelcastInstance = HazelcastUtils.getInstance().getHazelcastInstance();
+    protected transient HazelcastInstance hazelcastInstance;
 
     private String queueName;
-    private QueueStrategy queueStrategy = QueueStrategy.ACCEPT_NULL;
+    private ConsumerStrategy consumerStrategy = ConsumerStrategy.ACCEPT_NULL;
     private int timeout = 1;
 
-    public HazelcastQueueeConsumer(String queueName) {
+    public HazelcastQueueeConsumer(HazelcastInstance hazelcastInstance, String queueName) {
+    	this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
 	}
     
-	public HazelcastQueueeConsumer(String queueName, QueueStrategy queueStrategy) {
+	public HazelcastQueueeConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy) {
+		this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
-		this.queueStrategy = queueStrategy;
+		this.consumerStrategy = consumerStrategy;
 	}
     
-	public HazelcastQueueeConsumer(String queueName, QueueStrategy queueStrategy, int timeout) {
+	public HazelcastQueueeConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
+		this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
-		this.queueStrategy = queueStrategy;
+		this.consumerStrategy = consumerStrategy;
 		this.timeout = timeout;
 	}
 
@@ -49,9 +50,9 @@ public class HazelcastQueueeConsumer<T> implements Consumer<T>, Serializable{
             IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
             //Waits on take() only if strategy is {@link QueueStrategy#WAIT_ON_AVAILABLE}.
-            Thread.sleep(QueueStrategy.ACCEPT_NULL.equals(queueStrategy) && iQueue.isEmpty() ? timeout * 1000 : 0);
+            Thread.sleep(ConsumerStrategy.ACCEPT_NULL.equals(consumerStrategy) && iQueue.isEmpty() ? timeout * 1000 : 0);
 
-            T type = QueueStrategy.ACCEPT_NULL.equals(queueStrategy) ? iQueue.poll() : iQueue.take();
+            T type = ConsumerStrategy.ACCEPT_NULL.equals(consumerStrategy) ? iQueue.poll() : iQueue.take();
 
             logger.debug(String.format("Consume type %s from hazelcast queue.", type));
 
@@ -59,6 +60,7 @@ public class HazelcastQueueeConsumer<T> implements Consumer<T>, Serializable{
 
         } catch (InterruptedException e) {
             logger.error(String.format("Cannot consume the hazelcast %s queue!", queueName), e);
+            Thread.currentThread().interrupt();
         }
 
         return null;
@@ -76,8 +78,8 @@ public class HazelcastQueueeConsumer<T> implements Consumer<T>, Serializable{
      * Return the queueStrategy of this base consumer.
      * @return queueStrategy
      */
-    public QueueStrategy getQueueStrategy() {
-        return queueStrategy;
+    public ConsumerStrategy getQueueStrategy() {
+        return consumerStrategy;
     }
 
     /**
@@ -87,10 +89,9 @@ public class HazelcastQueueeConsumer<T> implements Consumer<T>, Serializable{
     public int getTimeout() {
         return timeout;
     }
-
-    public void shutdown(){
-        if (hazelcastInstance.getLifecycleService().isRunning()){
-            hazelcastInstance.shutdown();
-        }
+    
+    @Override
+    public void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
+        this.hazelcastInstance = hazelcastInstance;
     }
 }

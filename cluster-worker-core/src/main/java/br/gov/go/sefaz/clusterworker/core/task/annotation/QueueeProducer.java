@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface TaskProduceConfig {
+public @interface QueueeProducer {
 
     /**
      * Queue name to the task produce.

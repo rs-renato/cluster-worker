@@ -15,13 +15,12 @@ import com.hazelcast.core.Member;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastRunnableConsumer;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
+import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
+import br.gov.go.sefaz.clusterworker.core.support.PropertySupport;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
-import br.gov.go.sefaz.clusterworker.core.task.annotation.TaskProcessConfig;
-import br.gov.go.sefaz.clusterworker.core.task.annotation.TaskProduceConfig;
-import br.gov.go.sefaz.clusterworker.core.utils.ClusterWorkerUtils;
-import br.gov.go.sefaz.clusterworker.core.utils.HazelcastUtils;
-import br.gov.go.sefaz.clusterworker.core.utils.PropertyUtils;
+import br.gov.go.sefaz.clusterworker.core.task.annotation.QueueeProcessor;
+import br.gov.go.sefaz.clusterworker.core.task.annotation.QueueeProducer;
 
 /**
  * Central core to manage hazelcast executor services and it's lifecycle.
@@ -31,58 +30,61 @@ public final class ClusterWorker<T> {
 
     private static final Logger logger = Logger.getLogger(ClusterWorker.class);
 
-    private HazelcastUtils hazelcastUtils = HazelcastUtils.getInstance();
-    private HazelcastInstance hazelcastInstance = hazelcastUtils.getHazelcastInstance();
-
-    private final IExecutorService executorService = hazelcastInstance.getExecutorService(PropertyUtils.getProperties("cw-config").getProperty("cw.service.task"));
+    private HazelcastInstance hazelcastInstance;
+    private final IExecutorService executorService;
     private final ClusterWorkerFactory clusterWorkerFactory = ClusterWorkerFactory.getInstance();
-    private Map<TaskProducer<T>, Timer> timerMap = new HashMap<TaskProducer<T>, Timer>();
+    private Map<TaskProducer<T>, Timer> taskProducerTimerMap = new HashMap<TaskProducer<T>, Timer>();
 
+    public ClusterWorker(HazelcastInstance hazelcastInstance) {
+    	this.hazelcastInstance = hazelcastInstance;
+    	this.executorService = hazelcastInstance.getExecutorService(PropertySupport.getPropertyFile("cw-config").getProperty("cw.service.task"));
+    }
+    
     /**
      * Execute a {@link TaskProcessor} client's implementation on hazelcast executor service.
-     * @param taskProcess implementation of client task.
+     * @param taskProcessor implementation of client task.
      */
-    public void executeTaskProccess(TaskProcessor<T> taskProcess){
+    public void executeTaskProccessor(TaskProcessor<T> taskProcessor){
 
-        TaskProcessConfig taskProcessConfig = ClusterWorkerUtils.verifyMandatoryAnotation(taskProcess, TaskProcessConfig.class);
+        QueueeProcessor queueeProcessor = AnnotationSupport.assertMandatoryAnotation(taskProcessor, QueueeProcessor.class);
 
-        int workers = taskProcessConfig.workers();
+        int workers = queueeProcessor.workers();
 
-        logger.info(String.format("Executing task process (%s core(s)) implentation on hazelcast executor service.", workers));
+        logger.info(String.format("Executing task processor (%s core(s)) implentation on hazelcast executor service.", workers));
 
         for (int i = 0; i <  workers; i++) {
 
             try {
-                executorService.executeOnMember(clusterWorkerFactory.getWorkerConsumer(taskProcess), getLocalMember());
+                executorService.executeOnMember(clusterWorkerFactory.getHazelcastRunnableConsumer(taskProcessor), getLocalMember());
             }catch (Exception e){
-                logger.error(String.format("Cannot execute a TaskProcess on hazelcast executor service! %s", e.getMessage()));
+                logger.error(String.format("Cannot execute a TaskProcessor on hazelcast executor service! %s", e.getMessage()));
             }
         }
     }
 
     /**
      * Execute a {@link TaskProducer} client's implementation on hazelcast executor service.
-     * @param taskProduce implementation of client task.
+     * @param taskProducer implementation of client task.
      */
-    public void executeTaskProduce(final TaskProducer<T> taskProduce){
+    public void executeTaskProducer(final TaskProducer<T> taskProducer){
 
-        final HazelcastRunnableProducer<T> workerProducer = clusterWorkerFactory.getWorkerProducer(taskProduce);
+        final HazelcastRunnableProducer<T> hazelcastRunnableProducer = clusterWorkerFactory.getHazelcastRunnableProducer(taskProducer);
 
-        final TaskProduceConfig taskProduceConfig = ClusterWorkerUtils.verifyMandatoryAnotation(taskProduce, TaskProduceConfig.class);
+        final QueueeProducer queueeProducer = AnnotationSupport.assertMandatoryAnotation(taskProducer, QueueeProducer.class);
 
-        int frequency = taskProduceConfig.frequency();
+        int frequency = queueeProducer.frequency();
 
-        Timer timerTask = new Timer();
+        Timer timerTaskProducer = new Timer();
 
-        logger.info(String.format("Executing task produce implentation on hazelcast executor service with frequency %s second.", frequency));
+        logger.info(String.format("Executing task producer implentation on hazelcast executor service with frequency %s second.", frequency));
 
-        timerTask.scheduleAtFixedRate(
+        timerTaskProducer.scheduleAtFixedRate(
 
                 new TimerTask() {
                     @Override
                     public void run() {
 
-                        String queueName = taskProduceConfig.queueName();
+                        String queueName = queueeProducer.queueName();
 
                         logger.info(String.format("Hazelcast queue %s size: %s", queueName, hazelcastInstance.getQueue(queueName).size()));
 
@@ -94,12 +96,12 @@ public final class ClusterWorker<T> {
 
                                 try {
 
-                                    logger.debug("Executing task produce implementation on hazelcast executor service.");
+                                    logger.debug("Executing task producer implementation on hazelcast executor service.");
 
-                                    executorService.execute(workerProducer);
+                                    executorService.execute(hazelcastRunnableProducer);
 
                                 } catch (Exception e) {
-                                    logger.error(String.format("Cannot execute a TaskProduce on hazelcast executor service! %s", e.getMessage()));
+                                    logger.error(String.format("Cannot execute a TaskProducer on hazelcast executor service! %s", e.getMessage()));
                                 }
                             }
                         }
@@ -109,7 +111,7 @@ public final class ClusterWorker<T> {
                 TimeUnit.MILLISECONDS.convert(frequency, TimeUnit.SECONDS)
         );
 
-        timerMap.put(taskProduce, timerTask);
+        taskProducerTimerMap.put(taskProducer, timerTaskProducer);
     }
 
     /**
@@ -130,13 +132,13 @@ public final class ClusterWorker<T> {
 
     /**
      * Shutdown an specified timer {@link TaskProducer}
-     * @param taskProduce to be canceled.
+     * @param taskProducer to be canceled.
      */
-    public void shutDownTask(TaskProducer<T> taskProduce){
+    public void shutDownTask(TaskProducer<T> taskProducer){
 
-        if (timerMap.containsKey(taskProduce)){
-            logger.warn("Shuttingdown TaskProduce!");
-            timerMap.get(taskProduce).cancel();
+        if (taskProducerTimerMap.containsKey(taskProducer)){
+            logger.warn("Shutting down TaskProducer!");
+            taskProducerTimerMap.get(taskProducer).cancel();
         }
     }
 
@@ -145,9 +147,9 @@ public final class ClusterWorker<T> {
      */
     public void shutDownAll(){
 
-        logger.warn("Shuttingdown entire ClusterWorker!");
+        logger.warn("Shutting down entire ClusterWorker!");
 
-        for (Timer timer: timerMap.values()){
+        for (Timer timer: taskProducerTimerMap.values()){
             timer.cancel();
             logger.warn("Timer canceled: " + timer.toString());
         }
