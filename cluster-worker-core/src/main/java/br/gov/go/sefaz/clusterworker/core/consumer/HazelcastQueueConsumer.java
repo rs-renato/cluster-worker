@@ -1,6 +1,7 @@
 package br.gov.go.sefaz.clusterworker.core.consumer;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -9,12 +10,14 @@ import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.IQueue;
 
 /**
- * Base class for {@link Consumer} implementation.
- * @param <T> type of this base consumer.
+ * Base implementation for Hazelcast Queue Consumer.
+ * @author renato-rs
+ * @since 1.0
+ * @param <T> type of data to be consummed by this queue.
  */
-public class HazelcastQueueeConsumer<T> implements Consumer<T>, Serializable, HazelcastInstanceAware{
+public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, HazelcastInstanceAware{
 
-	private static final transient Logger logger = Logger.getLogger(HazelcastQueueeConsumer.class);
+	private static final transient Logger logger = Logger.getLogger(HazelcastQueueConsumer.class);
 
 	private static final long serialVersionUID = 4384549432295630459L;
 
@@ -24,18 +27,18 @@ public class HazelcastQueueeConsumer<T> implements Consumer<T>, Serializable, Ha
     private ConsumerStrategy consumerStrategy = ConsumerStrategy.ACCEPT_NULL;
     private int timeout = 1;
 
-    public HazelcastQueueeConsumer(HazelcastInstance hazelcastInstance, String queueName) {
+    public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName) {
     	this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
 	}
     
-	public HazelcastQueueeConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy) {
+	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy) {
 		this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
 		this.consumerStrategy = consumerStrategy;
 	}
     
-	public HazelcastQueueeConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
+	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
 		this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
 		this.consumerStrategy = consumerStrategy;
@@ -49,10 +52,8 @@ public class HazelcastQueueeConsumer<T> implements Consumer<T>, Serializable, Ha
 
             IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
-            //Waits on take() only if strategy is {@link QueueStrategy#WAIT_ON_AVAILABLE}.
-            Thread.sleep(ConsumerStrategy.ACCEPT_NULL.equals(consumerStrategy) && iQueue.isEmpty() ? timeout * 1000 : 0);
-
-            T type = ConsumerStrategy.ACCEPT_NULL.equals(consumerStrategy) ? iQueue.poll() : iQueue.take();
+            //Blocking on take() only if strategy is {@link QueueStrategy#WAIT_ON_AVAILABLE}, otherwise, wait until timeout.
+            T type = ConsumerStrategy.ACCEPT_NULL.equals(consumerStrategy) ? iQueue.poll(timeout, TimeUnit.SECONDS) : iQueue.take();
 
             logger.debug(String.format("Consume type %s from hazelcast queue.", type));
 

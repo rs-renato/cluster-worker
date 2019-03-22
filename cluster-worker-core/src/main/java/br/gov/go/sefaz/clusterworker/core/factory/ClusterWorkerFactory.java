@@ -3,14 +3,17 @@ package br.gov.go.sefaz.clusterworker.core.factory;
 import com.hazelcast.core.HazelcastInstance;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
+import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
+import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
+import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
+import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueConsumer;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastRunnableConsumer;
+import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
-import br.gov.go.sefaz.clusterworker.core.task.annotation.QueueeProcessor;
-import br.gov.go.sefaz.clusterworker.core.task.annotation.QueueeProducer;
 
 /**
  * Factory for create Workers and Standalones objects.
@@ -42,9 +45,9 @@ public class ClusterWorkerFactory {
      */
     public <T> HazelcastRunnableConsumer<T> getHazelcastRunnableConsumer(TaskProcessor<T> taskProcessor){
 
-        QueueeProcessor queueeProcessor = AnnotationSupport.assertMandatoryAnotation(taskProcessor, QueueeProcessor.class);
+        ConsumeFromQueue consumeFromQueue = AnnotationSupport.assertMandatoryAnnotation(taskProcessor, ConsumeFromQueue.class);
 
-        return new HazelcastRunnableConsumer<T>(taskProcessor, hazelcastInstance, queueeProcessor.queueName(), queueeProcessor.consumerStrategy(), queueeProcessor.timeout());
+        return new HazelcastRunnableConsumer<T>(taskProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
     }
 
     /**
@@ -54,11 +57,19 @@ public class ClusterWorkerFactory {
      */
     public <T> HazelcastRunnableProducer<T> getHazelcastRunnableProducer(TaskProducer<T> taskProducer){
 
-        QueueeProducer queueeProducer = AnnotationSupport.assertMandatoryAnotation(taskProducer, QueueeProducer.class);
+        ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(taskProducer, ProduceToQueue.class);
 
-        return new HazelcastRunnableProducer<T>(taskProducer, hazelcastInstance, queueeProducer.queueName());
+        return new HazelcastRunnableProducer<T>(taskProducer, hazelcastInstance, produceToQueue.queueName());
+    }
+
+    public <T> HazelcastQueueProducer<T> getHazelcastQueueProducer(String queueName){
+    	return new HazelcastQueueProducer<>(hazelcastInstance, queueName);
     }
     
+    public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, ConsumerStrategy consumerStrategy, int timeout){
+    	return new HazelcastQueueConsumer<>(hazelcastInstance, queueName, consumerStrategy, timeout);
+    }
+
     public HazelcastInstance getHazelcastinstance() {
 		return hazelcastInstance;
 	}

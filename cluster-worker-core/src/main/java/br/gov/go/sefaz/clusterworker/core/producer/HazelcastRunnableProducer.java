@@ -14,7 +14,7 @@ import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
  * The role cycle of this core is controled by {@link ClusterWorker}.
  * @param <T> type of thos core producer.
  */
-public final class HazelcastRunnableProducer<T>  extends HazelcastQueueeProducer<T> implements Runnable{
+public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<T> implements Runnable{
 
 	private static final long serialVersionUID = 2538609461091747126L;
 

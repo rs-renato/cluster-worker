@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import com.hazelcast.core.HazelcastInstance;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
+import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
 
 /**
@@ -12,11 +13,12 @@ import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
  * The role cycle of this core is controled by {@link ClusterWorker}.
  * @param <T> Type of this core consumer.
  */
-public final class HazelcastRunnableConsumer<T> extends HazelcastQueueeConsumer<T> implements Runnable{
+public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T> implements Runnable, ShutdownListener{
 
 	private static final long serialVersionUID = 5404415194904610053L;
 	private static final transient Logger logger = Logger.getLogger(HazelcastRunnableConsumer.class);
-    public static boolean stop;
+    
+	private boolean stopped;
 
     private TaskProcessor<T> taskProcessor;
 
@@ -30,7 +32,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueeConsumer<
 
         logger.info("Starting WorkerConsumer!");
 
-        while(!stop) {
+        while(isRunning()) {
 
             logger.debug(String.format("Processing on the client's implementation. Strategy defined to %s.", getQueueStrategy()));
 
@@ -50,4 +52,14 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueeConsumer<
 
         logger.warn("Finishing WorkerConsumer!");
     }
+    
+    public boolean isRunning() {
+    	return !this.stopped;
+    }
+
+	@Override
+	public void shutdown() {
+		logger.warn(String.format("Shutting down HazelcastRunnableConsumer - Thread '%s'", Thread.currentThread().getName()));
+		this.stopped = true;
+	}
 }

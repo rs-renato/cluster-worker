@@ -13,15 +13,15 @@ import com.hazelcast.core.IQueue;
  * Base class for {@Producer} implementation.
  * @param <T> type of this base producer.
  */
-public class HazelcastQueueeProducer<T> implements Producer<T>, Serializable, HazelcastInstanceAware {
+public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, HazelcastInstanceAware {
 
 	private static final long serialVersionUID = -3706506746207926465L;
-	private static final transient Logger logger = Logger.getLogger(HazelcastQueueeProducer.class);
+	private static final transient Logger logger = Logger.getLogger(HazelcastQueueProducer.class);
 
     protected transient HazelcastInstance hazelcastInstance;
     private String queueName;
 
-    public HazelcastQueueeProducer(HazelcastInstance hazelcastInstance, String queueName) {
+    public HazelcastQueueProducer(HazelcastInstance hazelcastInstance, String queueName) {
     	this.hazelcastInstance = hazelcastInstance;
     	this.queueName = queueName;
     }
