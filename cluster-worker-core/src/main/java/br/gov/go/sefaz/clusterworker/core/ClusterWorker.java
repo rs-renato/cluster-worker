@@ -51,13 +51,14 @@ public final class ClusterWorker<T> {
      * @param taskProcessor implementation of client task.
      */
     public void executeTaskProccessor(TaskProcessor<T> taskProcessor){
-
+    	//Assert mandatory exception to create an TaskProcessor
         ConsumeFromQueue consumeFromQueue = AnnotationSupport.assertMandatoryAnnotation(taskProcessor, ConsumeFromQueue.class);
 
         int workers = consumeFromQueue.workers();
 
         logger.info(String.format("Executing TaskProcessor (%s worker(s)) implementation on hazelcast executor service.", workers));
 
+        // Creates worker (HazelcastRunnableConsumer)
         for (int i = 1; i <=  workers; i++) {
 
             try {
@@ -78,7 +79,7 @@ public final class ClusterWorker<T> {
      * @param taskProducer implementation of client task.
      */
     public void executeTaskProducer(final TaskProducer<T> taskProducer){
-
+    	//Assert mandatory exception to create an TaskProducer
     	final ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(taskProducer, ProduceToQueue.class);
 
     	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(hazelcastInstance).getHazelcastRunnableProducer(taskProducer);
@@ -89,6 +90,7 @@ public final class ClusterWorker<T> {
 
         logger.info(String.format("Executing TaskProducer implementation on hazelcast executor service with frequency of %s second.", frequency));
 
+        // Create a fixed rate timer 
         timerTaskProducer.scheduleAtFixedRate(
 
                 new TimerTask() {
@@ -99,16 +101,16 @@ public final class ClusterWorker<T> {
 
                         logger.info(String.format("Hazelcast queue %s size: %s", queueName, hazelcastInstance.getQueue(queueName).size()));
 
+                        // Execute task producer only if the queue has none elements to be processed
                         if (hazelcastInstance.getQueue(queueName).isEmpty()) {
 
                             boolean isLocalMember = isLocalMember();
 
+                            // Execute the task just on the local members
                             if (isLocalMember) {
 
                                 try {
-
                                     logger.debug("Executing TaskProducer implementation on hazelcast executor service.");
-
                                     hazelcastInstance
                                     	.getExecutorService(ClusterWorkerConstants.CW_SERVICE_TASK_NAME)
                                     	.execute(hazelcastRunnableProducer);
