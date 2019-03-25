@@ -1,7 +1,7 @@
 package br.gov.go.sefaz.clusterworker.core.consumer;
 
 /**
- * Contract to consumer implementations.
+ * Contract to consumers implementations.
  * @author renato-rs
  * @since 1.0
  * @param <T> type of data to be consummed by this consumer.
@@ -9,8 +9,8 @@ package br.gov.go.sefaz.clusterworker.core.consumer;
 public interface Consumer<T> {
 
     /**
-     * Consume the type of T.
-     * @return T
+     * Consumes the type of T.
+     * @return T type
      */
     T consume();
 }

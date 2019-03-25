@@ -4,14 +4,14 @@ import org.apache.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 
-import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
 
 /**
- * Worker consumer implementation. This class consume from {@link TaskProcessor} client's implementation.
- * The role cycle of this core is controled by {@link ClusterWorker}.
- * @param <T> Type of this core consumer.
+ * Runnable of {@link HazelcastQueueConsumer}, responsible for process {@link TaskProcessor} client's implementation.
+ * @author renato-rs
+ * @since 1.0
+ * @param <T> type which this runnable will handle.
  */
 public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T> implements Runnable, ShutdownListener{
 
@@ -22,6 +22,14 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
 
     private TaskProcessor<T> taskProcessor;
 
+    /**
+     * Constructor of HazelcastRunnableConsumer
+     * @param taskProcessor TaskProcessor client's implementation.
+     * @param hazelcastInstance instance of hazelcast.
+     * @param queueName queue name
+     * @param consumerStrategy Consummer queue strategy
+     * @param timeout Timeout of execution (in seconds) to the task processor before to return null on queue consumption.
+     */
     public HazelcastRunnableConsumer(TaskProcessor<T> taskProcessor, HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
         super(hazelcastInstance, queueName, consumerStrategy, timeout);
         this.taskProcessor = taskProcessor;
@@ -32,16 +40,19 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
 
         logger.info("Starting WorkerConsumer!");
 
+        // Run this thread untill shutdown is called
         while(isRunning()) {
 
             logger.debug(String.format("Processing on the client's implementation. Strategy defined to %s.", getQueueStrategy()));
 
+            // Consumes from hazecast queue
             T type = consume();
 
+            //TODO: Verifies if should call process a null type
             if (type!= null){
 
                 try{
-
+                	// Proccess item on client's implementation
                 	taskProcessor.process(type);
 
                 }catch (Exception e){
@@ -53,6 +64,10 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
         logger.warn("Finishing WorkerConsumer!");
     }
     
+    /**
+     * Verifies if this runnable is running.
+     * @return <code>true</code> if thread is running, <code>false</code> otherwise.
+     */
     public boolean isRunning() {
     	return !this.stopped;
     }

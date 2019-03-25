@@ -4,9 +4,16 @@ import java.io.Serializable;
 import java.util.Collection;
 
 /**
- * Markup class to {@link TaskProducer} specializations.
- * @param <T> type of this type produce.
+ * Contract to task producer implementations.
+ * @author renato-rs
+ * @since 1.0
+ * @param <T> type of data to be produced by this producer.
  */
 public interface TaskProducer<T> extends Serializable {
+	
+	/**
+	 * Produces items
+	 * @return collection of item produced
+	 */
 	Collection<T> produce();
 }
