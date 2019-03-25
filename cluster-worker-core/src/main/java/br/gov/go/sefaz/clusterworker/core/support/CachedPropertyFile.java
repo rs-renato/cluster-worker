@@ -1,5 +1,6 @@
 package br.gov.go.sefaz.clusterworker.core.support;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,23 +9,29 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 /**
- * Property class utility.
+ * CachedPropertyFile abstraction class.
+ * @author renato-rs
+ * @since 1.0
  */
-public class PropertyFile{
+class CachedPropertyFile{
 
-    private static final Logger logger = Logger.getLogger(PropertyFile.class);
+    private static final Logger logger = Logger.getLogger(CachedPropertyFile.class);
 
-    private static final Map<Class<?>, Method> mapMethod = new HashMap<Class<?>, Method>();
-    private static final Map<String, Object> mapCached = new HashMap<String,Object>();
+    private static final Map<Class<?>, Method> mapMethod = new HashMap<>();
+    private static final Map<String, Object> mapCached = new HashMap<>();
 
     private final Properties properties;
 
-    public PropertyFile(Properties properties) {
+    /**
+     * Constructor of CachedPropertyFile
+     * @param properties to be cached
+     */
+    public CachedPropertyFile(Properties properties) {
         this.properties = properties;
     }
 
     /**
-     * Return a specified property from this {@link PropertyFile}
+     * Return a specified property from this {@link CachedPropertyFile}
      * @param propertyName name of the property to be load form property file.
      * @param type of this property to be casted.
      * @return property if it exist.
@@ -32,10 +39,8 @@ public class PropertyFile{
     public <T> T getProperty(String propertyName, Class<T> type){
 
         try{
-
-           //Load from cache if it exist.
+           //Loads from cache if it exist.
            return getCachedProperty(propertyName, type);
-
         }catch (Exception e){
             logger.error(e);
         }
@@ -43,7 +48,7 @@ public class PropertyFile{
     }
 
     /**
-     * Return a specified property from this {@link PropertyFile}
+     * Return a specified property from this {@link CachedPropertyFile}
      * @param propertyName name of the property to be load form property file.
      * @return property if it exist.
      */
@@ -52,14 +57,17 @@ public class PropertyFile{
     }
 
     /**
-     * Return a specified property from this {@link PropertyFile}
+     * Return a specified property from this {@link CachedPropertyFile}
      * @param propertyName name of the property to be load form property file.
      * @param type of this property to be casted.
      * @return property if it exist.
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
+     * @throws NoSuchMethodException 
      * @throws Exception if cannot to load the property.
      */
     @SuppressWarnings("unchecked")
-    private <T> T getCachedProperty(String propertyName, Class<T> type) throws Exception {
+    private <T> T getCachedProperty(String propertyName, Class<T> type) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException  {
 
         if(!mapCached.containsKey(propertyName)){
 
@@ -70,7 +78,6 @@ public class PropertyFile{
 
             mapCached.put(propertyName, t);
         }
-
         return (T) mapCached.get(propertyName);
     }
 

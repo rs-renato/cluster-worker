@@ -16,7 +16,7 @@ import com.hazelcast.core.HazelcastInstance;
 public final class HazelcastSupport {
 
     private static final Logger logger = Logger.getLogger(HazelcastSupport.class);
-    private static final PropertyFile propertyFile = PropertySupport.getPropertyFile("cw-config");
+    private static final CachedPropertyFile cachedPropertyFile = CachedPropertyFileSupport.getCachedPropertyFile("cw-config");
 
     private static final HazelcastSupport instance = new HazelcastSupport();
     private static HazelcastInstance hazelcastInstance;
@@ -48,11 +48,11 @@ public final class HazelcastSupport {
         Config config = new Config();
         config.setInstanceName("ClusterWorker");
 
-        int port = propertyFile.getProperty("cw.network.config.port", Integer.class);
-        int portCount = propertyFile.getProperty("cw.network.config.port.count", Integer.class);
+        int port = cachedPropertyFile.getProperty("cw.network.config.port", Integer.class);
+        int portCount = cachedPropertyFile.getProperty("cw.network.config.port.count", Integer.class);
 //        int queueMaxSizwe = property.getProperty("cw.queue.config.max.size", Integer.class);
-        boolean multicastEnabled = propertyFile.getProperty("cw.multicast.config.enabled", Boolean.class);
-        String multicastInterface = propertyFile.getProperty("cw.multicast.config.interface");
+        boolean multicastEnabled = cachedPropertyFile.getProperty("cw.multicast.config.enabled", Boolean.class);
+        String multicastInterface = cachedPropertyFile.getProperty("cw.multicast.config.interface");
 
         NetworkConfig networkConfig = config.getNetworkConfig();
 

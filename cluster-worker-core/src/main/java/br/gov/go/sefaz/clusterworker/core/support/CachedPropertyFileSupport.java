@@ -9,19 +9,24 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 /**
- * Property class utility.
+ * CachedPropertyFile support class.
+ * @author renato-rs
+ * @since
  */
-public class PropertySupport {
+public class CachedPropertyFileSupport {
 
-    private static final Logger logger = Logger.getLogger(PropertySupport.class);
-    private static final Map<String, PropertyFile> propMap = new HashMap<String, PropertyFile>();
+    private static final Logger logger = Logger.getLogger(CachedPropertyFileSupport.class);
+    private static final Map<String, CachedPropertyFile> propMap = new HashMap<>();
 
+    private CachedPropertyFileSupport() {
+	}
+    
     /**
-     * Load a property file.
+     * Loads a cached property file.
      * @param fileName file name of this property.
-     * @return property
+     * @return cached property file
      */
-    public static PropertyFile getPropertyFile(String fileName){
+    public static CachedPropertyFile getCachedPropertyFile(String fileName){
 
         if (!propMap.containsKey(fileName)){
 
@@ -35,7 +40,7 @@ public class PropertySupport {
                 InputStream is = loader.getResourceAsStream(fileName + extension);
                 properties.load(is);
 
-                propMap.put(fileName, new PropertyFile(properties));
+                propMap.put(fileName, new CachedPropertyFile(properties));
 
             }catch (IOException e) {
                 logger.error("Cannot read resource: " + fileName,e);
