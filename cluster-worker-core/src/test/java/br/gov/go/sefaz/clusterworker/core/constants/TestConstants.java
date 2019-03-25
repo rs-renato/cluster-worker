@@ -7,9 +7,9 @@ public class TestConstants {
 
 	public static final String CW_QUEUE_NAME			= "myQueue";
     
-	public static final int CW_TASK_PRODUCER_QUANTITY	= 50;
-    public static final int CW_TASK_PRODUCER_FREQUENCY	= 5;
+	public static final int CW_TASK_PRODUCER_QUANTITY	= 100;
+    public static final int CW_TASK_PRODUCER_FREQUENCY	= 2;
     public static final int CW_TASK_PROCESSOR_WORKERS	= 2;
 
-    public static final int CW_QUEUEE_TIMEOUT	= 2;
+    public static final int CW_QUEUEE_TIMEOUT			= 1;
 }

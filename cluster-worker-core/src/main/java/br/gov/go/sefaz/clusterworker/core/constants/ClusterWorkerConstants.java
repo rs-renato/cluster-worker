@@ -15,4 +15,9 @@ public class ClusterWorkerConstants {
 	 * Defines the default Service Task Name
 	 */
     public static final String CW_SERVICE_TASK_NAME = "cw.service.task";
+    
+    /**
+     * Defines the default queue config name
+     */
+    public static final String CW_QUEUE_CONFIG_DEFAULT = "cw.queue.config.default";
 }

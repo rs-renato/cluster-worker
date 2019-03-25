@@ -24,13 +24,38 @@ import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
  */
 public class ClusterWorkerFactory {
 
-    private static final ClusterWorkerFactory instance = new ClusterWorkerFactory();
-    private static final HazelcastInstance hazelcastInstance = HazelcastSupport.getInstance().getHazelcastInstance();
+    private static ClusterWorkerFactory CLUSTER_WORKER_FACTORY_INSTANCE;
+    private final HazelcastInstance hazelcastInstance;
 
-    private ClusterWorkerFactory() {}
+    private ClusterWorkerFactory(HazelcastInstance hazelcastInstance) {
+    	this.hazelcastInstance = hazelcastInstance;
+    }
 
-    public static ClusterWorkerFactory getInstance() {
-        return instance;
+    /**
+     * Creates a new ClusterWorkerFactory instance from default hazelcast instance configuration.
+     * @return a ClusterWorkerFactory instance
+     */
+    public static synchronized ClusterWorkerFactory getInstance() {
+
+    	if (CLUSTER_WORKER_FACTORY_INSTANCE == null) {
+			CLUSTER_WORKER_FACTORY_INSTANCE = new ClusterWorkerFactory(HazelcastSupport.getDefaultHazelcastInstance());
+		}
+    	
+    	return CLUSTER_WORKER_FACTORY_INSTANCE;
+    }
+    
+    /**
+     * Creates a new ClusterWorkerFactory instance from hazelcast instance.
+     * @return a ClusterWorkerFactory instance
+     */
+
+    public static synchronized ClusterWorkerFactory getInstance(HazelcastInstance hazelcastInstance) {
+
+    	if (CLUSTER_WORKER_FACTORY_INSTANCE == null) {
+			CLUSTER_WORKER_FACTORY_INSTANCE = new ClusterWorkerFactory(hazelcastInstance);
+		}
+    	
+    	return CLUSTER_WORKER_FACTORY_INSTANCE;
     }
 
     /**
@@ -83,12 +108,4 @@ public class ClusterWorkerFactory {
     public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, ConsumerStrategy consumerStrategy, int timeout){
     	return new HazelcastQueueConsumer<>(hazelcastInstance, queueName, consumerStrategy, timeout);
     }
-
-    /**
-     * Retrieve the hazelcast instance used used by this factory
-     * @return hazelcast instance
-     */
-    public HazelcastInstance getHazelcastinstance() {
-		return hazelcastInstance;
-	}
 }

@@ -61,7 +61,7 @@ public final class ClusterWorker<T> {
         for (int i = 1; i <=  workers; i++) {
 
             try {
-            	HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance().getHazelcastRunnableConsumer(taskProcessor);
+            	HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance(hazelcastInstance).getHazelcastRunnableConsumer(taskProcessor);
                 logger.debug(String.format("Adding listener for worker %s..", i));
             	this.shutdownListeners.add(hazelcastRunnableConsumer);
 				hazelcastInstance
@@ -81,7 +81,7 @@ public final class ClusterWorker<T> {
 
     	final ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(taskProducer, ProduceToQueue.class);
 
-    	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance().getHazelcastRunnableProducer(taskProducer);
+    	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(hazelcastInstance).getHazelcastRunnableProducer(taskProducer);
 
         int frequency = produceToQueue.frequency();
 
