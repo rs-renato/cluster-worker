@@ -13,6 +13,7 @@ import org.junit.Test;
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
+import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 import br.gov.go.sefaz.clusterworker.core.task.IntegerTaskProducer;
 
 /**
@@ -38,7 +39,7 @@ public class HazelcastQueueConsumerTest {
 	public void testHazelcastQueueConsumerWaitOnAvailable() {
 
 		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = 
-				cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, ConsumerStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT); 
+				cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, QueueStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT); 
 				
 		Integer result;
 
@@ -51,7 +52,7 @@ public class HazelcastQueueConsumerTest {
 	public void testHazelcastQueueConsumerAcceptNull() {
 
 		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = 
-				cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, ConsumerStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT);
+				cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, QueueStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT);
 
 		int loop = TestConstants.CW_TASK_PRODUCER_QUANTITY * 5;
 

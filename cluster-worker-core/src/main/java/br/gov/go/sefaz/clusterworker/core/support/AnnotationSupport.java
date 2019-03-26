@@ -26,13 +26,15 @@ public class AnnotationSupport {
      * @throws MandatoryAnnotationException if the given type hasn't the specified annotation
      */
     public static  <T,A extends Annotation> A assertMandatoryAnnotation(T type, Class<A> annotationClass){
-    	logger.debug(String.format("Asserting if annotation '%s' is present on type '%s'", annotationClass, type));
+    	Class<? extends Object> clazz = type.getClass();
+
+    	String className = clazz.getName();
+		logger.debug(String.format("Asserting if annotation '%s' is present on type '%s'", annotationClass, className));
     	
-        Class<? extends Object> clazz = type.getClass();
 		A annotation = clazz.getAnnotation(annotationClass);
 
         if (annotation == null){
-            throw new MandatoryAnnotationException(String.format("Definition of '%s' annotation is expected on class '%s'!", annotationClass.getName(), clazz.getName()));
+            throw new MandatoryAnnotationException(String.format("Definition of '%s' annotation is expected on class '%s'!", annotationClass.getName(), className));
         }
 
         return annotation;

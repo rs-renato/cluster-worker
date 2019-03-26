@@ -5,11 +5,11 @@ package br.gov.go.sefaz.clusterworker.core.constants;
  */
 public class TestConstants {
 
-	public static final String CW_QUEUE_NAME			= "myQueue";
+	public static final String CW_QUEUE_NAME			= "cw.queue.test";
     
-	public static final int CW_TASK_PRODUCER_QUANTITY	= 100;
-    public static final int CW_TASK_PRODUCER_FREQUENCY	= 2;
-    public static final int CW_TASK_PROCESSOR_WORKERS	= 2;
+	public static final int CW_TASK_PRODUCER_QUANTITY	= 10;
+    public static final int CW_TASK_PRODUCER_FREQUENCY	= 30;
+    public static final int CW_TASK_PROCESSOR_WORKERS	= 1;
 
     public static final int CW_QUEUEE_TIMEOUT			= 1;
 }

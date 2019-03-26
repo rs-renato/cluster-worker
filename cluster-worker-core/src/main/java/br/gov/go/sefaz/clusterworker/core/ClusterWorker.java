@@ -20,6 +20,7 @@ import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastRunnableConsumer;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
+import br.gov.go.sefaz.clusterworker.core.queue.HazelcastQueueNameRoundRobin;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
@@ -85,25 +86,29 @@ public final class ClusterWorker<T> {
     	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(hazelcastInstance).getHazelcastRunnableProducer(taskProducer);
 
         int frequency = produceToQueue.frequency();
+        
+        String queueName = produceToQueue.queueName();
+        
+        HazelcastQueueNameRoundRobin hazelcastQueueNameRoundRobin = new HazelcastQueueNameRoundRobin(queueName);
 
         Timer timerTaskProducer = new Timer();
 
         logger.info(String.format("Executing TaskProducer implementation on hazelcast executor service with frequency of %s second.", frequency));
 
+        final int TIMER_DELAY = 0;
         // Create a fixed rate timer 
-        timerTaskProducer.scheduleAtFixedRate(
+		timerTaskProducer.scheduleAtFixedRate(
 
                 new TimerTask() {
                     @Override
                     public void run() {
 
-                        String queueName = produceToQueue.queueName();
-
-                        logger.info(String.format("Hazelcast queue %s size: %s", queueName, hazelcastInstance.getQueue(queueName).size()));
-
-                        // Execute task producer only if the queue has none elements to be processed
-                        if (hazelcastInstance.getQueue(queueName).isEmpty()) {
-
+                        String nextEmptyQueue = hazelcastQueueNameRoundRobin.nextHazelcastQueue(hazelcastInstance, HazelcastQueueNameRoundRobin.STRATEGY.ACCEPT_ONLY_EMPTY);
+                    	logger.debug(String.format("Requested the next queue name from round robin: %s. Accepted only empty queue.", nextEmptyQueue));
+                        
+                        // Execute task producer only the queue has none more elements to be processed (its empty) 
+                        if (nextEmptyQueue != null) {
+                        	logger.info(String.format("Hazelcast queue %s size: %s", nextEmptyQueue, hazelcastInstance.getQueue(nextEmptyQueue).size()));
                             boolean isLocalMember = isLocalMember();
 
                             // Execute the task just on the local members
@@ -122,7 +127,7 @@ public final class ClusterWorker<T> {
                         }
                     }
                 },
-                0,
+                TIMER_DELAY,
                 TimeUnit.MILLISECONDS.convert(frequency, TimeUnit.SECONDS)
         );
 

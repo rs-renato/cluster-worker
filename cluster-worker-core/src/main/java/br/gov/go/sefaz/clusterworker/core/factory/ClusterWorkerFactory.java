@@ -6,12 +6,12 @@ import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
 import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
 import br.gov.go.sefaz.clusterworker.core.consumer.Consumer;
-import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueConsumer;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastRunnableConsumer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.Producer;
+import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
@@ -101,11 +101,11 @@ public class ClusterWorkerFactory {
     /**
      * Create a new {@link HazelcastQueueConsumer} instance of T type.
      * @param queueName queue name
-     * @param consumerStrategy Consummer queue strategy
+     * @param queueStrategy Consummer queue strategy
      * @param timeout Timeout of execution (in seconds) to the task processor before to return null on queue consumption.
      * @return {@link HazelcastQueueConsumer} instance
      */
-    public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, ConsumerStrategy consumerStrategy, int timeout){
-    	return new HazelcastQueueConsumer<>(hazelcastInstance, queueName, consumerStrategy, timeout);
+    public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, QueueStrategy queueStrategy, int timeout){
+    	return new HazelcastQueueConsumer<>(hazelcastInstance, queueName, queueStrategy, timeout);
     }
 }

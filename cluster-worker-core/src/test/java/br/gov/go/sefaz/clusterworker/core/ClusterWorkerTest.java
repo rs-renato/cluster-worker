@@ -19,7 +19,7 @@ public class ClusterWorkerTest {
         clusterWorker.executeTaskProducer(new IntegerTaskProducer());
         clusterWorker.executeTaskProccessor(new IntegerTaskProcessor());
 
-        //executes for 10s
+        //executes for 60s
         Thread.sleep(60 * 1000);
 
         clusterWorker.shutdown();

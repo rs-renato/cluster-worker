@@ -4,12 +4,12 @@ import org.apache.log4j.Logger;
 
 import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
-import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
+import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 
 /**
  * Created by renato-rs on 13/10/2016.
  */
-@ConsumeFromQueue(queueName = TestConstants.CW_QUEUE_NAME, strategy = ConsumerStrategy.WAIT_ON_AVAILABLE, workers = TestConstants.CW_TASK_PROCESSOR_WORKERS)
+@ConsumeFromQueue(queueName = TestConstants.CW_QUEUE_NAME, strategy = QueueStrategy.WAIT_ON_AVAILABLE, workers = TestConstants.CW_TASK_PROCESSOR_WORKERS)
 public class IntegerTaskProcessor implements TaskProcessor<Integer> {
 
 	private static final long serialVersionUID = -546308003566028878L;

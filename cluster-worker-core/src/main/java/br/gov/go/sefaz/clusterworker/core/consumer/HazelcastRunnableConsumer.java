@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import com.hazelcast.core.HazelcastInstance;
 
 import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
+import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
 
 /**
@@ -27,11 +28,11 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
      * @param taskProcessor TaskProcessor client's implementation.
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
-     * @param consumerStrategy Consummer queue strategy
+     * @param queueStrategy Consummer queue strategy
      * @param timeout Timeout of execution (in seconds) to the task processor before to return null on queue consumption.
      */
-    public HazelcastRunnableConsumer(TaskProcessor<T> taskProcessor, HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
-        super(hazelcastInstance, queueName, consumerStrategy, timeout);
+    public HazelcastRunnableConsumer(TaskProcessor<T> taskProcessor, HazelcastInstance hazelcastInstance, String queueName, QueueStrategy queueStrategy, int timeout) {
+        super(hazelcastInstance, queueName, queueStrategy, timeout);
         this.taskProcessor = taskProcessor;
     }
 

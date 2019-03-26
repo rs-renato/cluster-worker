@@ -9,6 +9,8 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.IQueue;
 
+import br.gov.go.sefaz.clusterworker.core.queue.HazelcastQueueNameRoundRobin;
+
 /**
  * Implementation for Hazelcast Queue Produces.
  * @author renato-rs
@@ -19,8 +21,9 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
 
 	private static final long serialVersionUID = -3706506746207926465L;
 	private static final transient Logger logger = Logger.getLogger(HazelcastQueueProducer.class);
+	private HazelcastQueueNameRoundRobin hazelcastQueueNameRoundRobin;
 
-    protected transient HazelcastInstance hazelcastInstance;
+    private transient HazelcastInstance hazelcastInstance;
     private String queueName;
 
     /**
@@ -31,12 +34,17 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
     public HazelcastQueueProducer(HazelcastInstance hazelcastInstance, String queueName) {
     	this.hazelcastInstance = hazelcastInstance;
     	this.queueName = queueName;
+    	this.hazelcastQueueNameRoundRobin = new HazelcastQueueNameRoundRobin(queueName);
     }
 
     @Override
     public void produce(Collection<T> types) {
 
-    	//Creates or return the hazelcast distributed queue
+    	//Return the next hazelcast distributed queue name
+    	String queueName = this.hazelcastQueueNameRoundRobin.nextQueue();
+
+    	logger.debug(String.format("Requested the next queue name from round robin: %s. Ignored if the queue is empty", queueName));
+    	
         IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
         for (T type : types) {

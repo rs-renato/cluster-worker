@@ -9,6 +9,9 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.IQueue;
 
+import br.gov.go.sefaz.clusterworker.core.queue.HazelcastQueueNameRoundRobin;
+import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
+
 /**
  * Implementation for Hazelcast Queue Consumer.
  * @author renato-rs
@@ -21,10 +24,12 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 
 	private static final long serialVersionUID = 4384549432295630459L;
 
-    protected transient HazelcastInstance hazelcastInstance;
+	private HazelcastQueueNameRoundRobin hazelcastQueueNameRoundRobin;
+
+    private transient HazelcastInstance hazelcastInstance;
 
     private String queueName;
-    private ConsumerStrategy consumerStrategy = ConsumerStrategy.ACCEPT_NULL;
+    private QueueStrategy queueStrategy = QueueStrategy.ACCEPT_NULL;
     private int timeout = 1;
 
     /**
@@ -35,32 +40,35 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName) {
     	this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
+    	this.hazelcastQueueNameRoundRobin = new HazelcastQueueNameRoundRobin(queueName);
 	}
     
     /**
      * Constructor for HazelcastQueueConsumer
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
-     * @param consumerStrategy Consummer queue strategy
+     * @param queueStrategy Consummer queue strategy
      */
-	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy) {
+	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, QueueStrategy queueStrategy) {
 		this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
-		this.consumerStrategy = consumerStrategy;
+		this.queueStrategy = queueStrategy;
+    	this.hazelcastQueueNameRoundRobin = new HazelcastQueueNameRoundRobin(queueName);
 	}
     
 	/**
 	 * Constructor for HazelcastQueueConsumer
 	 * @param hazelcastInstance instance of hazelcast.
 	 * @param queueName queue name
-	 * @param consumerStrategy Consummer queue strategy
+	 * @param queueStrategy Consummer queue strategy
 	 * @param timeout Timeout of execution (in seconds) to the task processor before to return null on queue consumption.
 	 */
-	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
+	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, QueueStrategy queueStrategy, int timeout) {
 		this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
-		this.consumerStrategy = consumerStrategy;
+		this.queueStrategy = queueStrategy;
 		this.timeout = timeout;
+    	this.hazelcastQueueNameRoundRobin = new HazelcastQueueNameRoundRobin(queueName);
 	}
 
     @Override
@@ -68,11 +76,16 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 
         try {
 
-        	//Creates or return the hazelcast distributed queue
+
+        	String queueName = this.hazelcastQueueNameRoundRobin.nextHazelcastQueue(hazelcastInstance, HazelcastQueueNameRoundRobin.STRATEGY.IGNORE_IF_EMPTY);
+
+        	logger.debug(String.format("Requested the next queue name from round robin: %s. Ignored if the queue is empty", queueName));
+        	
+        	//Return the next hazelcast distributed queue name
             IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
             //Blocking on take() only if strategy is {@link QueueStrategy#WAIT_ON_AVAILABLE}, otherwise, wait until timeout.
-            boolean isNonBlocking = ConsumerStrategy.ACCEPT_NULL.equals(consumerStrategy);
+            boolean isNonBlocking = QueueStrategy.ACCEPT_NULL.equals(queueStrategy);
             
 			T type = isNonBlocking ? iQueue.poll(timeout, TimeUnit.SECONDS) : iQueue.take();
 
@@ -100,8 +113,8 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
      * Return the queueStrategy of this consumer.
      * @return queueStrategy
      */
-    public ConsumerStrategy getQueueStrategy() {
-        return consumerStrategy;
+    public QueueStrategy getQueueStrategy() {
+        return queueStrategy;
     }
 
     /**
