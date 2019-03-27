@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 /**
  * CachedPropertyFile support class.
  * @author renato-rs
- * @since
+ * @since 1.0
  */
 public class CachedPropertyFileSupport {
 
