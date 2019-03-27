@@ -17,10 +17,11 @@ import com.hazelcast.core.IQueue;
  */
 public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, HazelcastInstanceAware {
 
-	private static final long serialVersionUID = -3706506746207926465L;
+	private static final transient long serialVersionUID = -3706506746207926465L;
 	private static final transient Logger logger = Logger.getLogger(HazelcastQueueProducer.class);
 
     private transient HazelcastInstance hazelcastInstance;
+  
     private String queueName;
 
     /**

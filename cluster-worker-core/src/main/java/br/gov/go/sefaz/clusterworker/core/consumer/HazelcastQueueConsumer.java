@@ -21,7 +21,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 
 	private static final transient Logger logger = Logger.getLogger(HazelcastQueueConsumer.class);
 
-	private static final long serialVersionUID = 4384549432295630459L;
+	private static final transient long serialVersionUID = 4384549432295630459L;
 
     private transient HazelcastInstance hazelcastInstance;
 

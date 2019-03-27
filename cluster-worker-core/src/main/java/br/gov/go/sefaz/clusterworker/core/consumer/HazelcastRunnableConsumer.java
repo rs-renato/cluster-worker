@@ -16,7 +16,7 @@ import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
  */
 public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T> implements Runnable, ShutdownListener{
 
-	private static final long serialVersionUID = 5404415194904610053L;
+	private static final transient long serialVersionUID = 5404415194904610053L;
 	private static final transient Logger logger = Logger.getLogger(HazelcastRunnableConsumer.class);
     
 	private boolean stopped;

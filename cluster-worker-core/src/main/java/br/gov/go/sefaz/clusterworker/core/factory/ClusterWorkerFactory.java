@@ -1,5 +1,8 @@
 package br.gov.go.sefaz.clusterworker.core.factory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.hazelcast.core.HazelcastInstance;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
@@ -13,7 +16,7 @@ import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.Producer;
 import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
-import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
+import br.gov.go.sefaz.clusterworker.core.support.HazelcastDefaultConfigurationSupport;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
 
@@ -24,8 +27,9 @@ import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
  */
 public class ClusterWorkerFactory {
 
-    private static ClusterWorkerFactory CLUSTER_WORKER_FACTORY_INSTANCE;
     private final HazelcastInstance hazelcastInstance;
+    
+    private static final Map<String, ClusterWorkerFactory> factoryInstances = new HashMap<>();
 
     private ClusterWorkerFactory(HazelcastInstance hazelcastInstance) {
     	this.hazelcastInstance = hazelcastInstance;
@@ -36,12 +40,7 @@ public class ClusterWorkerFactory {
      * @return a ClusterWorkerFactory instance
      */
     public static synchronized ClusterWorkerFactory getInstance() {
-
-    	if (CLUSTER_WORKER_FACTORY_INSTANCE == null) {
-			CLUSTER_WORKER_FACTORY_INSTANCE = new ClusterWorkerFactory(HazelcastSupport.getDefaultHazelcastInstance());
-		}
-    	
-    	return CLUSTER_WORKER_FACTORY_INSTANCE;
+    	return getInstance(HazelcastDefaultConfigurationSupport.getDefaultHazelcastInstance());
     }
     
     /**
@@ -51,11 +50,12 @@ public class ClusterWorkerFactory {
 
     public static synchronized ClusterWorkerFactory getInstance(HazelcastInstance hazelcastInstance) {
 
-    	if (CLUSTER_WORKER_FACTORY_INSTANCE == null) {
-			CLUSTER_WORKER_FACTORY_INSTANCE = new ClusterWorkerFactory(hazelcastInstance);
+    	String hazelcastInstanceName = hazelcastInstance.getName();
+		if (!factoryInstances.containsKey(hazelcastInstanceName)) {
+        	factoryInstances.put(hazelcastInstanceName, new ClusterWorkerFactory(hazelcastInstance));
 		}
     	
-    	return CLUSTER_WORKER_FACTORY_INSTANCE;
+    	return factoryInstances.get(hazelcastInstanceName);
     }
 
     /**

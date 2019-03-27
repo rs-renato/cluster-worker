@@ -1,7 +1,5 @@
 package br.gov.go.sefaz.clusterworker.core.support;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 
 import com.hazelcast.config.Config;
@@ -17,12 +15,12 @@ import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
  * @author renato-rs
  * @since 1.0
  */
-public final class HazelcastSupport {
+public final class HazelcastDefaultConfigurationSupport {
 
-    private static final Logger logger = Logger.getLogger(HazelcastSupport.class);
+    private static final Logger logger = Logger.getLogger(HazelcastDefaultConfigurationSupport.class);
     private static final CachedPropertyFile cachedPropertyFile = CachedPropertyFileSupport.getCachedPropertyFile("cw-config");
-
-    private HazelcastSupport() {
+    
+    private HazelcastDefaultConfigurationSupport() {
     }
 
     /**
@@ -34,15 +32,41 @@ public final class HazelcastSupport {
     }
     
     /**
+     * Return the default hazelcas instance name, defined by constant {@link ClusterWorkerConstants#CW_HAZELCAST_INSTANCE_NAME}
+     * @return
+     */
+    public static String getDefaultHazelcastInstanceName() {
+    	return ClusterWorkerConstants.CW_HAZELCAST_INSTANCE_NAME;
+    }
+
+    /**
+     * Verifies if there is the default hazelcast instance
+     * @return true is default hazelcast instance was found.
+     */
+    public static boolean hasDefaultHazelcastInstance(){
+        return Hazelcast.getHazelcastInstanceByName(getDefaultHazelcastInstanceName()) != null;
+    }
+
+    /**
+     * Shutdown all entire hazelcast instances if there is any.
+     */
+    public static void shutdownDefaultHazelcastInstance(){
+        if (hasDefaultHazelcastInstance()){
+            logger.warn("Shuttingdown Default Hazelcast Instance...");
+            getDefaultHazelcastInstance().shutdown();
+        }
+    }
+    
+    /**
      * Return the hazelcast default configuration.
      * @return hazelcast configuration
      */
-    public static Config getDefaultConfig(){
+    private static Config getDefaultConfig(){
 
         logger.info("Starting hazelcast default configuration..");
 
         Config hazelcastConfig = new Config();
-        hazelcastConfig.setInstanceName("ClusterWorker");
+        hazelcastConfig.setInstanceName(getDefaultHazelcastInstanceName());
         
         int port = cachedPropertyFile.getProperty("cw.network.config.port", Integer.class);
         int portCount = cachedPropertyFile.getProperty("cw.network.config.port.count", Integer.class);
@@ -79,25 +103,5 @@ public final class HazelcastSupport {
         logger.info(String.format("Hazelcast configurations finished: %s", hazelcastConfig));
 
         return hazelcastConfig;
-    }
-
-    /**
-     * Verifies if there are some hazelcast instance active.
-     * @return true is any hazelcast instance was found.
-     */
-    public static boolean hasHazelcstInstance(){
-        Set<HazelcastInstance> hazelcastInstances =  Hazelcast.getAllHazelcastInstances();
-        return hazelcastInstances != null && !hazelcastInstances.isEmpty();
-    }
-
-    /**
-     * Shutdown all entire hazelcast instances if there is any.
-     */
-    public static void shutdownHazelcast(){
-
-        if (hasHazelcstInstance()){
-            logger.warn("Shuttingdown Hazelcast...");
-            Hazelcast.shutdownAll();
-        }
     }
 }

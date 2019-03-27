@@ -16,7 +16,7 @@ import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
  */
 public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<T> implements Runnable{
 
-	private static final long serialVersionUID = 2538609461091747126L;
+	private static final transient long serialVersionUID = 2538609461091747126L;
 
 	private static final transient Logger logger = Logger.getLogger(HazelcastRunnableProducer.class);
 

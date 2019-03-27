@@ -11,6 +11,12 @@ public class ClusterWorkerConstants {
 	private ClusterWorkerConstants() {
 	}
 	
+	
+	/**
+	 * Defines the default Hazelcast Instance Name
+	 */
+    public static final String CW_HAZELCAST_INSTANCE_NAME = "ClusterWorker";
+    
 	/**
 	 * Defines the default Service Task Name
 	 */
