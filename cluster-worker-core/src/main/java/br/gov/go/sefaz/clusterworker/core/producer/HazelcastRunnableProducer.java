@@ -36,12 +36,12 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     @Override
     public void run() {
 
-        logger.debug("Producing on the client's implementation.");
+        logger.info("Starting HazelcastRunnableProducer!");
 
         try{
         	// Produces items from client's implementation
             Collection<T> types = taskProducer.produce();
-
+            
             if (types!= null){
                 produce(types);
             }

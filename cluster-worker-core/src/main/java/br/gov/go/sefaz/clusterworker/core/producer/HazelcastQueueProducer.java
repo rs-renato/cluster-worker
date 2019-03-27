@@ -37,13 +37,14 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
     @Override
     public void produce(Collection<T> types) {
 
+    	logger.debug(String.format("Producing %s objects to %s queue.", types.size(), queueName));
+    	
     	//Return the hazelcast distributed queue
         IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
         for (T type : types) {
 
             try {
-                logger.debug(String.format("Producing type %s to %s queue on base base producer.", type, queueName));
                 //Put a new item to the hazelcast queue
                 iQueue.put(type);
             } catch (InterruptedException e) {

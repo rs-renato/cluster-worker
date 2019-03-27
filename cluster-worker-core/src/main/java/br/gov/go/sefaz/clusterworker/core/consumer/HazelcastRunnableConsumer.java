@@ -39,7 +39,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
     @Override
     public void run() {
 
-        logger.info("Starting WorkerConsumer!");
+        logger.info("Starting HazelcastRunnableConsumer!");
 
         // Run this thread untill shutdown is called
         while(isRunning()) {

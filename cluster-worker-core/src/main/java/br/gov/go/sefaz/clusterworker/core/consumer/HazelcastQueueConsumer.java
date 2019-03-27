@@ -83,7 +83,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
             return type;
 
         } catch (InterruptedException e) {
-            logger.error(String.format("Cannot consume the hazelcast %s queue!", queueName), e);
+            logger.error(String.format("Cannot consume from hazelcast %s queue!", queueName), e);
             Thread.currentThread().interrupt();
         }
 
