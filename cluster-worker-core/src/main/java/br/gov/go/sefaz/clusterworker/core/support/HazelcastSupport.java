@@ -30,7 +30,7 @@ public final class HazelcastSupport {
      * @return hazelcast instance
      */
     public static HazelcastInstance getDefaultHazelcastInstance(){
-    	return Hazelcast.newHazelcastInstance(getDefaultConfig());
+    	return Hazelcast.getOrCreateHazelcastInstance(getDefaultConfig());
     }
     
     /**
@@ -43,13 +43,13 @@ public final class HazelcastSupport {
 
         Config hazelcastConfig = new Config();
         hazelcastConfig.setInstanceName("ClusterWorker");
-
+        
         int port = cachedPropertyFile.getProperty("cw.network.config.port", Integer.class);
         int portCount = cachedPropertyFile.getProperty("cw.network.config.port.count", Integer.class);
         int queueMaxSize = cachedPropertyFile.getProperty("cw.queue.config.max.size", Integer.class);
         boolean multicastEnabled = cachedPropertyFile.getProperty("cw.multicast.config.enabled", Boolean.class);
         String multicastInterface = cachedPropertyFile.getProperty("cw.multicast.config.interface");
-        String queueName = cachedPropertyFile.getProperty("cw.queue.name");
+//        String queueName = cachedPropertyFile.getProperty("cw.queue.name");
 
         NetworkConfig networkConfig = hazelcastConfig.getNetworkConfig();
        
@@ -59,9 +59,9 @@ public final class HazelcastSupport {
 
         hazelcastConfig
         	.getQueueConfig(ClusterWorkerConstants.CW_QUEUE_CONFIG_DEFAULT)
-        	.setName(queueName)
+//        	.setName(queueName)
             .setMaxSize(queueMaxSize);
-
+        
         JoinConfig join = networkConfig.getJoin();
 
         join.getMulticastConfig()
@@ -76,7 +76,7 @@ public final class HazelcastSupport {
                 .setEnabled(true)
                 .addInterface(multicastInterface);
 
-        logger.info("Hazelcast configurations finished!");
+        logger.info(String.format("Hazelcast configurations finished: %s", hazelcastConfig));
 
         return hazelcastConfig;
     }

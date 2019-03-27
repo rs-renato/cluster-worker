@@ -60,10 +60,10 @@ public final class ClusterWorker<T> {
         logger.info(String.format("Executing TaskProcessor (%s worker(s)) implementation on hazelcast executor service.", workers));
 
         // Creates worker (HazelcastRunnableConsumer)
+        HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance(hazelcastInstance).getHazelcastRunnableConsumer(taskProcessor);
         for (int i = 1; i <=  workers; i++) {
 
             try {
-            	HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance(hazelcastInstance).getHazelcastRunnableConsumer(taskProcessor);
                 logger.debug(String.format("Adding listener for worker %s..", i));
             	this.shutdownListeners.add(hazelcastRunnableConsumer);
 				hazelcastInstance
