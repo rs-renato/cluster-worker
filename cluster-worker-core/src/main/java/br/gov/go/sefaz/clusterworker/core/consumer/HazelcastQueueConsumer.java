@@ -9,7 +9,6 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.IQueue;
 
-import br.gov.go.sefaz.clusterworker.core.queue.HazelcastQueueNameRoundRobin;
 import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 
 /**
@@ -23,8 +22,6 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 	private static final transient Logger logger = Logger.getLogger(HazelcastQueueConsumer.class);
 
 	private static final long serialVersionUID = 4384549432295630459L;
-
-	private HazelcastQueueNameRoundRobin hazelcastQueueNameRoundRobin;
 
     private transient HazelcastInstance hazelcastInstance;
 
@@ -40,7 +37,6 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName) {
     	this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
-    	this.hazelcastQueueNameRoundRobin = new HazelcastQueueNameRoundRobin(queueName);
 	}
     
     /**
@@ -53,7 +49,6 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 		this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
 		this.queueStrategy = queueStrategy;
-    	this.hazelcastQueueNameRoundRobin = new HazelcastQueueNameRoundRobin(queueName);
 	}
     
 	/**
@@ -68,7 +63,6 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 		this.queueName = queueName;
 		this.queueStrategy = queueStrategy;
 		this.timeout = timeout;
-    	this.hazelcastQueueNameRoundRobin = new HazelcastQueueNameRoundRobin(queueName);
 	}
 
     @Override
@@ -76,12 +70,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 
         try {
 
-
-        	String queueName = this.hazelcastQueueNameRoundRobin.nextHazelcastQueue(hazelcastInstance, HazelcastQueueNameRoundRobin.STRATEGY.IGNORE_IF_EMPTY);
-
-        	logger.debug(String.format("Requested the next queue name from round robin: %s. Ignored if the queue is empty", queueName));
-        	
-        	//Return the next hazelcast distributed queue name
+        	//Return the hazelcast distributed queue
             IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
             //Blocking on take() only if strategy is {@link QueueStrategy#WAIT_ON_AVAILABLE}, otherwise, wait until timeout.

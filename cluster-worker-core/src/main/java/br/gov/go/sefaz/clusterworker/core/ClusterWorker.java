@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
+import com.hazelcast.core.IQueue;
 import com.hazelcast.core.Member;
 
 import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
@@ -20,7 +21,6 @@ import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastRunnableConsumer;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
-import br.gov.go.sefaz.clusterworker.core.queue.HazelcastQueueNameRoundRobin;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
 import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
@@ -82,20 +82,17 @@ public final class ClusterWorker<T> {
     public void executeTaskProducer(final TaskProducer<T> taskProducer){
     	//Assert mandatory exception to create an TaskProducer
     	final ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(taskProducer, ProduceToQueue.class);
-
+    	
     	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(hazelcastInstance).getHazelcastRunnableProducer(taskProducer);
 
         int frequency = produceToQueue.frequency();
         
-        String queueName = produceToQueue.queueName();
-        
-        HazelcastQueueNameRoundRobin hazelcastQueueNameRoundRobin = new HazelcastQueueNameRoundRobin(queueName);
-
         Timer timerTaskProducer = new Timer();
 
         logger.info(String.format("Executing TaskProducer implementation on hazelcast executor service with frequency of %s second.", frequency));
 
         final int TIMER_DELAY = 0;
+        
         // Create a fixed rate timer 
 		timerTaskProducer.scheduleAtFixedRate(
 
@@ -103,12 +100,13 @@ public final class ClusterWorker<T> {
                     @Override
                     public void run() {
 
-                        String nextEmptyQueue = hazelcastQueueNameRoundRobin.nextHazelcastQueue(hazelcastInstance, HazelcastQueueNameRoundRobin.STRATEGY.ACCEPT_ONLY_EMPTY);
-                    	logger.debug(String.format("Requested the next queue name from round robin: %s. Accepted only empty queue.", nextEmptyQueue));
+                    	String queueName = produceToQueue.queueName();
+                    	IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
+						logger.info(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
                         
-                        // Execute task producer only the queue has none more elements to be processed (its empty) 
-                        if (nextEmptyQueue != null) {
-                        	logger.info(String.format("Hazelcast queue %s size: %s", nextEmptyQueue, hazelcastInstance.getQueue(nextEmptyQueue).size()));
+                        // Execute task producer only if the queue has none elements to be processed
+                        if (iQueue.isEmpty()) {
+                        	
                             boolean isLocalMember = isLocalMember();
 
                             // Execute the task just on the local members
