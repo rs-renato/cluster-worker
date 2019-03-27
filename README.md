@@ -3,23 +3,21 @@
 ---
 
 *Table of Content*
-- [Cluster Worker - *Scale your tasks easily.*](#cluster-worker---scale-your-tasks-easily-)
+- [Cluster Worker - *Scale your tasks easily.*]
   * [The Client Perspective](#the-client-perspective)
     + [`Task Produce`](#task-produce)
     + [`Task Process`](#task-process)
   * [Executing Tasks](#executing-tasks)
     + [`ClusterWorker`](#clusterworker)
-    + [Standalones: *Base Producers & Base Consumers*](#standalones-base-producers--base-consumers)
+    + [Standalones: *Base Producers & Base Consumers*]
       - [`BaseProducer`](#baseproducer)
       - [`BaseConsumer`](#baseconsumer)
     + [AtomicLock](#atomiclock)
     + [QueueStrategy](#queuestrategy)
   * [The API Perspective](#the-api-perspective)
-    + [Workers: *Producer & Consumer*](#workers-producer--consumer)
+    + [Workers: *Producer & Consumer*]
       - [`WorkerProducer`](#workerproducer)
       - [`WorkerConsumer`](#workerconsumer)
-- [Comming Soon](#comming-soon)
-  * [Standalones: *Base Producers & Base Consumers Spring Integration*](#standalones-base-producers--base-consumers-spring-integration)
 
 Cluster Worker (CW) is a Hazelcast based API that help you to scale yours tasks producing and tasks processing under a cluster environment. CW uses producer x consumer strategy on hazelcast queues as central mechanism to distribute in an easily way the client's tasks implementations to be executed in the nodes, providing high availability and scalability for processing and exchange data through the cluster members.
 
@@ -230,7 +228,3 @@ Worker are `runnables` that encapsulate `tasks`. It comes in two flavors:
 
 #### `WorkerConsumer`
 `WorkerConsumer` is a `runnable` that encapsulate a `TaskProcess` and calls the client's implementation for processing data; These `runnables` are present and active in all cluster nodes, and lives till the cluster member lives.
-
-# Comming Soon
-## Standalones: *Base Producers & Base Consumers Spring Integration*
-Soon, Cluster Worker will provide an integration to Spring ecosystem.
