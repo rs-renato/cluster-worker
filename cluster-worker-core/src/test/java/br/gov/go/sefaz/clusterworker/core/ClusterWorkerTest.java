@@ -25,8 +25,8 @@ public class ClusterWorkerTest {
         // Execute the item processor on cluster worker
         clusterWorker.executeItemProccessor(new IntegerItemProcessor());
 
-        //Just wait for 60s to execute this test
-        Thread.sleep(60 * 1000);
+        //Just wait for 30s to execute this test
+        Thread.sleep(30 * 1000);
 
         // Shutdown cluster worker internals
         clusterWorker.shutdown();

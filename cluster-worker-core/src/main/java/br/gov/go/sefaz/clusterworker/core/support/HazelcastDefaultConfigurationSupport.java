@@ -29,11 +29,19 @@ public final class HazelcastDefaultConfigurationSupport {
     }
 
     /**
-     * Return a new HazelcastInstance from default configuration 
+     * Return a HazelcastInstance from default configuration 
      * @return hazelcast instance
      */
     public static HazelcastInstance getDefaultHazelcastInstance(){
     	return Hazelcast.getOrCreateHazelcastInstance(getDefaultConfig());
+    }
+    
+    /**
+     * Creates and return a new HazelcastInstance from default configuration 
+     * @return hazelcast instance
+     */
+    public static HazelcastInstance createDefaultHazelcastInstance(){
+    	return Hazelcast.newHazelcastInstance(getDefaultConfig());
     }
     
     /**

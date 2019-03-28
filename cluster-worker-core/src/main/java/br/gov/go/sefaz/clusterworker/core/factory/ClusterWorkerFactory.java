@@ -51,8 +51,12 @@ public class ClusterWorkerFactory {
     public static synchronized ClusterWorkerFactory getInstance(HazelcastInstance hazelcastInstance) {
 
     	String hazelcastInstanceName = hazelcastInstance.getName();
-		if (!factoryInstances.containsKey(hazelcastInstanceName)) {
-        	factoryInstances.put(hazelcastInstanceName, new ClusterWorkerFactory(hazelcastInstance));
+    	boolean containsInstance = factoryInstances.containsKey(hazelcastInstanceName);
+    	
+    	hazelcastInstance = isHazelcastInstanceRunning(hazelcastInstance) ? hazelcastInstance : HazelcastDefaultConfigurationSupport.createDefaultHazelcastInstance();
+    	
+    	if (!containsInstance || !isHazelcastInstanceRunning(factoryInstances.get(hazelcastInstanceName).hazelcastInstance)) {
+    		factoryInstances.put(hazelcastInstanceName, new ClusterWorkerFactory(hazelcastInstance));
 		}
     	
     	return factoryInstances.get(hazelcastInstanceName);
@@ -112,7 +116,7 @@ public class ClusterWorkerFactory {
     /**
      * Shutdown hazelcast instance.
      */
-	public void shutdownHazelcastInstance() {
+	public synchronized void shutdownHazelcastInstance() {
 
 		hazelcastInstance.shutdown();
 		
@@ -121,5 +125,9 @@ public class ClusterWorkerFactory {
 		}
 		
 		factoryInstances.remove(hazelcastInstance.getName());
+	}
+	
+	private static boolean isHazelcastInstanceRunning(HazelcastInstance hazelcastInstance) {
+		return hazelcastInstance.getLifecycleService().isRunning();
 	}
 }
