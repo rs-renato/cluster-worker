@@ -25,7 +25,7 @@ public class TestConstants {
     /**
 	 * Quantity of workers (threads) of processors (queues consumers)
 	 */
-    public static final int CW_ITEM_PROCESSOR_WORKERS	= 5;
+    public static final int CW_ITEM_PROCESSOR_WORKERS	= 2;
 
     /**
 	 * Timeout in seconts to consume the queue

@@ -1,6 +1,5 @@
 package br.gov.go.sefaz.clusterworker.core.consumer;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -17,11 +16,11 @@ import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
 import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 
 /**
- * HazelcastQueueConsumer example of use
+ * HazelcastQueueConsumer example of use in non-blocking way
  * @author renato-rs
  * @since 1.0
  */
-public class HazelcastQueueConsumerTest {
+public class HazelcastQueueNonBlockingConsumerTest {
 
 	private static ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance();
 	private static ClusterWorker<Integer> clusterWorker;
@@ -30,8 +29,7 @@ public class HazelcastQueueConsumerTest {
 	public static void setUp() {
     	// Instantiate a Cluster Worker to handle integer objects (produce and consume to/from hazelcast queue)
 		clusterWorker = cwFactory.getClusterWorker(Integer.class);
-        // Execute the item produder on cluster worker
-		clusterWorker.executeItemProducer(new IntegerItemProducer());
+		clusterWorker.executeItemProducer(new IntegerItemProducer());	
 	}
 
 	@AfterClass
@@ -41,24 +39,12 @@ public class HazelcastQueueConsumerTest {
 	}
 
 	@Test
-	public void testHazelcastQueueConsumerWaitOnAvailable() {
-        // Creates an consumer to consumes the hazelcast queue
-		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer =  cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, QueueStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT); 
-				
-		Integer result;
-
-		while ((result = hazelcastQueueConsumer.consume()) != TestConstants.CW_ITEM_PRODUCER_QUANTITY) {
-			assertNotNull(result);
-		}
-	}
-
-	@Test
 	public void testHazelcastQueueConsumerAcceptNull() {
 
         // Creates an consumer to consumes the hazelcast queue
 		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, QueueStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT);
 
-		int loop = TestConstants.CW_ITEM_PRODUCER_QUANTITY * 5;
+		int loop = TestConstants.CW_ITEM_PRODUCER_QUANTITY * 3;
 
 		int count = 0;
 
