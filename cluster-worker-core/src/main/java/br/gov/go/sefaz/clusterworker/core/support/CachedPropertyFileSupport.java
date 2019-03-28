@@ -36,10 +36,10 @@ public class CachedPropertyFileSupport {
             Properties properties = new Properties();
 
             try {
-
+            	// Loads the property file
                 InputStream is = loader.getResourceAsStream(fileName + extension);
                 properties.load(is);
-
+                // Create the cached property
                 propMap.put(fileName, new CachedPropertyFile(properties));
 
             }catch (IOException e) {

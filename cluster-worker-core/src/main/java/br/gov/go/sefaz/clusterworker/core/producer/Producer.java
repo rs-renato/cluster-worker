@@ -12,7 +12,7 @@ public interface Producer<T>{
 
     /**
      * Produces a collection of T type.
-     * @param types to produce.
+     * @param items to produce.
      */
-    void produce(Collection<T> types);
+    void produce(Collection<T> items);
 }

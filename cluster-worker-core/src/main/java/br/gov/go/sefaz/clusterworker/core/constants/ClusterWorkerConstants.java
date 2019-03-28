@@ -11,19 +11,19 @@ public class ClusterWorkerConstants {
 	private ClusterWorkerConstants() {
 	}
 	
+	
 	/**
-	 * Defines the default Service Task Name
+	 * Defines the default Hazelcast Instance Name
 	 */
-    public static final String CW_SERVICE_TASK_NAME = "cw.service.task";
+    public static final String CW_HAZELCAST_INSTANCE_NAME = "ClusterWorker";
+    
+	/**
+	 * Defines the default executor service name
+	 */
+    public static final String CW_EXECUTOR_SERVICE_NAME = "cw.executor.service";
     
     /**
      * Defines the default queue config name
      */
     public static final String CW_QUEUE_CONFIG_DEFAULT = "cw.queue.config.default";
-    
-    
-    /**
-     * Defines the quantity of pieces the queue will be splited. This is used for task equity distrution reasons
-     */
-    public static final int CW_QUEUE_SPLIT_SIZE = 4;
 }

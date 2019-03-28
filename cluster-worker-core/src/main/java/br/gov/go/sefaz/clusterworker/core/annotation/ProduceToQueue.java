@@ -5,10 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
+import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 
 /**
- * Annotation to configure a {@link TaskProducer}.
+ * Annotation to configure a {@link ItemProducer}.
  * @author renato-rs
  * @since 1.0
  */
@@ -23,7 +23,7 @@ public @interface ProduceToQueue {
     String queueName();
 
     /**
-     * Frequency of execution (in seconds) to the task producer. The default vaule is 60 seconds.
+     * Frequency of execution (in seconds) to the item producer. The default vaule is 60 seconds.
      * @return timeout
      */
     int frequency() default 60;

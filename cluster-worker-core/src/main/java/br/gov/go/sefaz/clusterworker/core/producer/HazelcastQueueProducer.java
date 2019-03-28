@@ -17,10 +17,11 @@ import com.hazelcast.core.IQueue;
  */
 public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, HazelcastInstanceAware {
 
-	private static final long serialVersionUID = -3706506746207926465L;
+	private static final transient long serialVersionUID = -3706506746207926465L;
 	private static final transient Logger logger = Logger.getLogger(HazelcastQueueProducer.class);
 
     private transient HazelcastInstance hazelcastInstance;
+  
     private String queueName;
 
     /**
@@ -34,17 +35,18 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
     }
 
     @Override
-    public void produce(Collection<T> types) {
+    public void produce(Collection<T> items) {
 
+    	logger.debug(String.format("Producing %s items to %s queue.", items.size(), queueName));
+    	
     	//Return the hazelcast distributed queue
         IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
-        for (T type : types) {
+        for (T item : items) {
 
             try {
-                logger.debug(String.format("Producing type %s to %s queue on base base producer.", type, queueName));
                 //Put a new item to the hazelcast queue
-                iQueue.put(type);
+                iQueue.put(item);
             } catch (InterruptedException e) {
                 logger.error(String.format("Cannot produce to hazelcast %s queue!", queueName), e);
                 Thread.currentThread().interrupt();
