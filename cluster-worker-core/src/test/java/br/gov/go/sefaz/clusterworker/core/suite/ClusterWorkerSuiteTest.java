@@ -9,6 +9,11 @@ import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueBlockingConsume
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueNonBlockingConsumerTest;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducerTest;
 
+/**
+ * Test Suite for Cluster Worker
+ * @author renato-rs
+ * @since 1.0
+ */
 @RunWith(Suite.class)
 @SuiteClasses({ClusterWorkerTest.class, 
 	HazelcastQueueBlockingConsumerTest.class,
