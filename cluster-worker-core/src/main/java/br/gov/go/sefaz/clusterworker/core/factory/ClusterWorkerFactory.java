@@ -11,14 +11,14 @@ import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
 import br.gov.go.sefaz.clusterworker.core.consumer.Consumer;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueConsumer;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastRunnableConsumer;
+import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
+import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.Producer;
 import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastDefaultConfigurationSupport;
-import br.gov.go.sefaz.clusterworker.core.task.TaskProcessor;
-import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
 
 /**
  * Factory for create {@link Consumer}'s and {@link Producer}'s 
@@ -60,7 +60,7 @@ public class ClusterWorkerFactory {
 
     /**
      * Create a new {@link ClusterWorker} instance of T type.
-     * @param type type which this ClusterWorker will handle.
+     * @param type which this ClusterWorker will handle.
      * @return {@link ClusterWorker} instance
      */
     public <T> ClusterWorker<T> getClusterWorker(Class<T> type){
@@ -69,24 +69,24 @@ public class ClusterWorkerFactory {
 
     /**
      * Create a new {@link HazelcastRunnableConsumer} instance of T type.
-     * @param taskProcessor the task process that will be executed by this {@link HazelcastRunnableConsumer}.
+     * @param itemProcessor the item process that will be executed by this {@link HazelcastRunnableConsumer}.
      * @return {@link HazelcastRunnableConsumer} instance
      */
-    public <T> HazelcastRunnableConsumer<T> getHazelcastRunnableConsumer(TaskProcessor<T> taskProcessor){
+    public <T> HazelcastRunnableConsumer<T> getHazelcastRunnableConsumer(ItemProcessor<T> itemProcessor){
     	//Assert mandatory exception to create an HazelcastRunnableConsumer
-        ConsumeFromQueue consumeFromQueue = AnnotationSupport.assertMandatoryAnnotation(taskProcessor, ConsumeFromQueue.class);
-        return new HazelcastRunnableConsumer<>(taskProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
+        ConsumeFromQueue consumeFromQueue = AnnotationSupport.assertMandatoryAnnotation(itemProcessor, ConsumeFromQueue.class);
+        return new HazelcastRunnableConsumer<>(itemProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
     }
 
     /**
      * Create a new {@link HazelcastRunnableProducer} instance of T type.
-     * @param taskProducer the task process that will be executed by this {@link HazelcastRunnableProducer}.
+     * @param itemProducer the item process that will be executed by this {@link HazelcastRunnableProducer}.
      * @return {@link HazelcastRunnableProducer} instance
      */
-    public <T> HazelcastRunnableProducer<T> getHazelcastRunnableProducer(TaskProducer<T> taskProducer){
+    public <T> HazelcastRunnableProducer<T> getHazelcastRunnableProducer(ItemProducer<T> itemProducer){
     	//Assert mandatory exception to create an HazelcastRunnableProducer
-        ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(taskProducer, ProduceToQueue.class);
-        return new HazelcastRunnableProducer<>(taskProducer, hazelcastInstance, produceToQueue.queueName());
+        ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
+        return new HazelcastRunnableProducer<>(itemProducer, hazelcastInstance, produceToQueue.queueName());
     }
 
     /**
@@ -102,10 +102,24 @@ public class ClusterWorkerFactory {
      * Create a new {@link HazelcastQueueConsumer} instance of T type.
      * @param queueName queue name
      * @param queueStrategy Consummer queue strategy
-     * @param timeout Timeout of execution (in seconds) to the task processor before to return null on queue consumption.
+     * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
      * @return {@link HazelcastQueueConsumer} instance
      */
     public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, QueueStrategy queueStrategy, int timeout){
     	return new HazelcastQueueConsumer<>(hazelcastInstance, queueName, queueStrategy, timeout);
     }
+    
+    /**
+     * Shutdown hazelcast instance.
+     */
+	public void shutdownHazelcastInstance() {
+
+		hazelcastInstance.shutdown();
+		
+		if (hazelcastInstance.getLifecycleService().isRunning()) {
+			hazelcastInstance.getLifecycleService().shutdown();
+		}
+		
+		factoryInstances.remove(hazelcastInstance.getName());
+	}
 }

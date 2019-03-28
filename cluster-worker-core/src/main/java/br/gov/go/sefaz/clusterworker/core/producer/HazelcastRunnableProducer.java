@@ -6,10 +6,10 @@ import org.apache.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 
-import br.gov.go.sefaz.clusterworker.core.task.TaskProducer;
+import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 
 /**
- * Runnable of {@link HazelcastQueueProducer}, responsible for produces {@link TaskProducer} client's implementation.
+ * Runnable of {@link HazelcastQueueProducer}, responsible for produces {@link ItemProducer} client's implementation.
  * @author renato-rs
  * @since 1.0
  * @param <T> type which this runnable will handle.
@@ -20,17 +20,17 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 
 	private static final transient Logger logger = Logger.getLogger(HazelcastRunnableProducer.class);
 
-    private TaskProducer<T> taskProducer;
+    private ItemProducer<T> itemProducer;
 
     /**
      * Constructor of HazelcastRunnableProducer
-     * @param taskProducer TaskProducer client's implementation.
+     * @param itemProducer ItemProducer client's implementation.
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
      */
-    public HazelcastRunnableProducer(TaskProducer<T> taskProducer, HazelcastInstance hazelcastInstance, String queueName) {
+    public HazelcastRunnableProducer(ItemProducer<T> itemProducer, HazelcastInstance hazelcastInstance, String queueName) {
         super(hazelcastInstance, queueName);
-        this.taskProducer = taskProducer;
+        this.itemProducer = itemProducer;
     }
 
     @Override
@@ -40,10 +40,10 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 
         try{
         	// Produces items from client's implementation
-            Collection<T> types = taskProducer.produce();
+            Collection<T> items = itemProducer.produce();
             
-            if (types!= null){
-                produce(types);
+            if (items!= null){
+                produce(items);
             }
 
         }catch (Exception e){

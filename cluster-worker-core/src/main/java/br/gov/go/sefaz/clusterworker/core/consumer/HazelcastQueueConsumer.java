@@ -27,7 +27,9 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 
     private String queueName;
     private QueueStrategy queueStrategy = QueueStrategy.ACCEPT_NULL;
+    private boolean isBlocking = false;
     private int timeout = 1;
+    
 
     /**
      * Constructor for HazelcastQueueConsumer
@@ -37,6 +39,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName) {
     	this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
+		this.isBlocking = QueueStrategy.WAIT_ON_AVAILABLE.equals(queueStrategy);
 	}
     
     /**
@@ -49,6 +52,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 		this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
 		this.queueStrategy = queueStrategy;
+		this.isBlocking = QueueStrategy.WAIT_ON_AVAILABLE.equals(queueStrategy);
 	}
     
 	/**
@@ -56,13 +60,14 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 	 * @param hazelcastInstance instance of hazelcast.
 	 * @param queueName queue name
 	 * @param queueStrategy Consummer queue strategy
-	 * @param timeout Timeout of execution (in seconds) to the task processor before to return null on queue consumption.
+	 * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
 	 */
 	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, QueueStrategy queueStrategy, int timeout) {
 		this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
 		this.queueStrategy = queueStrategy;
 		this.timeout = timeout;
+		this.isBlocking = QueueStrategy.WAIT_ON_AVAILABLE.equals(queueStrategy);
 	}
 
     @Override
@@ -70,17 +75,16 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 
         try {
 
-        	//Return the hazelcast distributed queue
+        	// Return the hazelcast distributed queue
             IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
-            //Blocking on take() only if strategy is {@link QueueStrategy#WAIT_ON_AVAILABLE}, otherwise, wait until timeout.
-            boolean isNonBlocking = QueueStrategy.ACCEPT_NULL.equals(queueStrategy);
-            
-			T type = isNonBlocking ? iQueue.poll(timeout, TimeUnit.SECONDS) : iQueue.take();
+            // Blocking on take() only if strategy is {@link QueueStrategy#WAIT_ON_AVAILABLE}.
+            // Otherwise, wait until timeout and return null if there is no item to process.
+			T item = isBlocking() ? iQueue.take() : iQueue.poll(timeout, TimeUnit.SECONDS);
 
-            logger.debug(String.format("Consume type %s from hazelcast queue.", type));
+            logger.debug(String.format("Consume item %s from hazelcast queue.", item));
 
-            return type;
+            return item;
 
         } catch (InterruptedException e) {
             logger.error(String.format("Cannot consume from hazelcast %s queue!", queueName), e);
@@ -89,6 +93,15 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 
         return null;
     }
+    
+    /**
+     * Verifies if this consumer has blocking strategy
+     * @see QueueStrategy
+     * @return
+     */
+    public boolean isBlocking() {
+		return isBlocking;
+	}
 
     /**
      * Return the queue's name of this consumer.

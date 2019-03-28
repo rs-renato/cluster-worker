@@ -1,13 +1,13 @@
-# Cluster Worker - *Scale your tasks easily.* [![Build Status](https://travis-ci.org/rs-renato/cluster-worker.svg?branch=master)](https://travis-ci.org/rs-renato/cluster-worker)
+# Cluster Worker - *Scale your items easily.* [![Build Status](https://travis-ci.org/rs-renato/cluster-worker.svg?branch=master)](https://travis-ci.org/rs-renato/cluster-worker)
 ###### *This version is snapshot and still in development. Some documentation inconsistence could be found here.*
 ---
 
 *Table of Content*
-- [Cluster Worker - *Scale your tasks easily.*]
+- [Cluster Worker - *Scale your items easily.*]
   * [The Client Perspective](#the-client-perspective)
-    + [`Task Produce`](#task-produce)
-    + [`Task Process`](#task-process)
-  * [Executing Tasks](#executing-tasks)
+    + [`Item Produce`](#item-produce)
+    + [`Item Process`](#item-process)
+  * [Executing Items](#executing-items)
     + [`ClusterWorker`](#clusterworker)
     + [Standalones: *Base Producers & Base Consumers*]
       - [`BaseProducer`](#baseproducer)
@@ -19,7 +19,7 @@
       - [`WorkerProducer`](#workerproducer)
       - [`WorkerConsumer`](#workerconsumer)
 
-Cluster Worker (CW) is a Hazelcast based API that help you to scale yours tasks producing and tasks processing under a cluster environment. CW uses producer x consumer strategy on hazelcast queues as central mechanism to distribute in an easily way the client's tasks implementations to be executed in the nodes, providing high availability and scalability for processing and exchange data through the cluster members.
+Cluster Worker (CW) is a Hazelcast based API that help you to scale yours items producing and items processing under a cluster environment. CW uses producer x consumer strategy on hazelcast queues as central mechanism to distribute in an easily way the client's items implementations to be executed in the nodes, providing high availability and scalability for processing and exchange data through the cluster members.
 
 <p align="center">
         <img alt="Cluster Worker Diagram" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/cw_diagram.jpg?raw=true">
@@ -34,25 +34,25 @@ Before to start, let's see an overview from Hazelcast's web site:
 ## The Client Perspective  
 
 <p align="center">
-        <img alt="TaskProduce" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/taskAcceptable.jpg?raw=true" height="200"/>
+        <img alt="ItemProduce" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/itemAcceptable.jpg?raw=true" height="200"/>
 </p>
 ----------------------------------------------------------------------------------------------------------------------------------------
 
-Cluster Worker knows how to manage client's tasks, everything you need is provide an implementation for producing and processing data.
-CW was designed to be task based, and comes in two flavors:
+Cluster Worker knows how to manage client's items, everything you need is provide an implementation for producing and processing data.
+CW was designed to be item based, and comes in two flavors:
 
-### `Task Produce`
-Producer is a *mandatory* single task (managed by `WorkerProducer`) that is located in the entire cluster's node, but only one execution will be activated at time. This task is responsible to execute the client's production, it could produce from files, web-services, database or whatever kind of production source as you need.
+### `Item Produce`
+Producer is a *mandatory* single item (managed by `WorkerProducer`) that is located in the entire cluster's node, but only one execution will be activated at time. This item is responsible to execute the client's production, it could produce from files, web-services, database or whatever kind of production source as you need.
 
-*Note: You can have as many different task produce as you need, but in a cluster environment this task will produce only in one cluster's node to ensure the data won't be produced repeatedly and cause inconsistent processing. If a node fails, there is no problem, this task produce is redundant beyond the entire cluster nodes and executed in a random node to ensure HA producing.*
+*Note: You can have as many different item produce as you need, but in a cluster environment this item will produce only in one cluster's node to ensure the data won't be produced repeatedly and cause inconsistent processing. If a node fails, there is no problem, this item produce is redundant beyond the entire cluster nodes and executed in a random node to ensure HA producing.*
 
-The example bellow shows an example of `TaskProduce` implementation that produces a Collection of 10 Integers to the queue named `myQueue` in a frequency of 05 seconds and receives an `AtomicLock` on the `produce()` method:
+The example bellow shows an example of `ItemProduce` implementation that produces a Collection of 10 Integers to the queue named `myQueue` in a frequency of 05 seconds and receives an `AtomicLock` on the `produce()` method:
 
 ```java
-@TaskProduceConfig(queueName = TestConstants.TASK_QUEUE, frequency = TestConstants.TASK_PRODUCE_FREQUENCY)
-public class MyTaskProducer extends TaskProduceLockable<Integer> {
+@ItemProduceConfig(queueName = TestConstants.ITEM_QUEUE, frequency = TestConstants.ITEM_PRODUCE_FREQUENCY)
+public class MyItemProducer extends ItemProduceLockable<Integer> {
 
-    private static final Logger logger = Logger.getLogger(MyTaskProducer.class);
+    private static final Logger logger = Logger.getLogger(MyItemProducer.class);
 
     @Override
     public Collection<Integer> produce(AtomicLock atomicLock) {
@@ -64,7 +64,7 @@ public class MyTaskProducer extends TaskProduceLockable<Integer> {
         try{
 
 
-            for (int i = 1; i <= TestConstants.TASK_PRODUCE_QUANTITY; i++){
+            for (int i = 1; i <= TestConstants.ITEM_PRODUCE_QUANTITY; i++){
                 list.add(i);
             }
 
@@ -78,19 +78,19 @@ public class MyTaskProducer extends TaskProduceLockable<Integer> {
     }
 }
 ```
-*Note:* `TaskProduce` has two specializations: `TaskProduceLockable` and `TaskProduceUnlockable`. Whereas TaskProduceUnlockable doesn't allows locks, TaskProduceLockable provides a way for control flow,
+*Note:* `ItemProduce` has two specializations: `ItemProduceLockable` and `ItemProduceUnlockable`. Whereas ItemProduceUnlockable doesn't allows locks, ItemProduceLockable provides a way for control flow,
  in the cuncurrent environment through of `AtomicLock` object, which provides two methods `atomicLock.lock()` and `atomicLock.unlock()`.
         
-### `Task Process`
-Processors are *optional* tasks (managed by `WorkerConsumer`) that is allocated in all cluster's node (multithread per node). This task is responsible to execute the client's processing, it could be process to files (eg. exporting a xml/json), database, web-services, pdf generation, etc.
+### `Item Process`
+Processors are *optional* items (managed by `WorkerConsumer`) that is allocated in all cluster's node (multithread per node). This item is responsible to execute the client's processing, it could be process to files (eg. exporting a xml/json), database, web-services, pdf generation, etc.
 
-The example below shows an example of `TaskProcess` that process one Integer obtained from queue named `myQueue`, with strategy defined to wait until an Integer become available and working with 02 workers (Threads):
+The example below shows an example of `ItemProcess` that process one Integer obtained from queue named `myQueue`, with strategy defined to wait until an Integer become available and working with 02 workers (Threads):
 
 ```java
-@TaskProcessConfig(queueName = "myQueue", strategy = QueueStrategy.WAIT_ON_AVAILABLE, workers = 2)
-public class MyTaskProcessor extends TaskProcessUnlockable<Integer> {
+@ItemProcessConfig(queueName = "myQueue", strategy = QueueStrategy.WAIT_ON_AVAILABLE, workers = 2)
+public class MyItemProcessor extends ItemProcessUnlockable<Integer> {
 
-    private static final Logger logger = Logger.getLogger(MyTaskProcessor.class);
+    private static final Logger logger = Logger.getLogger(MyItemProcessor.class);
 
     @Override
     public void process(Integer type) {
@@ -98,28 +98,28 @@ public class MyTaskProcessor extends TaskProcessUnlockable<Integer> {
     }
 }
 ```
-*Note:* `TaskProcess` has two specializations: `TaskProcessLockable` and `TaskProcessUnlockable`. Whereas TaskProcessUnlockable doesn't allows locks, TaskProcessLockable provides a way for control flow,
+*Note:* `ItemProcess` has two specializations: `ItemProcessLockable` and `ItemProcessUnlockable`. Whereas ItemProcessUnlockable doesn't allows locks, ItemProcessLockable provides a way for control flow,
  in the cuncurrent environment through of `AtomicLock` object, which provides two methods `atomicLock.lock()` and `atomicLock.unlock()`.
 
-## Executing Tasks
+## Executing Items
 
 ### `ClusterWorker`
-`ClusterWorker` class is the manager of `taskProduce` and `taskProcess`. An instance of CW for task's execution can be obtained as follow:
+`ClusterWorker` class is the manager of `itemProduce` and `itemProcess`. An instance of CW for item's execution can be obtained as follow:
 
 ```java
     ClusterWorker<Integer> clusterWorker = ClusterWorkerFactory.getInstance().getClusterWorker(Integer.class);
 
-    clusterWorker.executeTaskProccess(taskProduce);
-    clusterWorker.executeTaskProduce(taskProcess);
+    clusterWorker.executeItemProccess(itemProduce);
+    clusterWorker.executeItemProduce(itemProcess);
 ```
 
-This `ClusterWorker` will manage tasks producing and processing Integer objects through the cluster nodes.
+This `ClusterWorker` will manage items producing and processing Integer objects through the cluster nodes.
 
 ### Standalones: *Base Producers & Base Consumers*
 Cluster Worker allows you have an out of the box approach to control on demand your producing and consuming logic. You can manage when to produce and when to consume data directly from Hazelcast queue. Everything you need is to implement a standalone base producer/consumer with a composition of `BaseProducer` or `BaseConsumer`.
 
 <p align="center">
-        <img alt="TaskProduce" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/baseProducer_baseConsumer.jpg?raw=true" height="200"/>
+        <img alt="ItemProduce" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/baseProducer_baseConsumer.jpg?raw=true" height="200"/>
 </p>
 ----------------------------------------------------------------------------------------------------------------------------------------
 
@@ -221,10 +221,10 @@ causing a *serial process through the cluster*. `AtomicLock` should be used in `
 </p>
 
 As said, Cluster Worker is a API based on producer x consumer architecture. It uses Hazelcast queue as distributed point for data exchange through the cluster members.
-Worker are `runnables` that encapsulate `tasks`. It comes in two flavors:
+Worker are `runnables` that encapsulate `items`. It comes in two flavors:
 
 #### `WorkerProducer`
-`WorkerProducer` is a `runnable` that encapsulate a `TaskProduce` and calls the client's implementation for producing data; This `runnable` will be present in all cluster node, however, will be active at once in an atomic cycle, this means that this `runnable` will die after the production process.
+`WorkerProducer` is a `runnable` that encapsulate a `ItemProduce` and calls the client's implementation for producing data; This `runnable` will be present in all cluster node, however, will be active at once in an atomic cycle, this means that this `runnable` will die after the production process.
 
 #### `WorkerConsumer`
-`WorkerConsumer` is a `runnable` that encapsulate a `TaskProcess` and calls the client's implementation for processing data; These `runnables` are present and active in all cluster nodes, and lives till the cluster member lives.
+`WorkerConsumer` is a `runnable` that encapsulate a `ItemProcess` and calls the client's implementation for processing data; These `runnables` are present and active in all cluster nodes, and lives till the cluster member lives.

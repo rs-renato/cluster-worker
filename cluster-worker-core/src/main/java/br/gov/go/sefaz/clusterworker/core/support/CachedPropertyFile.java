@@ -39,7 +39,7 @@ class CachedPropertyFile{
     public <T> T getProperty(String propertyName, Class<T> type){
 
         try{
-           //Loads from cache if it exist.
+           // Loads from cache if it exist.
            return getCachedProperty(propertyName, type);
         }catch (Exception e){
             logger.error(e);
@@ -73,7 +73,7 @@ class CachedPropertyFile{
 
             Method method = getValueOfMethod(type);
 
-            //Invoke the valueOf method.
+            // Invoke the valueOf method.
             T t = (T) method.invoke(null, properties.getProperty(propertyName));
 
             mapCached.put(propertyName, t);
