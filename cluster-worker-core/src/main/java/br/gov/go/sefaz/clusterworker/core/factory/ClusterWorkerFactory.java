@@ -19,6 +19,7 @@ import br.gov.go.sefaz.clusterworker.core.producer.Producer;
 import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastDefaultConfigurationSupport;
+import br.gov.go.sefaz.clusterworker.core.support.ParameterizedTypeReference;
 
 /**
  * Factory for create {@link Consumer}'s and {@link Producer}'s 
@@ -68,6 +69,15 @@ public class ClusterWorkerFactory {
      * @return {@link ClusterWorker} instance
      */
     public <T> ClusterWorker<T> getClusterWorker(Class<T> type){
+        return new ClusterWorker<>(hazelcastInstance);
+    }
+    
+    /**
+     * Create a new {@link ClusterWorker} instance of T type.
+     * @param type which this ClusterWorker will handle.
+     * @return {@link ClusterWorker} instance
+     */
+    public <T> ClusterWorker<T> getClusterWorker(ParameterizedTypeReference<T> type){
         return new ClusterWorker<>(hazelcastInstance);
     }
 

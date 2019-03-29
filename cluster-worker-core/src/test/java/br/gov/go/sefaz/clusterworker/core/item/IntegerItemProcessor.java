@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 
 import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
-import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 
 /**

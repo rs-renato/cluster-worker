@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
-import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 
 /**
  * Example of implementation of {@link ItemProducer}
