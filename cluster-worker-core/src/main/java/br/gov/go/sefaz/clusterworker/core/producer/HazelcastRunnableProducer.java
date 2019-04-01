@@ -1,8 +1,10 @@
 package br.gov.go.sefaz.clusterworker.core.producer;
 
+
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 
@@ -18,7 +20,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 
 	private static final transient long serialVersionUID = 2538609461091747126L;
 
-	private static final transient Logger logger = Logger.getLogger(HazelcastRunnableProducer.class);
+	private static final transient Logger logger = LogManager.getLogger(HazelcastRunnableProducer.class);
 
     private ItemProducer<T> itemProducer;
 

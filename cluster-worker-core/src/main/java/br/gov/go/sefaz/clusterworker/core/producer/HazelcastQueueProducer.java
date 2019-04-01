@@ -3,7 +3,8 @@ package br.gov.go.sefaz.clusterworker.core.producer;
 import java.io.Serializable;
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
@@ -18,7 +19,7 @@ import com.hazelcast.core.IQueue;
 public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, HazelcastInstanceAware {
 
 	private static final transient long serialVersionUID = -3706506746207926465L;
-	private static final transient Logger logger = Logger.getLogger(HazelcastQueueProducer.class);
+	private static final transient Logger logger = LogManager.getLogger(HazelcastQueueProducer.class);
 
     private transient HazelcastInstance hazelcastInstance;
   
@@ -66,4 +67,9 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
     public void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         this.hazelcastInstance = hazelcastInstance;
     }
+
+	@Override
+	public String toString() {
+		return "HazelcastQueueProducer [queueName=" + queueName + "]";
+	}
 }

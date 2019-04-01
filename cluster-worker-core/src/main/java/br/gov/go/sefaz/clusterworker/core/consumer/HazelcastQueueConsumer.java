@@ -3,7 +3,8 @@ package br.gov.go.sefaz.clusterworker.core.consumer;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
@@ -19,7 +20,7 @@ import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
  */
 public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, HazelcastInstanceAware{
 
-	private static final transient Logger logger = Logger.getLogger(HazelcastQueueConsumer.class);
+	private static final transient Logger logger = LogManager.getLogger(HazelcastQueueConsumer.class);
 
 	private static final transient long serialVersionUID = 4384549432295630459L;
 
@@ -133,4 +134,10 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     public void setHazelcastInstance(HazelcastInstance hazelcastInstance) {
         this.hazelcastInstance = hazelcastInstance;
     }
+
+	@Override
+	public String toString() {
+		return "HazelcastQueueConsumer [queueName=" + queueName + ", queueStrategy=" + queueStrategy + ", isBlocking="
+				+ isBlocking + ", timeout=" + timeout + "]";
+	}
 }

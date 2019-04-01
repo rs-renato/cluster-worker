@@ -7,7 +7,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
@@ -24,7 +25,6 @@ import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
-
 /**
  * Central core to manage hazelcast executor services and it's lifecycle.
  * @author renato-rs
@@ -33,7 +33,7 @@ import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
  */
 public final class ClusterWorker<T> {
 
-    private static final Logger logger = Logger.getLogger(ClusterWorker.class);
+	private static final Logger logger = LogManager.getLogger(ClusterWorker.class);
 
     private final HazelcastInstance hazelcastInstance;
     private final Map<ItemProducer<T>, Timer> itemProducerTimerMap = new HashMap<>();
@@ -151,7 +151,7 @@ public final class ClusterWorker<T> {
      */
 	public void shutdown() {
 
-		logger.warn("Shutting down entire ClusterWorker!");
+		logger.warn("Shuttingdown ClusterWorker!");
 
 		logger.debug("Cancelling item timers ..");
 		this.itemProducerTimerMap.values().forEach(Timer::cancel);
@@ -170,5 +170,7 @@ public final class ClusterWorker<T> {
 			hazelcastInstance.getLifecycleService().shutdown();
 			logger.warn("Hazelcast LifecycleService finished!");
 		}
+		
+		logger.warn("ClusterWorker shutdown completed!");
 	}
 }

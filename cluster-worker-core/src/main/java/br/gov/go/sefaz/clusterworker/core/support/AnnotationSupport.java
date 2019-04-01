@@ -2,7 +2,8 @@ package br.gov.go.sefaz.clusterworker.core.support;
 
 import java.lang.annotation.Annotation;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import br.gov.go.sefaz.clusterworker.core.exception.MandatoryAnnotationException;
 
@@ -13,7 +14,7 @@ import br.gov.go.sefaz.clusterworker.core.exception.MandatoryAnnotationException
  */
 public class AnnotationSupport {
 	
-    private static final Logger logger = Logger.getLogger(AnnotationSupport.class);
+    private static final Logger logger = LogManager.getLogger(AnnotationSupport.class);
 
 	private AnnotationSupport() {
 	}

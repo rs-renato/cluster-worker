@@ -3,6 +3,9 @@ package br.gov.go.sefaz.clusterworker.core.factory;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.hazelcast.core.HazelcastInstance;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
@@ -27,6 +30,8 @@ import br.gov.go.sefaz.clusterworker.core.support.ParameterizedTypeReference;
  * @since 1.0
  */
 public class ClusterWorkerFactory {
+
+    private static final Logger logger = LogManager.getLogger(ClusterWorkerFactory.class);
 
     private final HazelcastInstance hazelcastInstance;
     
@@ -57,9 +62,11 @@ public class ClusterWorkerFactory {
     	hazelcastInstance = isHazelcastInstanceRunning(hazelcastInstance) ? hazelcastInstance : HazelcastDefaultConfigurationSupport.createDefaultHazelcastInstance();
     	
     	if (!containsInstance || !isHazelcastInstanceRunning(factoryInstances.get(hazelcastInstanceName).hazelcastInstance)) {
+    		logger.debug(String.format("Creating ClusterWorkerFactory instance associated to hazelcast instance %s", hazelcastInstanceName));
     		factoryInstances.put(hazelcastInstanceName, new ClusterWorkerFactory(hazelcastInstance));
 		}
     	
+		logger.debug(String.format("Returning ClusterWorkerFactory instance associated to hazelcast instance %s", hazelcastInstanceName));
     	return factoryInstances.get(hazelcastInstanceName);
     }
 
@@ -89,7 +96,9 @@ public class ClusterWorkerFactory {
     public <T> HazelcastRunnableConsumer<T> getHazelcastRunnableConsumer(ItemProcessor<T> itemProcessor){
     	//Assert mandatory exception to create an HazelcastRunnableConsumer
         ConsumeFromQueue consumeFromQueue = AnnotationSupport.assertMandatoryAnnotation(itemProcessor, ConsumeFromQueue.class);
-        return new HazelcastRunnableConsumer<>(itemProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
+        HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = new HazelcastRunnableConsumer<>(itemProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
+		logger.debug(String.format("Created HazelcastRunnableProducer: %s", hazelcastRunnableConsumer));
+		return hazelcastRunnableConsumer;
     }
 
     /**
@@ -98,9 +107,12 @@ public class ClusterWorkerFactory {
      * @return {@link HazelcastRunnableProducer} instance
      */
     public <T> HazelcastRunnableProducer<T> getHazelcastRunnableProducer(ItemProducer<T> itemProducer){
+		logger.debug("Creating new HazelcastRunnableProducer");
     	//Assert mandatory exception to create an HazelcastRunnableProducer
         ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
-        return new HazelcastRunnableProducer<>(itemProducer, hazelcastInstance, produceToQueue.queueName());
+        HazelcastRunnableProducer<T> hazelcastRunnableProducer = new HazelcastRunnableProducer<>(itemProducer, hazelcastInstance, produceToQueue.queueName());
+        logger.debug(String.format("Created HazelcastRunnableProducer: %s", hazelcastRunnableProducer));
+		return hazelcastRunnableProducer;
     }
 
     /**
@@ -109,7 +121,9 @@ public class ClusterWorkerFactory {
      * @return {@link HazelcastQueueProducer} instance
      */
     public <T> HazelcastQueueProducer<T> getHazelcastQueueProducer(String queueName){
-    	return new HazelcastQueueProducer<>(hazelcastInstance, queueName);
+    	HazelcastQueueProducer<T> hazelcastQueueProducer = new HazelcastQueueProducer<>(hazelcastInstance, queueName);
+        logger.debug(String.format("Created HazelcastQueueProducer: %s", hazelcastQueueProducer));
+		return hazelcastQueueProducer;
     }
     
     /**
@@ -120,7 +134,9 @@ public class ClusterWorkerFactory {
      * @return {@link HazelcastQueueConsumer} instance
      */
     public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, QueueStrategy queueStrategy, int timeout){
-    	return new HazelcastQueueConsumer<>(hazelcastInstance, queueName, queueStrategy, timeout);
+    	HazelcastQueueConsumer<T> hazelcastQueueConsumer = new HazelcastQueueConsumer<>(hazelcastInstance, queueName, queueStrategy, timeout);
+    	logger.debug(String.format("Created HazelcastQueueConsumer: %s", hazelcastQueueConsumer));
+		return hazelcastQueueConsumer;
     }
     
     /**
@@ -128,6 +144,7 @@ public class ClusterWorkerFactory {
      */
 	public synchronized void shutdownHazelcastInstance() {
 
+    	logger.warn("Shuttingdown ClusterWorkerFactory and its hazelcast instance..");
 		hazelcastInstance.shutdown();
 		
 		if (isHazelcastInstanceRunning(hazelcastInstance)) {
@@ -142,6 +159,8 @@ public class ClusterWorkerFactory {
 		}
 		
 		factoryInstances.remove(hazelcastInstanceName);
+		
+    	logger.warn("ClusterWorkerFactory shutdown completed!");
 	}
 	
 	private static boolean isHazelcastInstanceRunning(HazelcastInstance hazelcastInstance) {

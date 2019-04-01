@@ -1,6 +1,7 @@
 package br.gov.go.sefaz.clusterworker.core.consumer;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 
@@ -17,7 +18,7 @@ import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T> implements Runnable, ShutdownListener{
 
 	private static final transient long serialVersionUID = 5404415194904610053L;
-	private static final transient Logger logger = Logger.getLogger(HazelcastRunnableConsumer.class);
+	private static final transient Logger logger = LogManager.getLogger(HazelcastRunnableConsumer.class);
     
 	private boolean stopped;
 

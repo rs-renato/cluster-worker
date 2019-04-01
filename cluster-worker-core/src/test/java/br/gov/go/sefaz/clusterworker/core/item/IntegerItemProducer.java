@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
@@ -18,7 +19,7 @@ import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
 public class IntegerItemProducer implements ItemProducer<Integer> {
 
 	private static final long serialVersionUID = 3936335122592593550L;
-	private static final Logger logger = Logger.getLogger(IntegerItemProducer.class);
+	private static final Logger logger = LogManager.getLogger(IntegerItemProducer.class);
 
     @Override
     public Collection<Integer> produce() {

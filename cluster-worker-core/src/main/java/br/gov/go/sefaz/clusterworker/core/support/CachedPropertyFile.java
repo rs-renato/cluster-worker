@@ -1,12 +1,14 @@
 package br.gov.go.sefaz.clusterworker.core.support;
 
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * CachedPropertyFile abstraction class.
@@ -15,7 +17,7 @@ import org.apache.log4j.Logger;
  */
 class CachedPropertyFile{
 
-    private static final Logger logger = Logger.getLogger(CachedPropertyFile.class);
+    private static final Logger logger = LogManager.getLogger(CachedPropertyFile.class);
 
     private static final Map<Class<?>, Method> mapMethod = new HashMap<>();
     private static final Map<String, Object> mapCached = new HashMap<>();

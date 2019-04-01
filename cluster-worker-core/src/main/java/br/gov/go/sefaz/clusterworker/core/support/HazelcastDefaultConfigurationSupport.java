@@ -1,6 +1,8 @@
 package br.gov.go.sefaz.clusterworker.core.support;
 
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
@@ -17,7 +19,7 @@ import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
  */
 public final class HazelcastDefaultConfigurationSupport {
 
-    private static final Logger logger = Logger.getLogger(HazelcastDefaultConfigurationSupport.class);
+    private static final Logger logger = LogManager.getLogger(HazelcastDefaultConfigurationSupport.class);
     private static final CachedPropertyFile cachedPropertyFile = CachedPropertyFileSupport.getCachedPropertyFile("cw-config");
     private static final Config hazelcastConfig;
 
@@ -33,6 +35,7 @@ public final class HazelcastDefaultConfigurationSupport {
      * @return hazelcast instance
      */
     public static HazelcastInstance getDefaultHazelcastInstance(){
+		logger.debug("Getting default Hazelcast Instance");
     	return Hazelcast.getOrCreateHazelcastInstance(getDefaultConfig());
     }
     
@@ -41,6 +44,7 @@ public final class HazelcastDefaultConfigurationSupport {
      * @return hazelcast instance
      */
     public static HazelcastInstance createDefaultHazelcastInstance(){
+    	logger.debug("Creating new default Hazelcast Instance");
     	return Hazelcast.newHazelcastInstance(getDefaultConfig());
     }
     
@@ -64,10 +68,11 @@ public final class HazelcastDefaultConfigurationSupport {
      * Shutdown all entire hazelcast instances if there is any.
      */
     public static void shutdownDefaultHazelcastInstance(){
+    	logger.warn("Shuttingdown Default Hazelcast Instance...");
         if (hasDefaultHazelcastInstance()){
-            logger.warn("Shuttingdown Default Hazelcast Instance...");
             getDefaultHazelcastInstance().shutdown();
         }
+        logger.warn("Default Hazelcast Instance shutdown completed!");
     }
     
     /**
