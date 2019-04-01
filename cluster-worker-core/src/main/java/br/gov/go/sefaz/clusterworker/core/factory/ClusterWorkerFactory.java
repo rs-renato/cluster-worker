@@ -130,11 +130,18 @@ public class ClusterWorkerFactory {
 
 		hazelcastInstance.shutdown();
 		
-		if (hazelcastInstance.getLifecycleService().isRunning()) {
+		if (isHazelcastInstanceRunning(hazelcastInstance)) {
 			hazelcastInstance.getLifecycleService().shutdown();
 		}
 		
-		factoryInstances.remove(hazelcastInstance.getName());
+		String hazelcastInstanceName = hazelcastInstance.getName();
+		HazelcastInstance factoryInnerHazelcastInstance = factoryInstances.get(hazelcastInstanceName).hazelcastInstance;
+		
+		if (isHazelcastInstanceRunning(factoryInnerHazelcastInstance)) {
+			factoryInnerHazelcastInstance.getLifecycleService().shutdown();
+		}
+		
+		factoryInstances.remove(hazelcastInstanceName);
 	}
 	
 	private static boolean isHazelcastInstanceRunning(HazelcastInstance hazelcastInstance) {
