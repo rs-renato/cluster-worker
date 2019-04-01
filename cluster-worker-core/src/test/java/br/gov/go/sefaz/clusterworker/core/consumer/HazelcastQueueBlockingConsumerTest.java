@@ -25,13 +25,14 @@ public class HazelcastQueueBlockingConsumerTest {
 
 	private static ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance();
 	private static ClusterWorker<Integer> clusterWorker;
+	private static Timer timerItemProducer;
 
 	@BeforeClass
 	public static void setUp() {
     	// Instantiate a Cluster Worker to handle integer objects (produce and consume to/from hazelcast queue)
 		clusterWorker = cwFactory.getClusterWorker(Integer.class);
 		 
-		Timer timerItemProducer = new Timer();
+		timerItemProducer = new Timer();
 		 int TIMER_DELAY = 10_000;
 	        
 			timerItemProducer.schedule(
@@ -52,10 +53,11 @@ public class HazelcastQueueBlockingConsumerTest {
 	public static void tearDownClass() {
         // Shutdown cluster worker internals
 		clusterWorker.shutdown();
+		timerItemProducer.cancel();
 	}
 
 	@Test
-	public void testHazelcastQueueConsumerWaitOnAvailable() {
+	public void shouldExecuteHazelcastQueueConsumerWaitOnAvailable() {
         // Creates an consumer to consumes the hazelcast queue
 		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer =  cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, QueueStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT); 
 				

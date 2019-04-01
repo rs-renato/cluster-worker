@@ -39,7 +39,7 @@ public class HazelcastQueueNonBlockingConsumerTest {
 	}
 
 	@Test
-	public void testHazelcastQueueConsumerAcceptNull() {
+	public void shouldExecuteHazelcastQueueConsumerAcceptNull() {
 
         // Creates an consumer to consumes the hazelcast queue
 		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, QueueStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT);

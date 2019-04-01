@@ -1,5 +1,7 @@
 package br.gov.go.sefaz.clusterworker.core;
 
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
@@ -13,22 +15,30 @@ import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
  */
 public class ClusterWorkerTest {
 
+	private static ClusterWorker<Integer> clusterWorker;
+	
+	@BeforeClass
+	public static void setUp() {
+		clusterWorker = ClusterWorkerFactory.getInstance().getClusterWorker(Integer.class);
+	}
+	
+	@AfterClass
+	public static void tearDownClass() {
+		clusterWorker.shutdown();
+	}
+	
     @Test
-    public void testClusterWorker() throws InterruptedException {
-
-    	// Instantiate a Cluster Worker to handle integer objects (produce and consume to/from hazelcast queue)
-        ClusterWorker<Integer> clusterWorker = ClusterWorkerFactory.getInstance().getClusterWorker(Integer.class);
-        
+    public void shouldExecuteItemProducer() throws InterruptedException {
         // Execute the item produder on cluster worker
         clusterWorker.executeItemProducer(new IntegerItemProducer());
-        
+    }
+    
+    @Test
+    public void shouldExecuteItemProcessor() throws InterruptedException {
         // Execute the item processor on cluster worker
         clusterWorker.executeItemProccessor(new IntegerItemProcessor());
 
-        //Just wait for 30s to execute this test
-        Thread.sleep(30 * 1000);
-
-        // Shutdown cluster worker internals
-        clusterWorker.shutdown();
+        //Just wait for 20s to execute this test
+        Thread.sleep(20 * 1000);
     }
 }
