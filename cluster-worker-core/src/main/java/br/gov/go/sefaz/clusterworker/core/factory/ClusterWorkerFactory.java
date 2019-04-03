@@ -12,6 +12,7 @@ import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
 import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
 import br.gov.go.sefaz.clusterworker.core.consumer.Consumer;
+import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueConsumer;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastRunnableConsumer;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
@@ -19,13 +20,12 @@ import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.Producer;
-import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastDefaultConfigurationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.ParameterizedTypeReference;
 
 /**
- * Factory for create {@link Consumer}'s and {@link Producer}'s 
+ * Factory for create {@link Consumer}'s and {@link Producer}'s implementations
  * @author renato-rs
  * @since 1.0
  */
@@ -59,8 +59,10 @@ public class ClusterWorkerFactory {
     	String hazelcastInstanceName = hazelcastInstance.getName();
     	boolean containsInstance = factoryInstances.containsKey(hazelcastInstanceName);
     	
-    	hazelcastInstance = isHazelcastInstanceRunning(hazelcastInstance) ? hazelcastInstance : HazelcastDefaultConfigurationSupport.createDefaultHazelcastInstance();
+    	// Grants a running hazelcast instance
+    	hazelcastInstance = isHazelcastInstanceRunning(hazelcastInstance) ? hazelcastInstance : HazelcastDefaultConfigurationSupport.getDefaultHazelcastInstance();
     	
+    	// Creates a new ClusterWorkerFactory if has no cache to this factory or cachedFactory.hazelcastInstance is not running
     	if (!containsInstance || !isHazelcastInstanceRunning(factoryInstances.get(hazelcastInstanceName).hazelcastInstance)) {
     		logger.debug(String.format("Creating ClusterWorkerFactory instance associated to hazelcast instance %s", hazelcastInstanceName));
     		factoryInstances.put(hazelcastInstanceName, new ClusterWorkerFactory(hazelcastInstance));
@@ -129,12 +131,12 @@ public class ClusterWorkerFactory {
     /**
      * Create a new {@link HazelcastQueueConsumer} instance of T type.
      * @param queueName queue name
-     * @param queueStrategy Consummer queue strategy
+     * @param consumerStrategy Consumer queue strategy
      * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
      * @return {@link HazelcastQueueConsumer} instance
      */
-    public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, QueueStrategy queueStrategy, int timeout){
-    	HazelcastQueueConsumer<T> hazelcastQueueConsumer = new HazelcastQueueConsumer<>(hazelcastInstance, queueName, queueStrategy, timeout);
+    public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, ConsumerStrategy consumerStrategy, int timeout){
+    	HazelcastQueueConsumer<T> hazelcastQueueConsumer = new HazelcastQueueConsumer<>(hazelcastInstance, queueName, consumerStrategy, timeout);
     	logger.debug(String.format("Created HazelcastQueueConsumer: %s", hazelcastQueueConsumer));
 		return hazelcastQueueConsumer;
     }

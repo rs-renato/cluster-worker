@@ -1,19 +1,15 @@
 package br.gov.go.sefaz.clusterworker.core;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IExecutorService;
-import com.hazelcast.core.IQueue;
 import com.hazelcast.core.Member;
+import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
+import com.hazelcast.scheduledexecutor.IScheduledFuture;
 
 import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
 import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
@@ -36,15 +32,18 @@ public final class ClusterWorker<T> {
 	private static final Logger logger = LogManager.getLogger(ClusterWorker.class);
 
     private final HazelcastInstance hazelcastInstance;
-    private final Map<ItemProducer<T>, Timer> itemProducerTimerMap = new HashMap<>();
+    private final IScheduledExecutorService scheduledExecutorService;
     private final ArrayList<ShutdownListener> shutdownListeners = new ArrayList<>();
-
+    private final ArrayList<IScheduledFuture<?>> scheduledFutures = new ArrayList<>();
+    
     /**
      * Constructor for ClusterWorker.
      * @param hazelcastInstance instance of hazelcast.
      */
     public ClusterWorker(HazelcastInstance hazelcastInstance) {
     	this.hazelcastInstance = hazelcastInstance;
+    	this.scheduledExecutorService = hazelcastInstance.getScheduledExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
+    	
     }
     
     /**
@@ -57,20 +56,23 @@ public final class ClusterWorker<T> {
 
         // Number of workers (threads)
         int workers = consumeFromQueue.workers();
+        // Delay to start the consumers
+        int DELAY_TO_START = 0;
 
-        logger.info(String.format("Executing ItemProcessor (%s worker(s)) implementation on hazelcast executor service.", workers));
+        logger.info(String.format("Configuring ItemProcessor (%s worker(s)) implementation on hazelcast executor service.", workers));
 
         // Creates worker (HazelcastRunnableConsumer)
-        HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance(hazelcastInstance).getHazelcastRunnableConsumer(itemProcessor);
+        HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableConsumer(itemProcessor);
         for (int i = 1; i <=  workers; i++) {
 
             try {
-                logger.debug(String.format("Adding listener for worker %s..", i));
-            	this.shutdownListeners.add(hazelcastRunnableConsumer);
             	// Executes the consumer on hazelcast local member
-				hazelcastInstance
-            		.getExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME)
-            		.executeOnMember(hazelcastRunnableConsumer, getLocalMember());
+				IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMember(hazelcastRunnableConsumer, getLocalMember(), DELAY_TO_START, TimeUnit.SECONDS);
+				
+				logger.debug(String.format("Adding listener for worker %s..", i));
+				this.shutdownListeners.add(hazelcastRunnableConsumer);
+				logger.debug(String.format("Adding ScheduledFutures for worker %s..", i));
+				this.scheduledFutures.add(scheduledFuture);
             }catch (Exception e){
                 logger.error(String.format("Cannot execute a ItemProcessor on hazelcast executor service! %s", e.getMessage()));
             }
@@ -85,57 +87,14 @@ public final class ClusterWorker<T> {
     	//Assert mandatory exception to create an ItemProducer
     	final ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
     	
-    	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(hazelcastInstance).getHazelcastRunnableProducer(itemProducer);
+    	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableProducer(itemProducer);
 
     	// Frequency of produce's execution 
         int frequency = produceToQueue.frequency();
         
-        Timer timerItemProducer = new Timer();
+        logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s second.", frequency));
 
-        logger.info(String.format("Executing ItemProducer implementation on hazelcast executor service with frequency of %s second.", frequency));
-
-        final int TIMER_DELAY = 0;
-        
-        // Create a fixed rate timer 
-		timerItemProducer.scheduleAtFixedRate(
-
-                new TimerTask() {
-                    @Override
-                    public void run() {
-
-                    	String queueName = produceToQueue.queueName();
-                    	IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
-						logger.info(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
-                        
-                        // Execute item producer only if the queue has none elements to be processed
-						// The execution will be activated only on hazelcast local member
-                        if (iQueue.isEmpty() && isLocalMember()) {
-                        	
-                            try {
-                                logger.debug("Executing ItemProducer implementation on hazelcast executor service.");
-                                hazelcastInstance
-                                	.getExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME)
-                                	.execute(hazelcastRunnableProducer);
-
-                            } catch (Exception e) {
-                                logger.error(String.format("Cannot execute a ItemProducer on hazelcast executor service! %s", e.getMessage()));
-                            }
-                        }
-                    }
-                },
-                TIMER_DELAY,
-                TimeUnit.MILLISECONDS.convert(frequency, TimeUnit.SECONDS)
-        );
-
-        itemProducerTimerMap.put(itemProducer, timerItemProducer);
-    }
-
-    /**
-     * Verifies if this member is local member.
-     * @return true is local member.
-     */
-    private boolean isLocalMember() {
-        return hazelcastInstance.getCluster().getMembers().iterator().next().localMember();
+        this.scheduledExecutorService.scheduleOnAllMembersAtFixedRate(hazelcastRunnableProducer, 0, frequency, TimeUnit.SECONDS);
     }
 
     /**
@@ -143,34 +102,36 @@ public final class ClusterWorker<T> {
      * @return member
      */
     private Member getLocalMember() {
-        return hazelcastInstance.getCluster().getLocalMember();
+        return this.hazelcastInstance.getCluster().getLocalMember();
     }
 
     /**
-     * Shutdown entyre ClusterWorker core and all hazelcast instances.
+     * Shutdown the ClusterWorker core and its hazelcast instance, listeners, futures, etc.
      */
 	public void shutdown() {
 
-		logger.warn("Shuttingdown ClusterWorker!");
+		logger.info("Shuttingdown ClusterWorker!");
 
-		logger.debug("Cancelling item timers ..");
-		this.itemProducerTimerMap.values().forEach(Timer::cancel);
-
-		logger.debug("Shutting down listeners ..");
+		logger.info("Shuttingdown ScheduledFutures!");
+		this.scheduledFutures.forEach(future -> {
+			
+			if (!future.isCancelled()) {
+				future.cancel(false);
+			}
+		});
+		
+		logger.info("Shuttingdown Listeners ..");
 		this.shutdownListeners.forEach(ShutdownListener::shutdown);
-
-		IExecutorService executorService = hazelcastInstance.getExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
-
-		if (!executorService.isShutdown()) {
-			executorService.shutdownNow();
-			logger.warn("ExecutorService finished!");
-		}
-
-		if (hazelcastInstance.getLifecycleService().isRunning()) {
-			hazelcastInstance.getLifecycleService().shutdown();
-			logger.warn("Hazelcast LifecycleService finished!");
+		
+//		logger.info("Shuttingdown ScheduledExecutorService!");
+//		this.scheduledExecutorService.shutdown();
+		
+		if (this.hazelcastInstance.getLifecycleService().isRunning()) {
+			
+			this.hazelcastInstance.getLifecycleService().shutdown();
+			logger.info("Hazelcast LifecycleService finished!");
 		}
 		
-		logger.warn("ClusterWorker shutdown completed!");
+		logger.info("ClusterWorker shutdown completed!");
 	}
 }

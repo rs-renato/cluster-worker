@@ -1,13 +1,11 @@
-package br.gov.go.sefaz.clusterworker.core.queue;
-
-import br.gov.go.sefaz.clusterworker.core.consumer.Consumer;
+package br.gov.go.sefaz.clusterworker.core.consumer;
 
 /**
- * Consummer queue strategy to the general client's {@link Consumer} implementation.
+ * Consumer queue strategy to the general client's {@link Consumer} implementation.
  * @author renato-rs
  * @since 1.0
  */
-public enum QueueStrategy {
+public enum ConsumerStrategy {
     /**
      * Accept a null element from the queue even if a timeout ocurrs. This is a non-blocking strategy.
      */

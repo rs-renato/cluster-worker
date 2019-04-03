@@ -7,7 +7,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastInstanceNotActiveException;
+import com.hazelcast.core.IQueue;
+import com.hazelcast.core.Member;
 
+import br.gov.go.sefaz.clusterworker.core.exception.ItemProducerException;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 
 /**
@@ -38,18 +42,43 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     @Override
     public void run() {
 
-        logger.info("Starting HazelcastRunnableProducer!");
-
-        try{
-        	// Produces items from client's implementation
-            Collection<T> items = itemProducer.produce();
-            
-            if (items!= null){
-                produce(items);
-            }
-
-        }catch (Exception e){
-            logger.error("Cannot produce on client's implementation!", e);
-        }
+    	Member member = getFirstClusterMember();
+    	boolean isLocalMember = member.localMember();
+    	
+		logger.debug(String.format("Trying to execute HazelcastRunnableProducer on first Cluster Member: '%s'. Is Local Member: %s", member.getUuid(), isLocalMember));
+    	
+    	if (isLocalMember) {
+    		try{
+    			
+    			IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
+    			logger.info(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
+    			// Execute item producer only if the queue has none elements to be processed
+    			if (iQueue.isEmpty()) {
+    				// Produces items from client's implementation
+    				Collection<T> items = itemProducer.produce();
+    				
+    				if (items!= null){
+    					produce(items);
+    				}
+    			}
+            } catch (InterruptedException|HazelcastInstanceNotActiveException e) {
+				logger.error(String.format("Cannot produce to hazelcast %s queue! This thread will die! Reason: %s", queueName, e.getMessage()));
+				Thread.currentThread().interrupt();
+    		}catch (ItemProducerException e){
+    			logger.error(String.format("Cannot produce on client's implementation! Error: %s", e.getMessage()));
+    		 }catch (Exception e){
+     			logger.error("A general error occurs process on HazelcastRunnableProducer", e);
+             }
+		}
+    	
+		logger.debug(String.format("HazelcastRunnableProducer execution %s on member: '%s'.", (isLocalMember ? "completed" : "ignored"), member.getUuid()));
+    }
+    
+    /**
+     * Returns the first cluster member
+     * @return the first cluster member 
+     */
+    private Member getFirstClusterMember() {
+        return hazelcastInstance.getCluster().getMembers().iterator().next();
     }
 }

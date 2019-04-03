@@ -4,10 +4,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.HazelcastInstanceNotActiveException;
 
+import br.gov.go.sefaz.clusterworker.core.exception.ItemProcessorException;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
-import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 
 /**
  * Runnable of {@link HazelcastQueueConsumer}, responsible for process {@link ItemProcessor} client's implementation.
@@ -29,11 +30,11 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
      * @param itemProcessor ItemProcessor client's implementation.
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
-     * @param queueStrategy Consummer queue strategy
+     * @param consumerStrategy Consumer queue strategy
      * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
      */
-    public HazelcastRunnableConsumer(ItemProcessor<T> itemProcessor, HazelcastInstance hazelcastInstance, String queueName, QueueStrategy queueStrategy, int timeout) {
-        super(hazelcastInstance, queueName, queueStrategy, timeout);
+    public HazelcastRunnableConsumer(ItemProcessor<T> itemProcessor, HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
+        super(hazelcastInstance, queueName, consumerStrategy, timeout);
         this.itemProcessor = itemProcessor;
     }
 
@@ -45,22 +46,27 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
         // Run this thread untill shutdown is called
         while(isRunning()) {
 
-            logger.debug(String.format("Processing on the client's implementation. Strategy defined to %s.", getQueueStrategy()));
-
-            T item = consume();
-
-            // Process the item if it exists, or if the strategy is non-blocking, independently if the item exists 
-            if (item != null || !isBlocking()){
-
-                try{
+            try {
+            	// Consumes from hazelcast queue
+            	T item = consume();
+            	
+            	// Process the item if it exists, or if the strategy is non-blocking, independently if the item exists 
+                if (item != null || !isBlocking()){
+                	logger.debug(String.format("Processing on the client's implementation. Strategy defined to %s.", getQueueStrategy()));
                 	itemProcessor.process(item);
-                }catch (Exception e){
-                    logger.error("Cannot process on client's implementation!", e);
                 }
+                
+            } catch (InterruptedException|HazelcastInstanceNotActiveException e) {
+                logger.error(String.format("Cannot consume from hazelcast %s queue! This thread will die! Reason: %s", queueName, e.getMessage()));
+                Thread.currentThread().interrupt();
+            }catch (ItemProcessorException e){
+    			logger.error(String.format("Cannot process on client's implementation! Error: %s", e.getMessage()));
+            }catch (Exception e){
+    			logger.error("A general error occurs process on HazelcastRunnableConsumer", e);
             }
         }
 
-        logger.warn("Finishing WorkerConsumer!");
+        logger.warn("Finishing HazelcastRunnableConsumer!");
     }
     
     /**

@@ -46,5 +46,15 @@
           	<AppenderRef ref="log" level="INFO" />
 			<AppenderRef ref="error-log" level="ERROR" />
         </Logger>
+        
+        <Logger name="com.hazelcast.scheduledexecutor" additivity="TRUE" level="ERROR">
+          	<AppenderRef ref="log" level="ERROR" />
+			<AppenderRef ref="error-log" level="ERROR" />
+        </Logger>
+        
+         <Logger name="com.hazelcast.spi" additivity="TRUE" level="ERROR">
+          	<AppenderRef ref="log" level="ERROR" />
+			<AppenderRef ref="error-log" level="ERROR" />
+        </Logger>
     </Loggers>
 </Configuration>

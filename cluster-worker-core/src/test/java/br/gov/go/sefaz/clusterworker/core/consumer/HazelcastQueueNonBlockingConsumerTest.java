@@ -13,7 +13,6 @@ import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
-import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 
 /**
  * HazelcastQueueConsumer example of use in non-blocking way
@@ -39,10 +38,10 @@ public class HazelcastQueueNonBlockingConsumerTest {
 	}
 
 	@Test
-	public void shouldExecuteHazelcastQueueConsumerAcceptNull() {
+	public void shouldExecuteHazelcastQueueConsumerAcceptNull() throws InterruptedException {
 
         // Creates an consumer to consumes the hazelcast queue
-		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, QueueStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT);
+		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, ConsumerStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT);
 
 		int loop = TestConstants.CW_ITEM_PRODUCER_QUANTITY * 3;
 

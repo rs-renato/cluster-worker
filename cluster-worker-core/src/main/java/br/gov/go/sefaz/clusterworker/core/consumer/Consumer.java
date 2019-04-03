@@ -11,6 +11,7 @@ public interface Consumer<T> {
     /**
      * Consumes the type of T.
      * @return T type
+     * @throws InterruptedException if the thread is interrupted
      */
-    T consume();
+    T consume() throws InterruptedException;
 }

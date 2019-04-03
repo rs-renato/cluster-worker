@@ -31,21 +31,28 @@ public final class HazelcastDefaultConfigurationSupport {
     }
 
     /**
-     * Return a HazelcastInstance from default configuration 
+     * Return a HazelcastInstance from default configuration. This method grants a running HazelcastInstance
      * @return hazelcast instance
      */
     public static HazelcastInstance getDefaultHazelcastInstance(){
-		logger.debug("Getting default Hazelcast Instance");
-    	return Hazelcast.getOrCreateHazelcastInstance(getDefaultConfig());
-    }
-    
-    /**
-     * Creates and return a new HazelcastInstance from default configuration 
-     * @return hazelcast instance
-     */
-    public static HazelcastInstance createDefaultHazelcastInstance(){
-    	logger.debug("Creating new default Hazelcast Instance");
-    	return Hazelcast.newHazelcastInstance(getDefaultConfig());
+    	
+    	HazelcastInstance hazelcastInstance;
+    	
+    	boolean hasDefaultInstanceRunning = hasActiveDefaultHazelcastInstance();
+    	
+    	logger.info(String.format("Default HazelcastInstance running: %s", hasDefaultInstanceRunning));
+
+    	// Grants a hazelcast instance running
+    	if (!hasDefaultInstanceRunning){
+    		shutdownDefaultHazelcastInstance();
+        	logger.info("Creating new HazelcastInstance from default configuration");
+    		hazelcastInstance =  Hazelcast.newHazelcastInstance(getDefaultConfig());
+		}else  {
+			logger.info("Retrieving HazelcastInstance from default instance name");
+			hazelcastInstance =  Hazelcast.getHazelcastInstanceByName(getDefaultHazelcastInstanceName());
+		}
+    	
+    	return hazelcastInstance;
     }
     
     /**
@@ -60,19 +67,21 @@ public final class HazelcastDefaultConfigurationSupport {
      * Verifies if there is the default hazelcast instance
      * @return true is default hazelcast instance was found.
      */
-    public static boolean hasDefaultHazelcastInstance(){
-        return Hazelcast.getHazelcastInstanceByName(getDefaultHazelcastInstanceName()) != null;
+    public static boolean hasActiveDefaultHazelcastInstance(){
+        HazelcastInstance hazelcastInstance = Hazelcast.getHazelcastInstanceByName(getDefaultHazelcastInstanceName());
+		return hazelcastInstance != null && hazelcastInstance.getLifecycleService().isRunning();
     }
 
     /**
      * Shutdown all entire hazelcast instances if there is any.
      */
-    public static void shutdownDefaultHazelcastInstance(){
-    	logger.warn("Shuttingdown Default Hazelcast Instance...");
-        if (hasDefaultHazelcastInstance()){
-            getDefaultHazelcastInstance().shutdown();
-        }
-        logger.warn("Default Hazelcast Instance shutdown completed!");
+	public static void shutdownDefaultHazelcastInstance(){
+        HazelcastInstance hazelcastInstance = Hazelcast.getHazelcastInstanceByName(getDefaultHazelcastInstanceName());
+        if (hazelcastInstance != null) {
+        	logger.warn("Shuttingdown Default Hazelcast Instance...");
+        	hazelcastInstance.shutdown();
+        	logger.warn("Default Hazelcast Instance shutdown completed!");
+		}
     }
     
     /**
@@ -93,23 +102,24 @@ public final class HazelcastDefaultConfigurationSupport {
 
         // Creates the default configuration
         Config hazelcastDefaultConfig = new Config();
+        // Configures the log
+        hazelcastDefaultConfig.setProperty("hazelcast.logging.type", ClusterWorkerConstants.CW_HAZELCAST_LOGGING_TYPE);
+        
         hazelcastDefaultConfig.setInstanceName(getDefaultHazelcastInstanceName());
         
+        // Loads the property configuration values
         int port = cachedPropertyFile.getProperty("cw.network.config.port", Integer.class);
         int portCount = cachedPropertyFile.getProperty("cw.network.config.port.count", Integer.class);
         int queueMaxSize = cachedPropertyFile.getProperty("cw.queue.config.max.size", Integer.class);
         boolean multicastEnabled = cachedPropertyFile.getProperty("cw.multicast.config.enabled", Boolean.class);
         String multicastInterface = cachedPropertyFile.getProperty("cw.multicast.config.interface");
         
+        // Configures network
         NetworkConfig networkConfig = hazelcastDefaultConfig.getNetworkConfig();
        
         networkConfig.setPort(port)
                 .setReuseAddress(true)
                 .setPortCount(portCount);
-
-        hazelcastDefaultConfig
-        	.getQueueConfig(ClusterWorkerConstants.CW_QUEUE_CONFIG_DEFAULT)
-            .setMaxSize(queueMaxSize);
         
         JoinConfig join = networkConfig.getJoin();
 
@@ -125,6 +135,11 @@ public final class HazelcastDefaultConfigurationSupport {
                 .setEnabled(true)
                 .addInterface(multicastInterface);
 
+        // Configures queue
+        hazelcastDefaultConfig
+        	.getQueueConfig(ClusterWorkerConstants.CW_QUEUE_CONFIG_DEFAULT)
+            .setMaxSize(queueMaxSize);
+        
         logger.info(String.format("Hazelcast configurations finished: %s", hazelcastDefaultConfig));
 
         return hazelcastDefaultConfig;

@@ -13,6 +13,7 @@ public interface Producer<T>{
     /**
      * Produces a collection of T type.
      * @param items to produce.
+     * @throws InterruptedException 
      */
-    void produce(Collection<T> items);
+    void produce(Collection<T> items) throws InterruptedException;
 }

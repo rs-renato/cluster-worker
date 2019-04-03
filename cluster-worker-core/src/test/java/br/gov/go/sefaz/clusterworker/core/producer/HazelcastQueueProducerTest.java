@@ -10,9 +10,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
+import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueConsumer;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
-import br.gov.go.sefaz.clusterworker.core.queue.QueueStrategy;
 
 /**
  * HazelcastQueueProducer example of use
@@ -35,7 +35,7 @@ public class HazelcastQueueProducerTest {
 	}
 	
     @Test
-	public void shouldExecuteHazelcastQueueProducer() {
+	public void shouldExecuteHazelcastQueueProducer() throws InterruptedException {
 
         // Creates an producer to produces the hazelcast queue
 		HazelcastQueueProducer<Integer> hazelcastQueueProducer = cwFactory.getHazelcastQueueProducer(TestConstants.CW_QUEUE_NAME);
@@ -48,9 +48,9 @@ public class HazelcastQueueProducerTest {
 	}
     
     @Test
-   	public void shouldExecuteHazelcastQueueConsumer() {
+   	public void shouldExecuteHazelcastQueueConsumer() throws InterruptedException {
         // Creates an consumer to consumes the hazelcast queue
-   		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, QueueStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT);
+   		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, ConsumerStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT);
 
    		Integer result;
 

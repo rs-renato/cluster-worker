@@ -21,9 +21,9 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
 	private static final transient long serialVersionUID = -3706506746207926465L;
 	private static final transient Logger logger = LogManager.getLogger(HazelcastQueueProducer.class);
 
-    private transient HazelcastInstance hazelcastInstance;
+    protected transient HazelcastInstance hazelcastInstance;
   
-    private String queueName;
+    protected String queueName;
 
     /**
      * Constructor for HazelcastQueueProducer
@@ -36,23 +36,17 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
     }
 
     @Override
-    public void produce(Collection<T> items) {
+    public void produce(Collection<T> items) throws InterruptedException {
 
-    	logger.debug(String.format("Producing %s items to %s queue.", items.size(), queueName));
-    	
-    	//Return the hazelcast distributed queue
-        IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
-
-        for (T item : items) {
-
-            try {
-                //Put a new item to the hazelcast queue
-                iQueue.put(item);
-            } catch (InterruptedException e) {
-                logger.error(String.format("Cannot produce to hazelcast %s queue!", queueName), e);
-                Thread.currentThread().interrupt();
-            }
-        }
+		logger.debug(String.format("Producing %s items to %s queue.", items.size(), queueName));
+		
+		//Return the hazelcast distributed queue
+		IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
+		
+		for (T item : items) {
+			//Put a new item to the hazelcast queue
+			iQueue.put(item);
+		}
     }
 
     /**
