@@ -8,6 +8,7 @@ import br.gov.go.sefaz.clusterworker.core.ClusterWorkerTest;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueBlockingConsumerTest;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueNonBlockingConsumerTest;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducerTest;
+import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobinTest;
 
 /**
  * Test Suite for Cluster Worker
@@ -18,7 +19,8 @@ import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducerTest;
 @SuiteClasses({ClusterWorkerTest.class, 
 	HazelcastQueueBlockingConsumerTest.class,
 	HazelcastQueueNonBlockingConsumerTest.class,
-	HazelcastQueueProducerTest.class})
+	HazelcastQueueProducerTest.class,
+	HazelcastMemberRoundRobinTest.class})
 public class ClusterWorkerSuiteTest {
 
 }

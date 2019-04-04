@@ -1,6 +1,7 @@
 package br.gov.go.sefaz.clusterworker.core;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -92,9 +93,12 @@ public final class ClusterWorker<T> {
     	// Frequency of produce's execution 
         int frequency = produceToQueue.frequency();
         
-        logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s second.", frequency));
+        // Try to syncronize the initial execution always on second 0
+        int initialDelay = 60 - Calendar.getInstance().get(Calendar.SECOND);
+        
+        logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds.", frequency, initialDelay));
 
-        this.scheduledExecutorService.scheduleOnAllMembersAtFixedRate(hazelcastRunnableProducer, 0, frequency, TimeUnit.SECONDS);
+        this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.SECONDS);
     }
 
     /**
@@ -122,9 +126,6 @@ public final class ClusterWorker<T> {
 		
 		logger.info("Shuttingdown Listeners ..");
 		this.shutdownListeners.forEach(ShutdownListener::shutdown);
-		
-//		logger.info("Shuttingdown ScheduledExecutorService!");
-//		this.scheduledExecutorService.shutdown();
 		
 		if (this.hazelcastInstance.getLifecycleService().isRunning()) {
 			

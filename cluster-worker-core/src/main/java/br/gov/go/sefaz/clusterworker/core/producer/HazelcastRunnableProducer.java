@@ -13,6 +13,7 @@ import com.hazelcast.core.Member;
 
 import br.gov.go.sefaz.clusterworker.core.exception.ItemProducerException;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
+import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobin;
 
 /**
  * Runnable of {@link HazelcastQueueProducer}, responsible for produces {@link ItemProducer} client's implementation.
@@ -25,8 +26,10 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 	private static final transient long serialVersionUID = 2538609461091747126L;
 
 	private static final transient Logger logger = LogManager.getLogger(HazelcastRunnableProducer.class);
-
+	
     private ItemProducer<T> itemProducer;
+    
+    private long producerId;
 
     /**
      * Constructor of HazelcastRunnableProducer
@@ -37,17 +40,21 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     public HazelcastRunnableProducer(ItemProducer<T> itemProducer, HazelcastInstance hazelcastInstance, String queueName) {
         super(hazelcastInstance, queueName);
         this.itemProducer = itemProducer;
+        this.producerId = hazelcastInstance.getAtomicLong("producer.id").getAndIncrement();
     }
 
     @Override
     public void run() {
-
-    	Member member = getFirstClusterMember();
+    	
+    	// Unique roundrobin key BY HazelcastRunnableProducer
+    	String roundRobinKey = String.format("roundrobin.producer.%s", producerId);
+    	
+    	// Get the next member 
+		Member member = HazelcastMemberRoundRobin.next(hazelcastInstance, roundRobinKey);
     	boolean isLocalMember = member.localMember();
     	
-		logger.debug(String.format("Trying to execute HazelcastRunnableProducer on first Cluster Member: '%s'. Is Local Member: %s", member.getUuid(), isLocalMember));
-    	
     	if (isLocalMember) {
+    		
     		try{
     			
     			IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
@@ -72,13 +79,5 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 		}
     	
 		logger.debug(String.format("HazelcastRunnableProducer execution %s on member: '%s'.", (isLocalMember ? "completed" : "ignored"), member.getUuid()));
-    }
-    
-    /**
-     * Returns the first cluster member
-     * @return the first cluster member 
-     */
-    private Member getFirstClusterMember() {
-        return hazelcastInstance.getCluster().getMembers().iterator().next();
     }
 }

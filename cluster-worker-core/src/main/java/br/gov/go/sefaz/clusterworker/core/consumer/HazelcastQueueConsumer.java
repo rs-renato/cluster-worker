@@ -75,7 +75,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     	// Return the hazelcast distributed queue
         IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
-        logger.debug(String.format("Trying to consume item from hazelcast %s queue. Is Blocking: %s - Timeout (case of non-blocking): %s", queueName, isBlocking(), timeout));
+        logger.debug(String.format("Trying to consume item from hazelcast %s queue. Is Blocking: %s - Timeout (case of non-blocking): %s seconds", queueName, isBlocking(), timeout));
         
         // Blocking on take() only if strategy is {@link QueueStrategy#WAIT_ON_AVAILABLE}.
         // Otherwise, wait until timeout and return null if there is no item to process.
