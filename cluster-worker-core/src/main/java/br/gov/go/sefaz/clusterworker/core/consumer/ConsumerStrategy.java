@@ -12,7 +12,7 @@ public enum ConsumerStrategy {
     ACCEPT_NULL,
 
     /**
-     * Waits till an element become available from the queue. This is a blocking strategy.
+     * Waits until an element become available from the queue. This is a blocking strategy.
      */
     WAIT_ON_AVAILABLE;
 }

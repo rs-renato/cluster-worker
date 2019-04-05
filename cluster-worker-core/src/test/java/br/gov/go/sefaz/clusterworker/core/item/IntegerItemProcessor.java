@@ -20,7 +20,7 @@ public class IntegerItemProcessor implements ItemProcessor<Integer> {
 
     @Override
     public void process(Integer item) {
-    	// Process the item obtained from hazelcast queue 
+    	// Process the item obtained from hazelcast distributed queue 
         logger.info("Processing item: " + item);
     }
 }

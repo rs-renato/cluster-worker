@@ -31,7 +31,7 @@ public class IntegerItemProducer implements ItemProducer<Integer> {
         }
 
         logger.info("Producing items: " + items);
-    	// Produces the items to hazelcast queue 
+    	// Produces these items to hazelcast distributed queue
         return items;
     }
 }
