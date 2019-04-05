@@ -13,10 +13,9 @@
     + [Standalones: HazelcastQueueProducer & HazelcastQueueConsumer](#standalones-hazelcastqueueproducer-hazelcastqueueconsumer)
       - [HazelcastQueueProducer ](#hazelcastqueueproducer )
       - [HazelcastQueueConsumer](#hazelcastqueueconsumer)
-    + [ConsumerStrategy](#consumerStrategy)
   * [From API Perspective: Producer vs Consumer](#from-api-perspective-producer-vs-consumer)
-      - [HazelcastRunnableProducer](#hazelcastrunnableproducer)
-      - [HazelcastRunnableConsumer](#hazelcastrunnableconsumer)
+     - [HazelcastRunnableProducer](#hazelcastrunnableproducer)
+     - [HazelcastRunnableConsumer](#hazelcastrunnableconsumer)
 
 ![Insert here Cluster Worker Diagram](#)
 
