@@ -23,6 +23,17 @@
 		<!-- Log4j -->
 		<com.hazelcast.version>3.11.2</com.hazelcast.version>
     </properties>
+    
+    <distributionManagement>
+		<repository>
+			<id>deployments-releases</id>
+			<url>https://nexus.sefaz.go.gov.br/content/repositories/deployments-releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>deployments-snapshots</id>
+			<url>https://nexus.sefaz.go.gov.br/content/repositories/deployments-snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>
