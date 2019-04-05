@@ -21,6 +21,12 @@ public @interface ProduceToQueue {
      * @return queueName
      */
     String queueName();
+    
+    /**
+     * Queue size (maximum)
+     * @return queue size
+     */
+    int queueSize() default 1000;
 
     /**
      * Frequency of execution (in seconds) to the item producer. The default vaule is 60 seconds.

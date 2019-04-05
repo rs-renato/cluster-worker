@@ -8,7 +8,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
-import com.hazelcast.core.IQueue;
 import com.hazelcast.core.Member;
 
 import br.gov.go.sefaz.clusterworker.core.exception.ItemProducerException;
@@ -57,17 +56,12 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     		
     		try{
     			
-    			IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
-    			logger.info(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
-    			// Execute item producer only if the queue has none elements to be processed
-    			if (iQueue.isEmpty()) {
-    				// Produces items from client's implementation
-    				Collection<T> items = itemProducer.produce();
+   				Collection<T> items = itemProducer.produce();
     				
-    				if (items!= null){
-    					produce(items);
-    				}
-    			}
+				if (items!= null){
+					produce(items);
+				}
+				
             } catch (InterruptedException|HazelcastInstanceNotActiveException e) {
 				logger.error(String.format("Cannot produce to hazelcast %s queue! This thread will die! Reason: %s", queueName, e.getMessage()));
 				Thread.currentThread().interrupt();

@@ -30,25 +30,42 @@ public class ClusterWorkerFactory {
 
     private static final Logger logger = LogManager.getLogger(ClusterWorkerFactory.class);
 
+    private final String hazelcastInstanceName;
     private final HazelcastInstance hazelcastInstance;
     
     private ClusterWorkerFactory(HazelcastInstance hazelcastInstance) {
     	this.hazelcastInstance = hazelcastInstance;
+    	this.hazelcastInstanceName= null;
     }
     
-    public static ClusterWorkerFactory getInstance(String hazelcastInstanceName) {
-    	return getInstance(HazelcastSupport.getOrcreateDefaultHazelcastInstance(hazelcastInstanceName));
+    private ClusterWorkerFactory(String hazelcastInstanceName) {
+    	this.hazelcastInstanceName = hazelcastInstanceName;
+    	this.hazelcastInstance = null;
     }
     
     /**
-     * Creates a new ClusterWorkerFactory with the given from hazelcast instance.
+     * Creates a new ClusterWorkerFactory with the given hazelcast instance name.
      * The {@link HazelcastInstance} is mantained into this factory, that means all
      * objects created from this factory ({@link ClusterWorker}, {@link HazelcastRunnableConsumer}, {@link HazelcastRunnableProducer},
      * {@link HazelcastQueueProducer}, {@link HazelcastQueueConsumer}), will keep its reference.
+     * @param hazelcastInstanceName hazelcast instance name
+     * @return  a ClusterWorkerFactory instance
+     */
+    public static ClusterWorkerFactory getInstance(String hazelcastInstanceName) {
+    	logger.debug(String.format("Creating ClusterWorkerFactory instance with hazelcast instance name '%s'.", hazelcastInstanceName));
+    	return new ClusterWorkerFactory(hazelcastInstanceName);
+    }
+    
+    /**
+     * Creates a new ClusterWorkerFactory with the given hazelcast instance.
+     * The {@link HazelcastInstance} is mantained into this factory, that means all
+     * objects created from this factory ({@link ClusterWorker}, {@link HazelcastRunnableConsumer}, {@link HazelcastRunnableProducer},
+     * {@link HazelcastQueueProducer}, {@link HazelcastQueueConsumer}), will keep its reference.
+     * @param hazelcastInstance hazelcast instance
      * @return a ClusterWorkerFactory instance
      */
     public static ClusterWorkerFactory getInstance(HazelcastInstance hazelcastInstance) {
-    	logger.debug(String.format("Creating ClusterWorkerFactory instance with hazelcast instance name '%s'.", hazelcastInstance.getName()));
+    	logger.debug(String.format("Creating ClusterWorkerFactory instance with non-default hazelcast instance '%s'.", hazelcastInstance.getName()));
     	return new ClusterWorkerFactory(hazelcastInstance);
     }
 
@@ -58,7 +75,7 @@ public class ClusterWorkerFactory {
      * @return {@link ClusterWorker} instance
      */
     public <T> ClusterWorker<T> getClusterWorker(Class<T> type){
-        return new ClusterWorker<>(hazelcastInstance);
+        return new ClusterWorker<>(getOrCreateHazelcastInstance());
     }
     
     /**
@@ -67,7 +84,7 @@ public class ClusterWorkerFactory {
      * @return {@link ClusterWorker} instance
      */
     public <T> ClusterWorker<T> getClusterWorker(ParameterizedTypeReference<T> type){
-        return new ClusterWorker<>(hazelcastInstance);
+        return new ClusterWorker<>(getOrCreateHazelcastInstance());
     }
 
     /**
@@ -78,7 +95,7 @@ public class ClusterWorkerFactory {
     public <T> HazelcastRunnableConsumer<T> getHazelcastRunnableConsumer(ItemProcessor<T> itemProcessor){
     	//Assert mandatory exception to create an HazelcastRunnableConsumer
         ConsumeFromQueue consumeFromQueue = AnnotationSupport.assertMandatoryAnnotation(itemProcessor, ConsumeFromQueue.class);
-        HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = new HazelcastRunnableConsumer<>(itemProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
+        HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = new HazelcastRunnableConsumer<>(itemProcessor, getOrCreateHazelcastInstance(), consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
 		logger.debug(String.format("Created HazelcastRunnableProducer: %s", hazelcastRunnableConsumer));
 		return hazelcastRunnableConsumer;
     }
@@ -92,7 +109,7 @@ public class ClusterWorkerFactory {
 		logger.debug("Creating new HazelcastRunnableProducer");
     	//Assert mandatory exception to create an HazelcastRunnableProducer
         ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
-        HazelcastRunnableProducer<T> hazelcastRunnableProducer = new HazelcastRunnableProducer<>(itemProducer, hazelcastInstance, produceToQueue.queueName());
+        HazelcastRunnableProducer<T> hazelcastRunnableProducer = new HazelcastRunnableProducer<>(itemProducer, getOrCreateHazelcastInstance(), produceToQueue.queueName());
         logger.debug(String.format("Created HazelcastRunnableProducer: %s", hazelcastRunnableProducer));
 		return hazelcastRunnableProducer;
     }
@@ -103,7 +120,7 @@ public class ClusterWorkerFactory {
      * @return {@link HazelcastQueueProducer} instance
      */
     public <T> HazelcastQueueProducer<T> getHazelcastQueueProducer(String queueName){
-    	HazelcastQueueProducer<T> hazelcastQueueProducer = new HazelcastQueueProducer<>(hazelcastInstance, queueName);
+    	HazelcastQueueProducer<T> hazelcastQueueProducer = new HazelcastQueueProducer<>(getOrCreateHazelcastInstance(), queueName);
         logger.debug(String.format("Created HazelcastQueueProducer: %s", hazelcastQueueProducer));
 		return hazelcastQueueProducer;
     }
@@ -116,7 +133,7 @@ public class ClusterWorkerFactory {
      * @return {@link HazelcastQueueConsumer} instance
      */
     public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, ConsumerStrategy consumerStrategy, int timeout){
-    	HazelcastQueueConsumer<T> hazelcastQueueConsumer = new HazelcastQueueConsumer<>(hazelcastInstance, queueName, consumerStrategy, timeout);
+    	HazelcastQueueConsumer<T> hazelcastQueueConsumer = new HazelcastQueueConsumer<>(getOrCreateHazelcastInstance(), queueName, consumerStrategy, timeout);
     	logger.debug(String.format("Created HazelcastQueueConsumer: %s", hazelcastQueueConsumer));
 		return hazelcastQueueConsumer;
     }
@@ -128,10 +145,24 @@ public class ClusterWorkerFactory {
 
     	logger.warn("Shuttingdown ClusterWorkerFactory and its hazelcast instance..");
 		
+    	HazelcastInstance hazelcastInstance = getOrCreateHazelcastInstance();
+    	
 		if (HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
 			hazelcastInstance.getLifecycleService().shutdown();
 		}
 		
     	logger.warn("ClusterWorkerFactory shutdown completed!");
+	}
+	
+	
+	private HazelcastInstance getOrCreateHazelcastInstance() {
+		
+		if (this.hazelcastInstance != null) {
+			return hazelcastInstance;
+		}else {
+			
+			
+			return null;
+		}
 	}
 }

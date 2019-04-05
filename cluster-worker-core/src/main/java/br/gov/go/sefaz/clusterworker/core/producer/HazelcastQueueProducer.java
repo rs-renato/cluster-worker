@@ -38,13 +38,13 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
     @Override
     public void produce(Collection<T> items) throws InterruptedException {
 
-		logger.debug(String.format("Producing %s items to %s queue.", items.size(), queueName));
-		
 		//Return the hazelcast distributed queue
 		IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
+
+		logger.debug(String.format("Producing %s items to %s queue. The queue has %s itens", items.size(), queueName, iQueue.size()));
 		
+		//Put a new item to the hazelcast queue
 		for (T item : items) {
-			//Put a new item to the hazelcast queue
 			iQueue.put(item);
 		}
     }
