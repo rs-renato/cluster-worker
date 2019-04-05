@@ -1,8 +1,5 @@
 package br.gov.go.sefaz.clusterworker.core.factory;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,7 +18,7 @@ import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.Producer;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
-import br.gov.go.sefaz.clusterworker.core.support.HazelcastDefaultConfigurationSupport;
+import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
 import br.gov.go.sefaz.clusterworker.core.support.ParameterizedTypeReference;
 
 /**
@@ -35,41 +32,24 @@ public class ClusterWorkerFactory {
 
     private final HazelcastInstance hazelcastInstance;
     
-    private static final Map<String, ClusterWorkerFactory> factoryInstances = new HashMap<>();
-
     private ClusterWorkerFactory(HazelcastInstance hazelcastInstance) {
     	this.hazelcastInstance = hazelcastInstance;
     }
-
-    /**
-     * Creates a new ClusterWorkerFactory instance from default hazelcast instance configuration.
-     * @return a ClusterWorkerFactory instance
-     */
-    public static synchronized ClusterWorkerFactory getInstance() {
-    	return getInstance(HazelcastDefaultConfigurationSupport.getDefaultHazelcastInstance());
+    
+    public static ClusterWorkerFactory getInstance(String hazelcastInstanceName) {
+    	return getInstance(HazelcastSupport.getOrcreateDefaultHazelcastInstance(hazelcastInstanceName));
     }
     
     /**
-     * Creates a new ClusterWorkerFactory instance from hazelcast instance.
+     * Creates a new ClusterWorkerFactory with the given from hazelcast instance.
+     * The {@link HazelcastInstance} is mantained into this factory, that means all
+     * objects created from this factory ({@link ClusterWorker}, {@link HazelcastRunnableConsumer}, {@link HazelcastRunnableProducer},
+     * {@link HazelcastQueueProducer}, {@link HazelcastQueueConsumer}), will keep its reference.
      * @return a ClusterWorkerFactory instance
      */
-
-    public static synchronized ClusterWorkerFactory getInstance(HazelcastInstance hazelcastInstance) {
-
-    	String hazelcastInstanceName = hazelcastInstance.getName();
-    	boolean containsInstance = factoryInstances.containsKey(hazelcastInstanceName);
-    	
-    	// Grants a running hazelcast instance
-    	hazelcastInstance = isHazelcastInstanceRunning(hazelcastInstance) ? hazelcastInstance : HazelcastDefaultConfigurationSupport.getDefaultHazelcastInstance();
-    	
-    	// Creates a new ClusterWorkerFactory if has no cache to this factory or cachedFactory.hazelcastInstance is not running
-    	if (!containsInstance || !isHazelcastInstanceRunning(factoryInstances.get(hazelcastInstanceName).hazelcastInstance)) {
-    		logger.debug(String.format("Creating ClusterWorkerFactory instance associated to hazelcast instance %s", hazelcastInstanceName));
-    		factoryInstances.put(hazelcastInstanceName, new ClusterWorkerFactory(hazelcastInstance));
-		}
-    	
-		logger.debug(String.format("Returning ClusterWorkerFactory instance associated to hazelcast instance %s", hazelcastInstanceName));
-    	return factoryInstances.get(hazelcastInstanceName);
+    public static ClusterWorkerFactory getInstance(HazelcastInstance hazelcastInstance) {
+    	logger.debug(String.format("Creating ClusterWorkerFactory instance with hazelcast instance name '%s'.", hazelcastInstance.getName()));
+    	return new ClusterWorkerFactory(hazelcastInstance);
     }
 
     /**
@@ -142,30 +122,16 @@ public class ClusterWorkerFactory {
     }
     
     /**
-     * Shutdown hazelcast instance.
+     * Shutdown hazelcast instance from this factory.
      */
-	public synchronized void shutdownHazelcastInstance() {
+	public void shutdownHazelcastInstance() {
 
     	logger.warn("Shuttingdown ClusterWorkerFactory and its hazelcast instance..");
-		hazelcastInstance.shutdown();
 		
-		if (isHazelcastInstanceRunning(hazelcastInstance)) {
+		if (HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
 			hazelcastInstance.getLifecycleService().shutdown();
 		}
 		
-		String hazelcastInstanceName = hazelcastInstance.getName();
-		HazelcastInstance factoryInnerHazelcastInstance = factoryInstances.get(hazelcastInstanceName).hazelcastInstance;
-		
-		if (isHazelcastInstanceRunning(factoryInnerHazelcastInstance)) {
-			factoryInnerHazelcastInstance.getLifecycleService().shutdown();
-		}
-		
-		factoryInstances.remove(hazelcastInstanceName);
-		
     	logger.warn("ClusterWorkerFactory shutdown completed!");
-	}
-	
-	private static boolean isHazelcastInstanceRunning(HazelcastInstance hazelcastInstance) {
-		return hazelcastInstance.getLifecycleService().isRunning();
 	}
 }

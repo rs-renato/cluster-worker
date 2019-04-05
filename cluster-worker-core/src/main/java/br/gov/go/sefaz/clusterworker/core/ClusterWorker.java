@@ -44,7 +44,6 @@ public final class ClusterWorker<T> {
     public ClusterWorker(HazelcastInstance hazelcastInstance) {
     	this.hazelcastInstance = hazelcastInstance;
     	this.scheduledExecutorService = hazelcastInstance.getScheduledExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
-    	
     }
     
     /**

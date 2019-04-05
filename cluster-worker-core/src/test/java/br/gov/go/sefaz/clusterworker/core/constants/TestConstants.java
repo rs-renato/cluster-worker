@@ -8,10 +8,15 @@ package br.gov.go.sefaz.clusterworker.core.constants;
 public class TestConstants {
 
 	/**
+	 * Cluster Woker Name (used to hazelcast instance)
+	 */
+	public static final String CW_NAME					= "cw";
+    
+	/**
 	 * Hazelcast queue name
 	 */
 	public static final String CW_QUEUE_NAME			= "cw.queue.test";
-    
+	
 	/**
 	 * Quantity of items to produce to the queue
 	 */

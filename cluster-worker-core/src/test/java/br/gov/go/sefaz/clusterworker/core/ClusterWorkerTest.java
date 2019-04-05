@@ -4,6 +4,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
@@ -19,7 +20,7 @@ public class ClusterWorkerTest {
 	
 	@BeforeClass
 	public static void setUp() {
-		clusterWorker = ClusterWorkerFactory.getInstance().getClusterWorker(Integer.class);
+		clusterWorker = ClusterWorkerFactory.getInstance(TestConstants.CW_NAME).getClusterWorker(Integer.class);
 	}
 	
 	@AfterClass

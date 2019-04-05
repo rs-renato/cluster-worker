@@ -22,7 +22,7 @@ import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
  */
 public class HazelcastQueueBlockingConsumerTest {
 
-	private static ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance();
+	private static ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance(TestConstants.CW_NAME);
 	private static ClusterWorker<Integer> clusterWorker;
 	private static Timer timerItemProducer;
 

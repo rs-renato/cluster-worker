@@ -26,7 +26,7 @@ public class HazelcastQueueProducerTest {
 	
 	@BeforeClass
 	public static void setUp() {
-		cwFactory = ClusterWorkerFactory.getInstance();
+		cwFactory = ClusterWorkerFactory.getInstance(TestConstants.CW_NAME);
 	}
 	
 	@AfterClass

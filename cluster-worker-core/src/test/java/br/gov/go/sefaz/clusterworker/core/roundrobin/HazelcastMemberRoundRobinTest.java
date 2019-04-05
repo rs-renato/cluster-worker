@@ -25,7 +25,7 @@ public class HazelcastMemberRoundRobinTest {
 	}
 	
 	@Test
-    public void testRotation() {
+    public void shouldRoundRobinMember() {
 		int quantity = 3;
 		// Creates and adds the hazelcast instances into the set
         Set<HazelcastInstance> hazelcastInscantes = factory(quantity, () -> Hazelcast.newHazelcastInstance(null));
