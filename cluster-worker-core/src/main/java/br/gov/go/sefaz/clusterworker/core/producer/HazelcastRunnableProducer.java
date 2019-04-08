@@ -11,6 +11,7 @@ import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.hazelcast.core.IQueue;
 import com.hazelcast.core.Member;
 
+import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
 import br.gov.go.sefaz.clusterworker.core.exception.ItemProducerException;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobin;
@@ -28,8 +29,6 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 	private static final transient Logger logger = LogManager.getLogger(HazelcastRunnableProducer.class);
 	
     private ItemProducer<T> itemProducer;
-    
-    private long producerId;
 
     /**
      * Constructor of HazelcastRunnableProducer
@@ -40,30 +39,25 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     public HazelcastRunnableProducer(ItemProducer<T> itemProducer, HazelcastInstance hazelcastInstance, String queueName) {
         super(hazelcastInstance, queueName);
         this.itemProducer = itemProducer;
-        this.producerId = hazelcastInstance.getAtomicLong("producer.id").getAndIncrement();
     }
 
     @Override
     public void run() {
-    	
-    	// Unique roundrobin key BY HazelcastRunnableProducer
-    	String roundRobinKey = String.format("roundrobin.producer.%s", producerId);
-    	
+
     	// Get the next member 
-		Member member = HazelcastMemberRoundRobin.next(hazelcastInstance, roundRobinKey);
+		Member member = HazelcastMemberRoundRobin.next(hazelcastInstance, ClusterWorkerConstants.CW_ROUND_ROBIN_MEMBER);
     	boolean isLocalMember = member.localMember();
     	
     	if (isLocalMember) {
     		
     		try{
-    			
     			IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
-    			logger.info(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
+    			logger.debug(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
     			// Execute item producer only if the queue has none elements to be processed
     			if (iQueue.isEmpty()) {
     				// Produces items from client's implementation
     				Collection<T> items = itemProducer.produce();
-    				
+
     				if (items!= null){
     					produce(items);
     				}
@@ -78,6 +72,6 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
              }
 		}
     	
-		logger.debug(String.format("HazelcastRunnableProducer execution %s on member: '%s'.", (isLocalMember ? "completed" : "ignored"), member.getUuid()));
+		logger.info(String.format("HazelcastRunnableProducer execution %s on this member.", (isLocalMember ? "completed" : "ignored")));
     }
 }

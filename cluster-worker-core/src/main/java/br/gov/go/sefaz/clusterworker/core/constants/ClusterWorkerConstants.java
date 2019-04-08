@@ -17,17 +17,12 @@ public class ClusterWorkerConstants {
     public static final String CW_HAZELCAST_LOGGING_TYPE = "slf4j";
 	
 	/**
-	 * Defines the default Hazelcast Instance Name
+	 * Defines the default distributed executor service name
 	 */
-    public static final String CW_HAZELCAST_INSTANCE_NAME = "cluster.worker";
-    
-	/**
-	 * Defines the default executor service name
-	 */
-    public static final String CW_EXECUTOR_SERVICE_NAME = "cluster.worker.executor.service";
+    public static final String CW_EXECUTOR_SERVICE_NAME = "cw.executor.service";
     
     /**
-     * Defines the default queue config name
+     * Defines the name of distributed roundrobin member name  
      */
-    public static final String CW_QUEUE_CONFIG_DEFAULT = "cluster.worker.queue";
+	public static final String CW_ROUND_ROBIN_MEMBER 	= "cw.roundrobin.member";
 }
