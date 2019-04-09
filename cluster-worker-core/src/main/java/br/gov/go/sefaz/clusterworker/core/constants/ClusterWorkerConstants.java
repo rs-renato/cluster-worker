@@ -27,6 +27,11 @@ public class ClusterWorkerConstants {
 	public static final String CW_ROUND_ROBIN_MEMBER 		= "cw.roundrobin.member";
 	
 	/**
+     * Defines the name of distributed roundrobin lock name  
+     */
+	public static final String CW_ROUND_ROBIN_LOCK 			= "cw.roundrobin.lock";
+	
+	/**
 	 * Defines the name of distributed map used to sync the next new producer instances  
 	 */
 	public static final String CW_PRODUCER_SYNC_EXECUTION 	= "cw.producer.sync";

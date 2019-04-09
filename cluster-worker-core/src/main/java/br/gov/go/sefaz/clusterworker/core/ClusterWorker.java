@@ -90,13 +90,13 @@ public final class ClusterWorker<T> {
     	
     	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableProducer(itemProducer);
 
+    	IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
+    	
     	// Frequency of produce's execution (converted to milleseconds to grant more sync) 
         long frequency = TimeUnit.SECONDS.toMillis(produceToQueue.frequency());
         
         // Try to syncronize the initial execution always on second 0
         long initialDelay = TimeUnit.SECONDS.toMillis(60L - Calendar.getInstance().get(Calendar.SECOND));
-
-		IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
 		
 		// Retrieve the last execution timestamp
         if (iMap.containsKey(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION)) {
@@ -108,6 +108,7 @@ public final class ClusterWorker<T> {
         
         logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds.", TimeUnit.MILLISECONDS.toSeconds(frequency), TimeUnit.MILLISECONDS.toSeconds(initialDelay)));
 
+        // Schedule the execution to execute into local member
         this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.MILLISECONDS);
     }
 

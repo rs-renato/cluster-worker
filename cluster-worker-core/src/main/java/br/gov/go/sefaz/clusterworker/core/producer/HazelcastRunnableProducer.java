@@ -48,15 +48,15 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     @Override
     public void run() {
 
+    	IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
+    	iMap.put(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION, Calendar.getInstance().getTimeInMillis());
+    	
     	// Get the next member 
 		Member member = hazelcastMemberRoundRobin.select();
     	boolean isLocalMember = member.localMember();
     	
     	if (isLocalMember) {
     		
-    		IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
-			iMap.put(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION, Calendar.getInstance().getTimeInMillis());
-			
     		try{
     			IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
     			logger.debug(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
@@ -69,6 +69,9 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     					produce(items);
     				}
     				
+					// Forces this threads sleeps a while before update the roundrobin because of concurrence in distibuted producers in other JVM's
+    				// This waits cause the other distibuted thread (producers) finish their proccess after this local member
+    				Thread.sleep(100);
     				// Advances the round robin pivot
     				hazelcastMemberRoundRobin.advance();
     			}

@@ -40,6 +40,6 @@ public class ClusterWorkerTest {
         clusterWorker.executeItemProccessor(new IntegerItemProcessor());
 
         //Just wait for 20s to execute this test
-        Thread.sleep(20 * 1000);
+        Thread.sleep(TestConstants.CW_EXECUTION_TIME);
     }
 }
