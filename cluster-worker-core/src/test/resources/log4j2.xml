@@ -34,7 +34,7 @@
 	
 	<Loggers>
         <Root level="INFO">
-            <AppenderRef ref="console" />
+            <AppenderRef ref="console" level="INFO"/>
         </Root>
         
  		<Logger name="br.gov.go.sefaz" additivity="TRUE" level="DEBUG">

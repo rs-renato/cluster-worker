@@ -1,6 +1,7 @@
 package br.gov.go.sefaz.clusterworker.core.roundrobin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
@@ -21,37 +22,54 @@ public class HazelcastMemberRoundRobin{
 	
 	private static final Logger logger = LogManager.getLogger(HazelcastMemberRoundRobin.class);
 
-	private HazelcastMemberRoundRobin() {
+	private final IAtomicLong iAtomicLong;
+    private final HazelcastInstance hazelcastInstance;
+    
+	public HazelcastMemberRoundRobin(HazelcastInstance hazelcastInstance, String roundRobinName) {
+		this.iAtomicLong = hazelcastInstance.getAtomicLong(roundRobinName);
+		this.hazelcastInstance = hazelcastInstance;
 	}
-
+	
 	/**
-	 * Return the next clustert member from hazelcast instance 
-	 * @param hazelcastInstance hazelcast instance
-	 * @param roundRobinName the name of roundrobin. This name is used to create a {@link IAtomicLong} to control the roundrobin strategy
-	 * @return the next member
+	 * Advances the round robin pivot
+	 * @return HazelcastMemberRoundRobin
 	 */
-    public static Member next(HazelcastInstance hazelcastInstance, String roundRobinName) {
+	public HazelcastMemberRoundRobin advance() {
+		logger.debug("Advancing round robin pivot");
+		this.iAtomicLong.incrementAndGet();
+        return this;
+	}
+	
+	/**
+	 * Return actual cluster member (round robin selected) from hazelcast instance 
+	 * @return the cluster member
+	 */
+    public Member select() {
+    	
     	Member member;
 
-    	// Creates or obtain an atomic long
-    	IAtomicLong iAtomicLong = hazelcastInstance.getAtomicLong(roundRobinName);
         Cluster cluster = hazelcastInstance.getCluster();
-		List<Member> clusterMembers = new ArrayList<>(cluster.getMembers());
-        int membersSize = clusterMembers.size();
-        int selectedMemberIndex;
-		int count;
-
-		count = (int) iAtomicLong.get();
-		selectedMemberIndex = count % membersSize;
-		member = clusterMembers.get(selectedMemberIndex);
-
-		// Only the master member (the oldest member in the cluster) will update the count to grant sync
-		Member masterMember = clusterMembers.iterator().next();
-		if (masterMember.localMember() && cluster.getClusterState().equals(ClusterState.ACTIVE)){
-			iAtomicLong.incrementAndGet();
+        List<Member> clusterMembers = new ArrayList<>(cluster.getMembers());
+        Collections.sort(clusterMembers, (one, other) -> one.toString().compareTo(other.toString()));
+        
+        // The master member (the oldest member in the cluster)
+        Member masterMember = clusterMembers.iterator().next();
+        
+		ClusterState clusterState = cluster.getClusterState();
+		int membersSize = clusterMembers.size();
+		
+		int count = (int) iAtomicLong.get();
+		int selectedMemberIndex = count % membersSize;
+		
+		if (!clusterState.equals(ClusterState.ACTIVE) || membersSize == 1) {
+			logger.debug(String.format("The cluster state is %s. Cluster Size: %s - Selecting the oldest member (master)", clusterState, membersSize));
+			member = masterMember;
+		}else {
+			member = clusterMembers.get(selectedMemberIndex);
 		}
 
-		logger.debug(String.format("Executing roundrobing for '%s'. Cluster Members Size: %s - Selected Member Index: %s - Count: %s", roundRobinName, membersSize, selectedMemberIndex, count));
-        return member;
+		logger.info(String.format("Roundrobing executed. Cluster Size: %s - Selected Member Index: %s - Count: %s - Member ID: %s", membersSize, selectedMemberIndex, count, member.getUuid()));
+		
+		return member;
     }
 }

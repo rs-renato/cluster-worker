@@ -1,6 +1,7 @@
 package br.gov.go.sefaz.clusterworker.core.producer;
 
 
+import java.util.Calendar;
 import java.util.Collection;
 
 import org.apache.logging.log4j.LogManager;
@@ -8,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
+import com.hazelcast.core.IMap;
 import com.hazelcast.core.IQueue;
 import com.hazelcast.core.Member;
 
@@ -29,6 +31,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 	private static final transient Logger logger = LogManager.getLogger(HazelcastRunnableProducer.class);
 	
     private ItemProducer<T> itemProducer;
+    private transient HazelcastMemberRoundRobin hazelcastMemberRoundRobin;
 
     /**
      * Constructor of HazelcastRunnableProducer
@@ -39,17 +42,21 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     public HazelcastRunnableProducer(ItemProducer<T> itemProducer, HazelcastInstance hazelcastInstance, String queueName) {
         super(hazelcastInstance, queueName);
         this.itemProducer = itemProducer;
+        this.hazelcastMemberRoundRobin = new HazelcastMemberRoundRobin(hazelcastInstance, ClusterWorkerConstants.CW_ROUND_ROBIN_MEMBER);
     }
 
     @Override
     public void run() {
 
     	// Get the next member 
-		Member member = HazelcastMemberRoundRobin.next(hazelcastInstance, ClusterWorkerConstants.CW_ROUND_ROBIN_MEMBER);
+		Member member = hazelcastMemberRoundRobin.select();
     	boolean isLocalMember = member.localMember();
     	
     	if (isLocalMember) {
     		
+    		IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
+			iMap.put(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION, Calendar.getInstance().getTimeInMillis());
+			
     		try{
     			IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
     			logger.debug(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
@@ -61,6 +68,9 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     				if (items!= null){
     					produce(items);
     				}
+    				
+    				// Advances the round robin pivot
+    				hazelcastMemberRoundRobin.advance();
     			}
             } catch (InterruptedException|HazelcastInstanceNotActiveException e) {
 				logger.error(String.format("Cannot produce to hazelcast %s queue! This thread will die! Reason: %s", queueName, e.getMessage()));

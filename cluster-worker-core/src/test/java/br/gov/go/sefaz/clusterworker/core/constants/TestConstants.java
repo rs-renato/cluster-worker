@@ -20,12 +20,12 @@ public class TestConstants {
 	/**
 	 * Quantity of items to produce to the queue
 	 */
-	public static final int CW_ITEM_PRODUCER_QUANTITY	= 100;
+	public static final int CW_ITEM_PRODUCER_QUANTITY	= 10;
 	
 	/**
 	 * Frequency of productioin in seconds
 	 */
-    public static final int CW_ITEM_PRODUCER_FREQUENCY	= 10;
+    public static final int CW_ITEM_PRODUCER_FREQUENCY	= 30;
     
     /**
 	 * Quantity of workers (threads) of processors (queues consumers)

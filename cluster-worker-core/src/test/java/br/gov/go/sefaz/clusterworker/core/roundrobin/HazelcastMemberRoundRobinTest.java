@@ -6,11 +6,14 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
+
 
 /**
  * HazelcastMemberRoundRobin example of use
@@ -19,6 +22,15 @@ import com.hazelcast.core.Member;
  */
 public class HazelcastMemberRoundRobinTest {
 
+	private static int INSTANCES_QUANTITY	= 3; 
+	private static Set<HazelcastInstance> hazelcastInscantes;
+	
+	@BeforeClass
+	public static void setUp() {
+		// Creates and adds the hazelcast instances into the set
+		hazelcastInscantes = factory(INSTANCES_QUANTITY, () -> Hazelcast.newHazelcastInstance(null));
+	}
+	
 	@AfterClass
 	public static void tearDownClass() {
 		Hazelcast.shutdownAll();
@@ -26,24 +38,23 @@ public class HazelcastMemberRoundRobinTest {
 	
 	@Test
     public void shouldRoundRobinMember() {
-		int quantity = 3;
-		// Creates and adds the hazelcast instances into the set
-        Set<HazelcastInstance> hazelcastInscantes = factory(quantity, () -> Hazelcast.newHazelcastInstance(null));
         
+		HazelcastMemberRoundRobin hazelcastMemberRoundRobin = new HazelcastMemberRoundRobin(hazelcastInscantes.iterator().next(), "roundrobin");
+		  
         // Iterates the hazelcast instances and add the members into the set
-        Set<Member> roundRobinMembers = factory(quantity, () -> HazelcastMemberRoundRobin.next(hazelcastInscantes.iterator().next(), "roundrobin"));
+        Set<Member> roundRobinMembers = factory(INSTANCES_QUANTITY, () -> hazelcastMemberRoundRobin.advance().select());
         
         // Asserts the quantity of members
-        assert quantity == roundRobinMembers.size();
+        Assert.assertEquals(INSTANCES_QUANTITY, roundRobinMembers.size());
 
         // Iterate all instances, get the member, and add them to the set
         Set<Member> members = transformToSet(hazelcastInscantes, (hazelcastInstance) -> hazelcastInstance.getCluster().getLocalMember());
         
         // Asserts equals the original members to the roundrobin members
-		assert roundRobinMembers.equals(members);
+        Assert.assertTrue(roundRobinMembers.equals(members));
     }
 
-    private <T> Set<T> factory(int quantity, Supplier<T> supplier) {
+    private static <T> Set<T> factory(int quantity, Supplier<T> supplier) {
         Set<T> result = new HashSet<>();
         for(int i = 0; i < quantity; i++) {
             result.add(supplier.get());

@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import com.hazelcast.core.Member;
 import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 import com.hazelcast.scheduledexecutor.IScheduledFuture;
@@ -89,15 +90,25 @@ public final class ClusterWorker<T> {
     	
     	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableProducer(itemProducer);
 
-    	// Frequency of produce's execution 
-        int frequency = produceToQueue.frequency();
+    	// Frequency of produce's execution (converted to milleseconds to grant more sync) 
+        long frequency = TimeUnit.SECONDS.toMillis(produceToQueue.frequency());
         
         // Try to syncronize the initial execution always on second 0
-        int initialDelay = 60 - Calendar.getInstance().get(Calendar.SECOND);
-        
-        logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds.", frequency, initialDelay));
+        long initialDelay = TimeUnit.SECONDS.toMillis(60L - Calendar.getInstance().get(Calendar.SECOND));
 
-        this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.SECONDS);
+		IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
+		
+		// Retrieve the last execution timestamp
+        if (iMap.containsKey(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION)) {
+        	// Check the difference from now 
+        	long difference = Calendar.getInstance().getTimeInMillis() - iMap.get(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION);
+        	// Calculate the initial delay to this execution
+        	initialDelay = frequency - difference;
+        }
+        
+        logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds.", TimeUnit.MILLISECONDS.toSeconds(frequency), TimeUnit.MILLISECONDS.toSeconds(initialDelay)));
+
+        this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.MILLISECONDS);
     }
 
     /**
