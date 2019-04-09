@@ -17,9 +17,6 @@
      - [HazelcastRunnableProducer](#hazelcastrunnableproducer)
      - [HazelcastRunnableConsumer](#hazelcastrunnableconsumer)
 
-![Insert here Cluster Worker Diagram](#)
-
-
 ## From Client Perspective: Producer vs Processor  
 
 <p align="center">
