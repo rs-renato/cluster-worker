@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import br.gov.go.sefaz.clusterworker.core.exception.ClusterWorkerException;
 /**
  * CachedPropertyFile support class.
  * @author renato-rs
@@ -15,7 +14,6 @@ import org.apache.logging.log4j.Logger;
  */
 public class CachedPropertyFileSupport {
 
-    private static final Logger logger = LogManager.getLogger(CachedPropertyFileSupport.class);
     private static final Map<String, CachedPropertyFile> propMap = new HashMap<>();
 
     private CachedPropertyFileSupport() {
@@ -25,6 +23,7 @@ public class CachedPropertyFileSupport {
      * Loads a cached property file.
      * @param fileName file name of this property.
      * @return cached property file
+     * @throws ClusterWorkerException if some error occurs on file load
      */
     public static CachedPropertyFile getCachedPropertyFile(String fileName){
 
@@ -43,7 +42,7 @@ public class CachedPropertyFileSupport {
                 propMap.put(fileName, new CachedPropertyFile(properties));
 
             }catch (IOException e) {
-                logger.error("Cannot read resource: " + fileName,e);
+            	throw new ClusterWorkerException(String.format("Could not read the resource '%s'. Did you define in your class path?", fileName));
             }
         }
 

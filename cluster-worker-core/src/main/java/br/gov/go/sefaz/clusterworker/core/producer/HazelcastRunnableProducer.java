@@ -48,6 +48,8 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     @Override
     public void run() {
 
+    	Thread.currentThread().setName(String.format("%s.%s", hazelcastInstance.getName(), "runnable.producer"));
+    	
     	IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
     	iMap.put(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION, Calendar.getInstance().getTimeInMillis());
     	
@@ -58,6 +60,11 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     	if (isLocalMember) {
     		
     		try{
+    			
+    			// Forces this threads sleeps a while because of concurrence in distibuted producers in other JVM's
+    			// This waits cause the other distibuted thread (producers) finish their proccess before this local member
+    			Thread.sleep(100);
+    			
     			IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
     			logger.debug(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
     			// Execute item producer only if the queue has none elements to be processed
@@ -65,13 +72,9 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     				// Produces items from client's implementation
     				Collection<T> items = itemProducer.produce();
 
-    				if (items!= null){
+    				if (items != null && !items.isEmpty()){
     					produce(items);
     				}
-    				
-					// Forces this threads sleeps a while before update the roundrobin because of concurrence in distibuted producers in other JVM's
-    				// This waits cause the other distibuted thread (producers) finish their proccess after this local member
-    				Thread.sleep(100);
     				// Advances the round robin pivot
     				hazelcastMemberRoundRobin.advance();
     			}

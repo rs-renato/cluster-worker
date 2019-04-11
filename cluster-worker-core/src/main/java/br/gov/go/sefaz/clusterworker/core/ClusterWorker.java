@@ -57,23 +57,22 @@ public final class ClusterWorker<T> {
 
         // Number of workers (threads)
         int workers = consumeFromQueue.workers();
-        // Delay to start the consumers
-        int DELAY_TO_START = 0;
 
         logger.info(String.format("Configuring ItemProcessor (%s worker(s)) implementation on hazelcast executor service.", workers));
 
         // Creates worker (HazelcastRunnableConsumer)
         HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableConsumer(itemProcessor);
+        
         for (int i = 1; i <=  workers; i++) {
 
             try {
             	// Executes the consumer on hazelcast local member
-				IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMember(hazelcastRunnableConsumer, getLocalMember(), DELAY_TO_START, TimeUnit.SECONDS);
-				
+				IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMember(hazelcastRunnableConsumer,getLocalMember(),0, TimeUnit.SECONDS);
+                
 				logger.debug(String.format("Adding listener for worker %s..", i));
 				this.shutdownListeners.add(hazelcastRunnableConsumer);
 				logger.debug(String.format("Adding ScheduledFutures for worker %s..", i));
-				this.scheduledFutures.add(scheduledFuture);
+                this.scheduledFutures.add(scheduledFuture);
             }catch (Exception e){
                 logger.error(String.format("Cannot execute a ItemProcessor on hazelcast executor service! %s", e.getMessage()));
             }
@@ -96,7 +95,8 @@ public final class ClusterWorker<T> {
         long frequency = TimeUnit.SECONDS.toMillis(produceToQueue.frequency());
         
         // Try to syncronize the initial execution always on second 0
-        long initialDelay = TimeUnit.SECONDS.toMillis(60L - Calendar.getInstance().get(Calendar.SECOND));
+        Calendar calendar = Calendar.getInstance();
+		long initialDelay = TimeUnit.SECONDS.toMillis(60L - calendar.get(Calendar.SECOND)) - calendar.get(Calendar.MILLISECOND);
 		
 		// Retrieve the last execution timestamp
         if (iMap.containsKey(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION)) {
@@ -106,7 +106,7 @@ public final class ClusterWorker<T> {
         	initialDelay = frequency - difference;
         }
         
-        logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds.", TimeUnit.MILLISECONDS.toSeconds(frequency), TimeUnit.MILLISECONDS.toSeconds(initialDelay)));
+        logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds (aproximated).", TimeUnit.MILLISECONDS.toSeconds(frequency), TimeUnit.MILLISECONDS.toSeconds(initialDelay)));
 
         // Schedule the execution to execute into local member
         this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.MILLISECONDS);

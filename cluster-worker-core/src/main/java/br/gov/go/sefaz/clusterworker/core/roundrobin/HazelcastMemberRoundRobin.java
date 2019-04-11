@@ -36,7 +36,7 @@ public class HazelcastMemberRoundRobin{
 	 */
 	public HazelcastMemberRoundRobin advance() {
 		ClusterState clusterState = getClusterState();
-
+		// Just update the pivot if the the cluster is active and has more than one member
 		if (clusterState.equals(ClusterState.ACTIVE) && getClusterMembers().size() > 1) {
 			logger.debug("Advancing round robin pivot");
 			this.iAtomicLong.incrementAndGet();
@@ -54,14 +54,17 @@ public class HazelcastMemberRoundRobin{
     	Member member;
 
         List<Member> clusterMembers = new ArrayList<>(getClusterMembers());
+        // Sorts the cluster members by its ID
         Collections.sort(clusterMembers, (one, other) -> one.toString().compareTo(other.toString()));
         
 		ClusterState clusterState = getClusterState();
 		int membersSize = clusterMembers.size();
 		int count = (int) iAtomicLong.get();
 		
+		// Calculate module and get member index
 		int selectedMemberIndex = count % membersSize;
 		
+		// If the cluster is not active or has just one member, return the first one
 		if (!clusterState.equals(ClusterState.ACTIVE) || membersSize == 1) {
 			logger.debug(String.format("The cluster state is %s. Cluster Size: %s - Selecting the oldest member (master)", clusterState, membersSize));
 			member = clusterMembers.iterator().next();
@@ -69,7 +72,7 @@ public class HazelcastMemberRoundRobin{
 			member = clusterMembers.get(selectedMemberIndex);
 		}
 
-		logger.info(String.format("Roundrobing executed. Cluster Size: %s - Selected Member Index: %s - Count: %s - Member ID: %s", membersSize, selectedMemberIndex, count, member.getUuid()));
+		logger.info(String.format("Roundrobin executed. Cluster Size: %s - Selected Member Index: %s - Count: %s - Member ID: %s", membersSize, selectedMemberIndex, count, member.getUuid()));
 		
 		return member;
     }

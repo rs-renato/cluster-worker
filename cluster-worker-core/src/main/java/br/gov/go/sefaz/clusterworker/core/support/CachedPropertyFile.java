@@ -10,6 +10,8 @@ import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import br.gov.go.sefaz.clusterworker.core.exception.ClusterWorkerException;
+
 /**
  * CachedPropertyFile abstraction class.
  * @author renato-rs
@@ -76,7 +78,13 @@ class CachedPropertyFile{
             Method method = getValueOfMethod(type);
 
             // Invoke the valueOf method.
-            T t = (T) method.invoke(null, properties.getProperty(propertyName));
+            String property = properties.getProperty(propertyName);
+            
+            if (property == null) {
+				throw new ClusterWorkerException(String.format("Mandatory property '%s' not defined!", propertyName));
+			}
+            
+			T t = (T) method.invoke(null, property);
 
             mapCached.put(propertyName, t);
         }

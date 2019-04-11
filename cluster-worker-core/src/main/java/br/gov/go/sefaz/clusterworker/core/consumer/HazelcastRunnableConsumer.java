@@ -41,6 +41,8 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
     @Override
     public void run() {
 
+    	Thread.currentThread().setName(String.format("%s.%s", hazelcastInstance.getName(), "runnable.consumer"));
+    	
         logger.info("Starting HazelcastRunnableConsumer!");
 
         // Run this thread untill shutdown is called
