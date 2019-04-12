@@ -39,7 +39,7 @@ public @interface ConsumeFromQueue {
     int timeout() default 1;
 
     /**
-     * Number of workers (threads) to the processor. The default value is 01.
+     * Number of workers (threads) to the processor. The default value is 01 workers.
      * @return workers
      */
     int workers() default 1;

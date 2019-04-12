@@ -11,7 +11,7 @@ import java.io.Serializable;
 public interface ItemProcessor<T> extends Serializable{
 	
 	/**
-	 * Process the item
+	 * Process the item from the queue
 	 * @param item to be processed
 	 */
 	void process(T item);

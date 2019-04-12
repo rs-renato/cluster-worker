@@ -3,6 +3,7 @@ package br.gov.go.sefaz.clusterworker.core.factory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
@@ -92,7 +93,17 @@ public class ClusterWorkerFactory {
 		logger.debug("Creating new HazelcastRunnableProducer");
     	//Assert mandatory exception to create an HazelcastRunnableProducer
         ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
-        HazelcastRunnableProducer<T> hazelcastRunnableProducer = new HazelcastRunnableProducer<>(itemProducer, hazelcastInstance, produceToQueue.queueName());
+        
+        String queueName = produceToQueue.queueName();
+        
+        // Configures the queue size if this configuration wasn't set
+        Config config = this.hazelcastInstance.getConfig();
+		if (!config.getQueueConfigs().containsKey(queueName)) {
+			config.getQueueConfig(queueName)
+				.setMaxSize(produceToQueue.maxSize());
+		}
+		
+		HazelcastRunnableProducer<T> hazelcastRunnableProducer = new HazelcastRunnableProducer<>(itemProducer, hazelcastInstance, queueName);
         logger.debug(String.format("Created HazelcastRunnableProducer: %s", hazelcastRunnableProducer));
 		return hazelcastRunnableProducer;
     }
