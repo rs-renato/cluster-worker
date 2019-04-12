@@ -22,7 +22,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 
 	private static final transient long serialVersionUID = 4384549432295630459L;
 
-    private transient HazelcastInstance hazelcastInstance;
+    protected transient HazelcastInstance hazelcastInstance;
 
     protected String queueName;
     private ConsumerStrategy consumerStrategy = ConsumerStrategy.ACCEPT_NULL;
@@ -75,13 +75,13 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     	// Return the hazelcast distributed queue
         IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
-        logger.debug(String.format("Trying to consume item from hazelcast %s queue. Is Blocking: %s - Timeout (case of non-blocking): %s seconds", queueName, isBlocking(), timeout));
+        logger.trace(String.format("Trying to consume item from hazelcast %s queue. Is Blocking: %s - Timeout (case of non-blocking): %s seconds", queueName, isBlocking(), timeout));
         
         // Blocking on take() only if strategy is {@link QueueStrategy#WAIT_ON_AVAILABLE}.
         // Otherwise, wait until timeout and return null if there is no item to process.
 		T item = isBlocking() ? iQueue.take() : iQueue.poll(timeout, TimeUnit.SECONDS);
 
-        logger.debug(String.format("Consumed item %s from hazelcast queue.", item));
+        logger.trace(String.format("Consumed item %s from hazelcast queue.", item));
 
         return item;
     }

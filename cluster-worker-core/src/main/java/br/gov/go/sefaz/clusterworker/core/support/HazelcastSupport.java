@@ -56,42 +56,48 @@ public final class HazelcastSupport {
         logger.debug("Creating hazelcast configuration..");
 
         // Creates the default configuration
-        Config hazelcastDefaultConfig = new Config();
+        Config config = new Config();
         // Configures the log
-        hazelcastDefaultConfig.setProperty("hazelcast.logging.type", ClusterWorkerConstants.CW_HAZELCAST_LOGGING_TYPE);
+        config.setProperty("hazelcast.logging.type", ClusterWorkerConstants.CW_HAZELCAST_LOGGING_TYPE);
         
-        hazelcastDefaultConfig.setInstanceName(hazelcastInstanceName);
+        config.setInstanceName(hazelcastInstanceName);
         
         // Loads the property configuration values
         int port = cachedPropertyFile.getProperty("cw.network.config.port", Integer.class);
-        int portCount = cachedPropertyFile.getProperty("cw.network.config.port.count", Integer.class);
         boolean multicastEnabled = cachedPropertyFile.getProperty("cw.multicast.config.enabled", Boolean.class);
         String multicastInterface = cachedPropertyFile.getProperty("cw.multicast.config.interface");
         
-        // Configures network
-        NetworkConfig networkConfig = hazelcastDefaultConfig.getNetworkConfig();
-       
-        networkConfig.setPort(port)
-                .setReuseAddress(true)
-                .setPortCount(portCount);
+        int maxPoolSize = cachedPropertyFile.getProperty("cw.executor.max.pool.size", Integer.class);
         
-        JoinConfig join = networkConfig.getJoin();
+        // Configures network
+        NetworkConfig network = config.getNetworkConfig();
+       
+        network.setPort(port)
+        	.setPortAutoIncrement(true)
+        	.setReuseAddress(true);
+        
+        // Configure TPC-IP configuration 
+        JoinConfig join = network.getJoin();
 
         join.getMulticastConfig()
-                .setEnabled(multicastEnabled)
-                .addTrustedInterface(multicastInterface);
+        	.setEnabled(multicastEnabled)
+        	.addTrustedInterface(multicastInterface);
 
         join.getTcpIpConfig()
-                .addMember(multicastInterface)
-                .setEnabled(true);
+        	.addMember(multicastInterface)
+        	.setEnabled(true);
 
-        networkConfig.getInterfaces()
-                .setEnabled(true)
-                .addInterface(multicastInterface);
+        network.getInterfaces()
+        	.setEnabled(true)
+        	.addInterface(multicastInterface);
+        
+        // Configure Scheduel Executor Service used to schedule Producers
+        config.getScheduledExecutorConfig(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME)
+        	.setPoolSize(maxPoolSize);
+        	
+        logger.info(String.format("Hazelcast configurations finished: %s", config));
 
-        logger.info(String.format("Hazelcast configurations finished: %s", hazelcastDefaultConfig));
-
-        return hazelcastDefaultConfig;
+        return config;
     }
     
     /**

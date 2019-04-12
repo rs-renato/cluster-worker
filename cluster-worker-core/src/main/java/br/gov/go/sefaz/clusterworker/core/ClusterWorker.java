@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IMap;
 import com.hazelcast.core.Member;
 import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 import com.hazelcast.scheduledexecutor.IScheduledFuture;
@@ -56,23 +57,22 @@ public final class ClusterWorker<T> {
 
         // Number of workers (threads)
         int workers = consumeFromQueue.workers();
-        // Delay to start the consumers
-        int DELAY_TO_START = 0;
 
         logger.info(String.format("Configuring ItemProcessor (%s worker(s)) implementation on hazelcast executor service.", workers));
 
         // Creates worker (HazelcastRunnableConsumer)
         HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableConsumer(itemProcessor);
+        
         for (int i = 1; i <=  workers; i++) {
 
             try {
             	// Executes the consumer on hazelcast local member
-				IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMember(hazelcastRunnableConsumer, getLocalMember(), DELAY_TO_START, TimeUnit.SECONDS);
-				
+				IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMember(hazelcastRunnableConsumer,getLocalMember(),0, TimeUnit.SECONDS);
+                
 				logger.debug(String.format("Adding listener for worker %s..", i));
 				this.shutdownListeners.add(hazelcastRunnableConsumer);
 				logger.debug(String.format("Adding ScheduledFutures for worker %s..", i));
-				this.scheduledFutures.add(scheduledFuture);
+                this.scheduledFutures.add(scheduledFuture);
             }catch (Exception e){
                 logger.error(String.format("Cannot execute a ItemProcessor on hazelcast executor service! %s", e.getMessage()));
             }
@@ -89,15 +89,27 @@ public final class ClusterWorker<T> {
     	
     	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableProducer(itemProducer);
 
-    	// Frequency of produce's execution 
-        int frequency = produceToQueue.frequency();
+    	IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
+    	
+    	// Frequency of produce's execution (converted to milleseconds to grant more sync) 
+        long frequency = TimeUnit.SECONDS.toMillis(produceToQueue.frequency());
         
         // Try to syncronize the initial execution always on second 0
-        int initialDelay = 60 - Calendar.getInstance().get(Calendar.SECOND);
+        Calendar calendar = Calendar.getInstance();
+		long initialDelay = TimeUnit.SECONDS.toMillis(60L - calendar.get(Calendar.SECOND)) - calendar.get(Calendar.MILLISECOND);
+		
+		// Retrieve the last execution timestamp
+        if (iMap.containsKey(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION)) {
+        	// Check the difference from now 
+        	long difference = Calendar.getInstance().getTimeInMillis() - iMap.get(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION);
+        	// Calculate the initial delay to this execution
+        	initialDelay = frequency - difference;
+        }
         
-        logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds.", frequency, initialDelay));
+        logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds (aproximated).", TimeUnit.MILLISECONDS.toSeconds(frequency), TimeUnit.MILLISECONDS.toSeconds(initialDelay)));
 
-        this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.SECONDS);
+        // Schedule the execution to execute into local member
+        this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.MILLISECONDS);
     }
 
     /**

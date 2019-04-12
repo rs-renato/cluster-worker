@@ -17,12 +17,11 @@
      - [HazelcastRunnableProducer](#hazelcastrunnableproducer)
      - [HazelcastRunnableConsumer](#hazelcastrunnableconsumer)
 
-![Insert here Cluster Worker Diagram](#)
-
-
 ## From Client Perspective: Producer vs Processor  
 
-![IInsert here Client Perspective Diagram](#)
+<p align="center">
+	<img alt="From Client Perspective: Producer vs Processor" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/cluster-worker-client-perspective.png?raw=true">
+</p>
 
 Cluster Worker knows how to manage client's tasks, everything you need is provide an implementation for producing and processing data. CW was designed to be task based, and comes in two flavors:
 
@@ -105,7 +104,9 @@ These tasks of production and processing will handle integer objects through the
 ### Standalones: HazelcastQueueProducer & HazelcastQueueConsumer
 Cluster Worker allows you have an out of the box approach to control per demand your producing and consumption logic. You can manage when to produce and when to consume data directly to/from hazelcast distributed queue. Everything you need is create an instance of these objects  through `ClusterWorkerFactory`.
 
-![Insert here Standalones Diagram](#)
+<p align="center">
+	<img alt="Standalones: HazelcastQueueProducer & HazelcastQueueConsumer" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/cluster-worker-out-of-the-box.png?raw=true">
+</p>
 
 #### HazelcastQueueProducer
 This producer is useful when you need to control your producing process just by calling a `produce()` method. This approach put the data directly into hazelcast distributed queue. The example below shows a `HazelcastQueueProducer` producing integers objects to the queue named `cw.example.queue`:
@@ -140,7 +141,9 @@ for (int i = 0; i < 100; i++) {
 
 ## From API Perspective: Producer vs Consumer
 
-![Insert here API Perspective Diagram](#)
+<p align="center">
+	<img alt="From API Perspective: Producer vs Consumer" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/cluster-worker-api-perspective.png?raw=true">
+</p>
 
 As said, Cluster Worker is an API based on `producer vs consumer architecture`. It uses hazelcast distibuted queue to  exchange data through the cluster members. Its internal uses  `Runnable's` that encapsulate the client's implementation of `ItemProducer` and `ItemConsumer`. It comes in two flavors:
 

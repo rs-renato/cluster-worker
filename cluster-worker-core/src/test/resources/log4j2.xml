@@ -9,7 +9,7 @@
 	<Appenders>
 		<RollingFile name="log" fileName="${log-path}/${app-name}.log" filePattern="${log-path}/${app-name}.log.%d{yyyy-MM-dd}">
 			<PatternLayout>
-				<pattern>%d{dd-MM-yyyy HH:mm:ss} %-5p %T %c{1}.%M:%L %m%n</pattern>
+				<pattern>%d{dd-MM-yyyy HH:mm:ss:SSS} %-5p %T %c{1}.%M:%L %m%n</pattern>
 			</PatternLayout>
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
@@ -18,7 +18,7 @@
 
 		<RollingFile name="error-log" fileName="${log-path}/${app-name}-error.log" filePattern="${log-path}/${app-name}-error.log.%d{yyyy-MM-dd}">
 			<PatternLayout>
-				<pattern>%d{dd-MM-yyyy HH:mm:ss} %-5p %T %c{1}.%M:%L %m%n</pattern>
+				<pattern>%d{dd-MM-yyyy HH:mm:ss:SSS} %-5p %T %c{1}.%M:%L %m%n</pattern>
 			</PatternLayout>
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
@@ -27,14 +27,14 @@
 
 		<Console name="console" target="SYSTEM_OUT">
 			<PatternLayout>
-				<pattern>%d{dd-MM-yyyy HH:mm:ss} %-5p %T %c{1}.%M:%L %m%n</pattern>
+				<pattern>%d{dd-MM-yyyy HH:mm:ss:SSS} %-5p %T %c{1}.%M:%L %m%n</pattern>
 			</PatternLayout>
 		</Console>
 	</Appenders>
 	
 	<Loggers>
         <Root level="INFO">
-            <AppenderRef ref="console" />
+            <AppenderRef ref="console" level="INFO"/>
         </Root>
         
  		<Logger name="br.gov.go.sefaz" additivity="TRUE" level="DEBUG">

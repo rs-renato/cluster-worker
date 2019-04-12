@@ -41,6 +41,8 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
     @Override
     public void run() {
 
+    	Thread.currentThread().setName(String.format("%s.%s", hazelcastInstance.getName(), "runnable.consumer"));
+    	
         logger.info("Starting HazelcastRunnableConsumer!");
 
         // Run this thread untill shutdown is called
@@ -52,7 +54,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
             	
             	// Process the item if it exists, or if the strategy is non-blocking, independently if the item exists 
                 if (item != null || !isBlocking()){
-                	logger.debug(String.format("Processing on the client's implementation. Strategy defined to %s.", getQueueStrategy()));
+                	logger.trace(String.format("Processing on the client's implementation. Strategy defined to %s.", getQueueStrategy()));
                 	itemProcessor.process(item);
                 }
                 
