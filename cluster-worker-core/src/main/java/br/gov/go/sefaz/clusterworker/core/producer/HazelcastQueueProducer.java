@@ -45,7 +45,9 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
 		
 		//Put a new item to the hazelcast queue
 		for (T item : items) {
-			iQueue.put(item);
+			if (!iQueue.contains(item)) {
+				iQueue.put(item);
+			}
 		}
     }
 

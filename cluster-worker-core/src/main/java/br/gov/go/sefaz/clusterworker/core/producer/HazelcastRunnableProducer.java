@@ -27,7 +27,6 @@ import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobin;
 public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<T> implements Runnable{
 
 	private static final transient long serialVersionUID = 2538609461091747126L;
-
 	private static final transient Logger logger = LogManager.getLogger(HazelcastRunnableProducer.class);
 	
     private ItemProducer<T> itemProducer;
@@ -67,17 +66,14 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     			
     			IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
     			logger.debug(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
-    			// Execute item producer only if the queue has none elements to be processed
-    			if (iQueue.isEmpty()) {
-    				// Produces items from client's implementation
-    				Collection<T> items = itemProducer.produce();
+				// Produces items from client's implementation
+				Collection<T> items = itemProducer.produce();
 
-    				if (items != null && !items.isEmpty()){
-    					produce(items);
-    				}
-    				// Advances the round robin pivot
-    				hazelcastMemberRoundRobin.advance();
-    			}
+				if (items != null && !items.isEmpty()){
+					produce(items);
+				}
+				// Advances the round robin pivot
+				hazelcastMemberRoundRobin.advance();
             } catch (InterruptedException|HazelcastInstanceNotActiveException e) {
 				logger.error(String.format("Cannot produce to hazelcast %s queue! This thread will die! Reason: %s", queueName, e.getMessage()));
 				Thread.currentThread().interrupt();

@@ -15,7 +15,7 @@ import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
  * @author renato-rs
  * @since 1.0
  */
-@ProduceToQueue(queueName = TestConstants.CW_QUEUE_NAME, frequency = TestConstants.CW_ITEM_PRODUCER_FREQUENCY)
+@ProduceToQueue(queueName = TestConstants.CW_QUEUE_NAME, frequency = TestConstants.CW_ITEM_PRODUCER_FREQUENCY, maxSize = TestConstants.CW_ITEM_PRODUCER_MAX_QUANTITY)
 public class IntegerItemProducer implements ItemProducer<Integer> {
 
 	private static final long serialVersionUID = 3936335122592593550L;
