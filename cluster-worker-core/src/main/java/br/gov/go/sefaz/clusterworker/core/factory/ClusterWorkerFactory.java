@@ -135,7 +135,7 @@ public class ClusterWorkerFactory {
     /**
      * Shutdown hazelcast instance from this factory.
      */
-	public void shutdownHazelcastInstance() {
+	public void shutdown() {
 
     	logger.warn("Shuttingdown ClusterWorkerFactory and its hazelcast instance..");
 		

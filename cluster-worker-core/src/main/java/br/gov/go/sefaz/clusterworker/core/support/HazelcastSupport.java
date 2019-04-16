@@ -11,6 +11,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
 import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
+import br.gov.go.sefaz.clusterworker.core.support.CachedPropertyFileSupport.SILENT_MODE;
 
 /**
  * Hazelcast support class.
@@ -20,7 +21,7 @@ import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
 public final class HazelcastSupport {
 
     private static final Logger logger = LogManager.getLogger(HazelcastSupport.class);
-    private static final CachedPropertyFile cachedPropertyFile = CachedPropertyFileSupport.getCachedPropertyFile("cw-config");
+    private static final CachedPropertyFile cachedPropertyFile = CachedPropertyFileSupport.getCachedPropertyFile("cw-config", SILENT_MODE.ENABLED);
     
     private HazelcastSupport() {
     }
@@ -58,17 +59,17 @@ public final class HazelcastSupport {
         // Creates the default configuration
         Config config = new Config();
         // Configures the log
-        config.setProperty("hazelcast.logging.type", ClusterWorkerConstants.CW_HAZELCAST_LOGGING_TYPE);
+        config.setProperty("hazelcast.logging.type", ClusterWorkerConstants.CW_LOGGING_TYPE);
         
         config.setInstanceName(hazelcastInstanceName);
         
         // Loads the property configuration values
-        int port = cachedPropertyFile.getProperty("cw.network.config.port", Integer.class);
-        boolean multicastEnabled = cachedPropertyFile.getProperty("cw.multicast.config.enabled", Boolean.class);
-        String multicastInterface = cachedPropertyFile.getProperty("cw.multicast.config.interface");
-        
-        int maxPoolSize = cachedPropertyFile.getProperty("cw.executor.max.pool.size", Integer.class);
-        
+        int port = cachedPropertyFile.getProperty("cw.network.port", Integer.class);
+        boolean multicastEnabled = cachedPropertyFile.getProperty("cw.network.multicast.enabled", Boolean.class, ClusterWorkerConstants.CW_MULTCAST_ENABLED_DEFAULT);
+        String ipMember = cachedPropertyFile.getProperty("cw.network.ip.member", String.class);
+        String trustedInterface = cachedPropertyFile.getProperty("cw.network.trusted.interface", ClusterWorkerConstants.CW_NETWORK_TRUSTED_INTERFACE_DEFAULT);
+        int maxPoolSize = cachedPropertyFile.getProperty("cw.executor.max.pool.size", Integer.class, ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_POOL_SIZE_DEFAULT);
+
         // Configures network
         NetworkConfig network = config.getNetworkConfig();
        
@@ -81,15 +82,15 @@ public final class HazelcastSupport {
 
         join.getMulticastConfig()
         	.setEnabled(multicastEnabled)
-        	.addTrustedInterface(multicastInterface);
+        	.addTrustedInterface(trustedInterface);
 
         join.getTcpIpConfig()
-        	.addMember(multicastInterface)
+        	.addMember(ipMember)
         	.setEnabled(true);
 
         network.getInterfaces()
         	.setEnabled(true)
-        	.addInterface(multicastInterface);
+        	.addInterface(trustedInterface);
         
         // Configure Scheduel Executor Service used to schedule Producers
         config.getScheduledExecutorConfig(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME)

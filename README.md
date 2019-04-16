@@ -30,7 +30,7 @@ Cluster Worker knows how to manage client's tasks, everything you need is provid
 
 >*Note: You can have as many different item producer as you need, but in a cluster environment this task will produce only in one cluster's node to ensure the data won't be produced repeatedly and cause inconsistent processing. If a node fails, there is no problem, this producer is redundant beyond the entire cluster nodes and executed in a roundrobin strategy to grant HA producing and balancing.*
 
-The example bellow shows an  `ItemProducer` implementation that produces a collection of 100 integers to the queue named `cw.example.queue` with execution frequency of 60 seconds:
+The example bellow shows an  `ItemProducer` implementation that produces a collection of 100 integers to the queue named `cw.example.queue` with execution frequency of 60 seconds and set the max queue size to 100 items:
 
 ```java
 /**
@@ -38,7 +38,7 @@ The example bellow shows an  `ItemProducer` implementation that produces a colle
  * @author renato-rs
  * @since 1.0
  */
-@ProduceToQueue(queueName = "cw.example.queue", frequency = 60)
+@ProduceToQueue(queueName = "cw.example.queue", frequency = 60, maxSize = 100)
 public class IntegerItemProducer implements ItemProducer<Integer> {
 
     @Override

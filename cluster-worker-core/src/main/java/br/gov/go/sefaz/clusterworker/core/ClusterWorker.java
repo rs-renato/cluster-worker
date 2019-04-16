@@ -23,6 +23,7 @@ import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
+import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
 /**
  * Central core to manage hazelcast executor services and it's lifecycle.
  * @author renato-rs
@@ -138,8 +139,7 @@ public final class ClusterWorker<T> {
 		logger.info("Shuttingdown Listeners ..");
 		this.shutdownListeners.forEach(ShutdownListener::shutdown);
 		
-		if (this.hazelcastInstance.getLifecycleService().isRunning()) {
-			
+		if (HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
 			this.hazelcastInstance.getLifecycleService().shutdown();
 			logger.info("Hazelcast LifecycleService finished!");
 		}

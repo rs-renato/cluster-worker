@@ -31,7 +31,7 @@ public class HazelcastQueueProducerTest {
 	
 	@AfterClass
 	public static void tearDownClass() {
-		cwFactory.shutdownHazelcastInstance();
+		cwFactory.shutdown();
 	}
 	
     @Test
