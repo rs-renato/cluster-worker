@@ -25,7 +25,7 @@ public class ClusterWorkerConstants {
 	public static final String CW_NETWORK_TRUSTED_INTERFACE_DEFAULT		= LOCALHOST_IP;
 
 	/**
-	 * Defines the default the port the Hazelcast member will try to bind on.
+	 * Defines the default the port which Hazelcast member will try to bind on.
 	 */
 //	public static final int CW_NETWORK_PORT_DEFAULT 					= 6000;
 	

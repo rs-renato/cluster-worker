@@ -16,6 +16,7 @@
   * [From API Perspective: Producer vs Consumer](#from-api-perspective-producer-vs-consumer)
      - [HazelcastRunnableProducer](#hazelcastrunnableproducer)
      - [HazelcastRunnableConsumer](#hazelcastrunnableconsumer)
+  * [Configurations](#configurations)     
 
 ## From Client Perspective: Producer vs Processor  
 
@@ -152,3 +153,15 @@ As said, Cluster Worker is an API based on `producer vs consumer architecture`. 
 
 ### HazelcastRunnableConsumer
 `WorkerConsumer` is a `runnable` that encapsulate a `ItemProcess` and calls the client's implementation for processing data; These `runnables` are present and active in all cluster nodes, and lives till the cluster member lives.
+
+## Configurations
+Cw defines a file `cw-network.properties` with the following mandatory property values:
+* `cw.network.port`: defines the port which Hazelcast member will try to bind on.
+* `cw.network.ip.member`: defines the ip member to add to the cluster (could be comma separated).
+
+And the following optional property values:
+* `cw.network.multicast.enabled`: defines the multicast discovery mechanism. Default value is `true`.
+* `cw.network.trusted.interface`: defines the trusted interface. Default value is `127.0.0.1`.
+* `cw.executor.max.pool.size`: defines the number of executor threads used for Consumers/Processors threads. Default values is `10`. 
+
+>*Note: The property cw.executor.max.pool.size defines the max pool size of executor service. That means, the value needs contemplate the sum of consumers and producers threads. If the number of consumers + producers threads was greather than max pool size, some threads execution may be ignored!*
