@@ -5,7 +5,7 @@ import java.security.SecureRandom;
 /**
  * Random String Support
  * @author renato-rs
- * @since
+ * @since 1.0
  */
 public class RandomStringSupport {
 

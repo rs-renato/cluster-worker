@@ -1,4 +1,4 @@
-package br.gov.go.sefaz.clusterworker.core.constants;
+package br.gov.go.sefaz.clusterworker.core.support;
 
 /**
  * Constants defined for tests
@@ -51,5 +51,5 @@ public class TestConstants {
     /**
      * Time to execute a test (in milleseconds)
      */
-	public static final long CW_EXECUTION_TIME 					= 1 * 60 * 1000;
+	public static final long CW_EXECUTION_TIME 					= 60 * 1000;
 }

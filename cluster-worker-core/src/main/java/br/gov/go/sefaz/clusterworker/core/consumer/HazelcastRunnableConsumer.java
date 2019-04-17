@@ -59,7 +59,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
                 }
                 
             } catch (InterruptedException|HazelcastInstanceNotActiveException e) {
-                logger.error(String.format("Cannot consume from hazelcast %s queue! This thread will die! Reason: %s", queueName, e.getMessage()));
+                logger.error(String.format("Cannot consume from hazelcast '%s' queue! This thread will die! Reason: %s", queueName, e.getMessage()));
                 Thread.currentThread().interrupt();
             }catch (ItemProcessorException e){
     			logger.error(String.format("Cannot process on client's implementation! Reason: %s", e.getMessage()));

@@ -11,9 +11,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
-import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
+import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 
 /**
  * HazelcastQueueConsumer example of use in blocking way
@@ -23,35 +23,30 @@ import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
 public class HazelcastQueueBlockingConsumerTest {
 
 	private static ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance(TestConstants.CW_NAME);
-	private static ClusterWorker<Integer> clusterWorker;
+	private static ClusterWorker<Integer> clusterWorker = cwFactory.getClusterWorker(Integer.class);
 	private static Timer timerItemProducer;
 
 	@BeforeClass
 	public static void setUp() {
-    	// Instantiate a Cluster Worker to handle integer objects (produce and consume to/from hazelcast queue)
-		clusterWorker = cwFactory.getClusterWorker(Integer.class);
-		 
 		timerItemProducer = new Timer();
-		 int TIMER_DELAY = 10_000;
-	        
-			timerItemProducer.schedule(
+		int TIMER_DELAY = 10_000;
 
-	                new TimerTask() {
-	                    @Override
-	                    public void run() {
-	                    	// Execute the item produder on cluster worker
-	                		clusterWorker.executeItemProducer(new IntegerItemProducer());	
-	                    }
-	                },
-	                TIMER_DELAY,
-	                TimeUnit.MILLISECONDS.convert(TestConstants.CW_ITEM_PRODUCER_FREQUENCY, TimeUnit.SECONDS)
-	        );
+		timerItemProducer.schedule(
+			new TimerTask() {
+				@Override
+				public void run() {
+					// Execute the item produder on cluster worker
+					clusterWorker.executeItemProducer(new IntegerItemProducer());
+				}
+			}, TIMER_DELAY,
+			TimeUnit.MILLISECONDS.convert(TestConstants.CW_ITEM_PRODUCER_FREQUENCY, TimeUnit.SECONDS)
+		);
 	}
 
 	@AfterClass
 	public static void tearDownClass() {
         // Shutdown cluster worker internals
-		clusterWorker.shutdown();
+		cwFactory.shutdown(clusterWorker);
 		timerItemProducer.cancel();
 	}
 

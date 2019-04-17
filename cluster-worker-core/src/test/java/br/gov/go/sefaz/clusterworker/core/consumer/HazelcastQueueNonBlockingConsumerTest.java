@@ -10,9 +10,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
-import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
+import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 
 /**
  * HazelcastQueueConsumer example of use in non-blocking way
@@ -22,19 +22,18 @@ import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
 public class HazelcastQueueNonBlockingConsumerTest {
 
 	private static ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance(TestConstants.CW_NAME);
-	private static ClusterWorker<Integer> clusterWorker;
+	private static ClusterWorker<Integer> clusterWorker = cwFactory.getClusterWorker(Integer.class);
 
 	@BeforeClass
 	public static void setUp() {
     	// Instantiate a Cluster Worker to handle integer objects (produce and consume to/from hazelcast queue)
-		clusterWorker = cwFactory.getClusterWorker(Integer.class);
 		clusterWorker.executeItemProducer(new IntegerItemProducer());	
 	}
 
 	@AfterClass
 	public static void tearDownClass() {
         // Shutdown cluster worker internals
-		clusterWorker.shutdown();
+		cwFactory.shutdown(clusterWorker);
 	}
 
 	@Test

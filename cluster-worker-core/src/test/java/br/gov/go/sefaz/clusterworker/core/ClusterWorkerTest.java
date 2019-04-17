@@ -1,13 +1,13 @@
 package br.gov.go.sefaz.clusterworker.core;
 
 import org.junit.AfterClass;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import br.gov.go.sefaz.clusterworker.core.constants.TestConstants;
+import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
+import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 
 /**
  * Cluster Worker example of use
@@ -16,16 +16,12 @@ import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
  */
 public class ClusterWorkerTest {
 
-	private static ClusterWorker<Integer> clusterWorker;
-	
-	@BeforeClass
-	public static void setUp() {
-		clusterWorker = ClusterWorkerFactory.getInstance(TestConstants.CW_NAME).getClusterWorker(Integer.class);
-	}
+	private static ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance(TestConstants.CW_NAME);
+	private static ClusterWorker<Integer> clusterWorker = cwFactory.getClusterWorker(Integer.class);
 	
 	@AfterClass
 	public static void tearDownClass() {
-		clusterWorker.shutdown();
+		cwFactory.shutdown(clusterWorker);
 	}
 	
     @Test
@@ -39,7 +35,7 @@ public class ClusterWorkerTest {
         // Execute the item processor on cluster worker
         clusterWorker.executeItemProccessor(new IntegerItemProcessor());
 
-        //Just wait for 20s to execute this test
+        //Just wait some seconds to execute this test
         Thread.sleep(TestConstants.CW_EXECUTION_TIME);
     }
 }
