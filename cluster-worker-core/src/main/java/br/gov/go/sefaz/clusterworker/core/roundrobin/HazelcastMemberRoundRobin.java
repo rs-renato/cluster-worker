@@ -38,7 +38,7 @@ public class HazelcastMemberRoundRobin{
 		ClusterState clusterState = getClusterState();
 		// Just update the pivot if the the cluster is active and has more than one member
 		if (clusterState.equals(ClusterState.ACTIVE) && getClusterMembers().size() > 1) {
-			logger.debug("Advancing round robin pivot");
+			logger.debug(String.format("Advancing round robin pivot '%s'", this.iAtomicLong.getName()));
 			this.iAtomicLong.incrementAndGet();
 		}
 		

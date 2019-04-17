@@ -49,7 +49,7 @@ public class ClusterWorkerFactory {
      * @return a ClusterWorkerFactory instance
      */
     public static ClusterWorkerFactory getInstance(HazelcastInstance hazelcastInstance) {
-    	logger.debug(String.format("Creating ClusterWorkerFactory instance with hazelcast instance name '%s'.", hazelcastInstance.getName()));
+    	logger.debug(String.format("Creating ClusterWorkerFactory instance with hazelcast instance name '%s'..", hazelcastInstance.getName()));
     	return new ClusterWorkerFactory(hazelcastInstance);
     }
 
@@ -90,7 +90,6 @@ public class ClusterWorkerFactory {
      * @return {@link HazelcastRunnableProducer} instance
      */
     public <T> HazelcastRunnableProducer<T> getHazelcastRunnableProducer(ItemProducer<T> itemProducer){
-		logger.debug("Creating new HazelcastRunnableProducer");
     	//Assert mandatory exception to create an HazelcastRunnableProducer
         ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
         
@@ -135,9 +134,9 @@ public class ClusterWorkerFactory {
     /**
      * Shutdown hazelcast instance from this factory.
      */
-	public void shutdownHazelcastInstance() {
+	public void shutdown() {
 
-    	logger.warn("Shuttingdown ClusterWorkerFactory and its hazelcast instance..");
+    	logger.warn("Shutting down ClusterWorkerFactory and its hazelcast instance..");
 		
 		if (HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
 			hazelcastInstance.getLifecycleService().shutdown();

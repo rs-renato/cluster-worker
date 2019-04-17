@@ -41,7 +41,7 @@ public class HazelcastQueueNonBlockingConsumerTest {
 	public void shouldExecuteHazelcastQueueConsumerAcceptNull() throws InterruptedException {
 
         // Creates an consumer to consumes the hazelcast queue
-		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, ConsumerStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT);
+		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_INTEGER_QUEUE_NAME, ConsumerStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT);
 
 		int loop = TestConstants.CW_ITEM_PRODUCER_QUANTITY * 3;
 

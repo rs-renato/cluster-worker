@@ -47,7 +47,9 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     @Override
     public void run() {
 
-    	Thread.currentThread().setName(String.format("%s.%s", hazelcastInstance.getName(), "runnable.producer"));
+		String producerThreadName = buildThreadName();
+		Thread.currentThread().setName(producerThreadName);
+        logger.info(String.format("Starting thread '%s'..", producerThreadName));
     	
     	IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
     	iMap.put(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION, Calendar.getInstance().getTimeInMillis());
@@ -65,7 +67,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     			Thread.sleep(100);
     			
     			IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
-    			logger.debug(String.format("Hazelcast queue %s size: %s", queueName, iQueue.size()));
+    			logger.debug(String.format("Hazelcast queue '%s' has %s items..", queueName, iQueue.size()));
 				// Produces items from client's implementation
 				Collection<T> items = itemProducer.produce();
 
@@ -75,15 +77,23 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 				// Advances the round robin pivot
 				hazelcastMemberRoundRobin.advance();
             } catch (InterruptedException|HazelcastInstanceNotActiveException e) {
-				logger.error(String.format("Cannot produce to hazelcast %s queue! This thread will die! Reason: %s", queueName, e.getMessage()));
+				logger.error(String.format("Cannot produce to hazelcast '%s' queue! This thread will die! Reason: %s", queueName, e.getMessage()));
 				Thread.currentThread().interrupt();
     		}catch (ItemProducerException e){
-    			logger.error(String.format("Cannot produce on client's implementation! Error: %s", e.getMessage()));
+    			logger.error(String.format("Cannot produce on client's implementation! Reason: %s", e.getMessage()));
     		 }catch (Exception e){
-     			logger.error("A general error occurs process on HazelcastRunnableProducer", e);
+     			logger.error(String.format("A general error occurs process on '%s'", producerThreadName), e);
              }
 		}
     	
-		logger.info(String.format("HazelcastRunnableProducer execution %s on this member.", (isLocalMember ? "completed" : "ignored")));
+		logger.info(String.format("Thread '%s' execution %s and finished on this member..", producerThreadName, (isLocalMember ? "COMPLETED" : "IGNORED")));
+    }
+    
+    /**
+     * Builds a unique thread name for this producer
+     * @return the unique producer thread name
+     */
+    private String buildThreadName() {
+    	return String.format("%s.producer[%s]", hazelcastInstance.getName(), itemProducer.getClass().getSimpleName());
     }
 }
