@@ -68,7 +68,7 @@ class CachedPropertyFile{
 			// Loads from cache if it exist.
 			value = getCachedProperty(propertyName, type);
 		} catch (Exception e) {
-			logger.error(String.format("Could not retrieve cached property: %s. The default value '%s' will be returned", e.getMessage(), defaultValue));
+			logger.error(String.format("Could not retrieve cached property. Reason: %s. The default value '%s' will be returned", e.getMessage(), defaultValue));
 		}
 		
 		return value != null ? value : defaultValue;

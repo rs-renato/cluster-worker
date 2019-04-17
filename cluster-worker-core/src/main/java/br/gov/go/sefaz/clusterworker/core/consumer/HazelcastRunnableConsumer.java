@@ -41,9 +41,9 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
     @Override
     public void run() {
 
-    	Thread.currentThread().setName(String.format("%s.%s", hazelcastInstance.getName(), "runnable.consumer"));
-    	
-        logger.info("Starting HazelcastRunnableConsumer!");
+		String consumerThreadName = buildThreadName();
+		Thread.currentThread().setName(consumerThreadName);
+        logger.info(String.format("Starting thread '%s'..", consumerThreadName));
 
         // Run this thread untill shutdown is called
         while(isRunning()) {
@@ -62,15 +62,21 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
                 logger.error(String.format("Cannot consume from hazelcast %s queue! This thread will die! Reason: %s", queueName, e.getMessage()));
                 Thread.currentThread().interrupt();
             }catch (ItemProcessorException e){
-    			logger.error(String.format("Cannot process on client's implementation! Error: %s", e.getMessage()));
+    			logger.error(String.format("Cannot process on client's implementation! Reason: %s", e.getMessage()));
             }catch (Exception e){
-    			logger.error("A general error occurs process on HazelcastRunnableConsumer", e);
+    			logger.error(String.format("A general error occurs process on '%s'", consumerThreadName), e);
             }
         }
 
-        logger.warn("Finishing HazelcastRunnableConsumer!");
+        logger.warn(String.format("Thread execution '%s' FINISHED on this member..", consumerThreadName));
     }
     
+	@Override
+	public void shutdown() {
+		logger.warn(String.format("Shutting down '%s'..", Thread.currentThread().getName()));
+		this.stopped = true;
+	}
+	
     /**
      * Verifies if this runnable is running.
      * @return <code>true</code> if thread is running, <code>false</code> otherwise.
@@ -79,9 +85,13 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
     	return !this.stopped;
     }
 
-	@Override
-	public void shutdown() {
-		logger.warn(String.format("Shutting down HazelcastRunnableConsumer - Thread '%s'", Thread.currentThread().getName()));
-		this.stopped = true;
-	}
+    /**
+     * Builds a unique thread name for this consumer
+     * @return the unique consumer thread name
+     */
+    private String buildThreadName() {
+    	String threadName = String.format("%s.consumer[%s]-", hazelcastInstance.getName(), itemProcessor.getClass().getSimpleName());
+		long threadCount = hazelcastInstance.getAtomicLong(threadName).getAndIncrement();
+		return threadName + threadCount;
+    }
 }

@@ -38,7 +38,7 @@ public class HazelcastQueueProducerTest {
 	public void shouldExecuteHazelcastQueueProducer() throws InterruptedException {
 
         // Creates an producer to produces into hazelcast queue
-		HazelcastQueueProducer<Integer> hazelcastQueueProducer = cwFactory.getHazelcastQueueProducer(TestConstants.CW_QUEUE_NAME);
+		HazelcastQueueProducer<Integer> hazelcastQueueProducer = cwFactory.getHazelcastQueueProducer(TestConstants.CW_INTEGER_QUEUE_NAME);
 
 		for (int i = 0; i < TestConstants.CW_ITEM_PRODUCER_QUANTITY; i++) {
 			itemProduced.add(i);
@@ -50,7 +50,7 @@ public class HazelcastQueueProducerTest {
     @Test
    	public void shouldExecuteHazelcastQueueConsumer() throws InterruptedException {
         // Creates an consumer to consumes from hazelcast queue
-   		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_QUEUE_NAME, ConsumerStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT);
+   		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_INTEGER_QUEUE_NAME, ConsumerStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT);
 
    		Integer result;
 

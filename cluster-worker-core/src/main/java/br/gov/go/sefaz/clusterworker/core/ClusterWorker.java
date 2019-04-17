@@ -75,7 +75,7 @@ public final class ClusterWorker<T> {
 				logger.debug(String.format("Adding ScheduledFutures for worker %s..", i));
                 this.scheduledFutures.add(scheduledFuture);
             }catch (Exception e){
-                logger.error(String.format("Cannot execute a ItemProcessor on hazelcast executor service! %s", e.getMessage()));
+                logger.error(String.format("Cannot execute a ItemProcessor on hazelcast executor service! Reason: %s", e.getMessage()));
             }
         }
     }

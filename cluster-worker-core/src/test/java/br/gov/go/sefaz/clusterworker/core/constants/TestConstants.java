@@ -13,9 +13,14 @@ public class TestConstants {
 	public static final String CW_NAME							= "cw";
     
 	/**
-	 * Hazelcast queue name
+	 * Hazelcast integer queue name
 	 */
-	public static final String CW_QUEUE_NAME					= "cw.queue.test";
+	public static final String CW_INTEGER_QUEUE_NAME			= "cw.queue.integer";
+	
+	/**
+	 * Hazelcast string queue name
+	 */
+	public static final String CW_STRING_QUEUE_NAME				= "cw.queue.string";
 	
 	/**
 	 * Quantity of items to produce to the queue
@@ -31,7 +36,7 @@ public class TestConstants {
 	/**
 	 * Frequency of productioin in seconds
 	 */
-    public static final int CW_ITEM_PRODUCER_FREQUENCY			= 30;
+    public static final int CW_ITEM_PRODUCER_FREQUENCY			= 10;
     
     /**
 	 * Quantity of workers (threads) of processors (queues consumers)
@@ -44,7 +49,7 @@ public class TestConstants {
     public static final int CW_QUEUEE_TIMEOUT					= 1;
 
     /**
-     * Time to execute a test
+     * Time to execute a test (in milleseconds)
      */
-	public static final long CW_EXECUTION_TIME 					= 5 * 60 * 1000;
+	public static final long CW_EXECUTION_TIME 					= 1 * 60 * 1000;
 }

@@ -41,7 +41,7 @@ public final class HazelcastSupport {
 
 		if (!instanceFound || !isRunning) {
     		hazelcastInstance = Hazelcast.newHazelcastInstance(createDefaultConfig(hazelcastInstanceName));
-    		logger.debug("New hazelcast instance created");
+    		logger.debug("New hazelcast instance created..");
 		}
     			
 		return hazelcastInstance;
