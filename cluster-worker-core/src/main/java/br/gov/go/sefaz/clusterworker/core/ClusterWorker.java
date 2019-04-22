@@ -122,7 +122,9 @@ public final class ClusterWorker<T> {
     }
 
     /**
-     * Shutdown the ClusterWorker core and its hazelcast instance, listeners, futures, etc.
+     * Shutdown the ClusterWorker core (listeners and futures).
+     * </br></br><i>Note:</i> This method DOESN'T shutdown the internal hazelcast instance!
+     * @see ClusterWorker#shutdown(boolean)
      */
 	public void shutdown() {
 
@@ -139,11 +141,27 @@ public final class ClusterWorker<T> {
 		logger.info("Shuttingdown Listeners ..");
 		this.shutdownListeners.forEach(ShutdownListener::shutdown);
 		
-		if (HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
+		// Clears lists
+		this.scheduledFutures.clear();
+		this.shutdownListeners.clear();
+		
+		logger.info("ClusterWorker shutdown completed!");
+	}
+	
+	/**
+	 * Shutdown the ClusterWorker core (listeners and futures).
+	 * </br></br><i>Note:</i> If <code>shutdownHazelcast</code> was set to true, any other dependency of this hazelcast instance
+	 * will be affected! Eg.: Another clusterworker instance.
+	 * @param shutdownHazelcast <code>true</code> if this method should shutdown its internal hazelcast instance,
+	 * <code>false</code> otherwise.
+	 */
+	public void shutdown(boolean shutdownHazelcast) {
+		
+		if (shutdownHazelcast && HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
 			this.hazelcastInstance.getLifecycleService().shutdown();
 			logger.info("Hazelcast LifecycleService finished!");
 		}
-		
-		logger.info("ClusterWorker shutdown completed!");
+        // Shutdown the clusterWoker core
+		shutdown();
 	}
 }

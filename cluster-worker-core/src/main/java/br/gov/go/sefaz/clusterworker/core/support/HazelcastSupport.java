@@ -95,7 +95,7 @@ public final class HazelcastSupport {
         // Configure Scheduel Executor Service used to schedule Producers
         config.getScheduledExecutorConfig(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME)
         	.setPoolSize(maxPoolSize);
-        	
+
         logger.info(String.format("Hazelcast configurations finished: %s", config));
 
         return config;

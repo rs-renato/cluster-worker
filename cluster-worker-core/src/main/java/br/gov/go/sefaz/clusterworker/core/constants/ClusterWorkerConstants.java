@@ -15,20 +15,10 @@ public class ClusterWorkerConstants {
 	private static final String LOCALHOST_IP							= "127.0.0.1";
 	
 	/**
-	 * Defines the default ip member
-	 */
-//	public static final String CW_IP_MEMBER_DEFAULT						= LOCALHOST_IP;
-	
-	/**
 	 * Defines the default trusted interface
 	 */
 	public static final String CW_NETWORK_TRUSTED_INTERFACE_DEFAULT		= LOCALHOST_IP;
 
-	/**
-	 * Defines the default the port which Hazelcast member will try to bind on.
-	 */
-//	public static final int CW_NETWORK_PORT_DEFAULT 					= 6000;
-	
 	/**
 	 * Defines the default number of executor threads per member for the executor.
 	 */

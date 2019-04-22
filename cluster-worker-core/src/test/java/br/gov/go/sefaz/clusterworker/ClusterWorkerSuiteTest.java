@@ -1,4 +1,4 @@
-package br.gov.go.sefaz.clusterworker.core.suite;
+package br.gov.go.sefaz.clusterworker;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

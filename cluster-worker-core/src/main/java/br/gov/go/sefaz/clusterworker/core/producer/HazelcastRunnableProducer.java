@@ -48,8 +48,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     public void run() {
 
 		String producerThreadName = buildThreadName();
-		Thread.currentThread().setName(producerThreadName);
-        logger.info(String.format("Starting thread '%s'..", producerThreadName));
+        logger.info(String.format("[%s] - Starting thread '%s'..", Thread.currentThread().getName(), producerThreadName));
     	
     	IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
     	iMap.put(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION, Calendar.getInstance().getTimeInMillis());
@@ -86,7 +85,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
              }
 		}
     	
-		logger.info(String.format("Thread '%s' execution %s and finished on this member..", producerThreadName, (isLocalMember ? "COMPLETED" : "IGNORED")));
+		logger.info(String.format("[%s] - Thread '%s' execution %s and finished on this member..", Thread.currentThread().getName(), producerThreadName, (isLocalMember ? "COMPLETED" : "IGNORED")));
     }
     
     /**

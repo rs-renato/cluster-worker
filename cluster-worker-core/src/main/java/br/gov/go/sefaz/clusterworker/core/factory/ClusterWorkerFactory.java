@@ -1,5 +1,8 @@
 package br.gov.go.sefaz.clusterworker.core.factory;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -32,13 +35,22 @@ public class ClusterWorkerFactory {
     private static final Logger logger = LogManager.getLogger(ClusterWorkerFactory.class);
 
     private final HazelcastInstance hazelcastInstance;
+    private final boolean isDefaultHazelcastInstance;
+    private final Set<ClusterWorker<?>> cwInstances = new HashSet<>();
     
-    private ClusterWorkerFactory(HazelcastInstance hazelcastInstance) {
+    /**
+     * Creates a ClusterWorkerFactory
+     * @param hazelcastInstance hazelcast instance
+     * @param isDefaultHazelcastInstance <code>true</code> if this instance was created by this factory, <code>false</code> otherwise.
+     */
+    private ClusterWorkerFactory(HazelcastInstance hazelcastInstance, boolean isDefaultHazelcastInstance) {
+    	this.isDefaultHazelcastInstance = isDefaultHazelcastInstance;
     	this.hazelcastInstance = hazelcastInstance;
     }
     
     public static ClusterWorkerFactory getInstance(String hazelcastInstanceName) {
-    	return getInstance(HazelcastSupport.getOrcreateDefaultHazelcastInstance(hazelcastInstanceName));
+    	logger.debug(String.format("Creating ClusterWorkerFactory instance with hazelcast instance name '%s'..", hazelcastInstanceName));
+    	return new ClusterWorkerFactory(HazelcastSupport.getOrcreateDefaultHazelcastInstance(hazelcastInstanceName), true);
     }
     
     /**
@@ -50,7 +62,7 @@ public class ClusterWorkerFactory {
      */
     public static ClusterWorkerFactory getInstance(HazelcastInstance hazelcastInstance) {
     	logger.debug(String.format("Creating ClusterWorkerFactory instance with hazelcast instance name '%s'..", hazelcastInstance.getName()));
-    	return new ClusterWorkerFactory(hazelcastInstance);
+    	return new ClusterWorkerFactory(hazelcastInstance, false);
     }
 
     /**
@@ -59,16 +71,16 @@ public class ClusterWorkerFactory {
      * @return {@link ClusterWorker} instance
      */
     public <T> ClusterWorker<T> getClusterWorker(Class<T> type){
-        return new ClusterWorker<>(hazelcastInstance);
+		return addAndReturn(new ClusterWorker<>(hazelcastInstance));
     }
-    
+
     /**
      * Create a new {@link ClusterWorker} instance of T type.
      * @param type which this ClusterWorker will handle.
      * @return {@link ClusterWorker} instance
      */
     public <T> ClusterWorker<T> getClusterWorker(ParameterizedTypeReference<T> type){
-        return new ClusterWorker<>(hazelcastInstance);
+		return addAndReturn(new ClusterWorker<>(hazelcastInstance));
     }
 
     /**
@@ -132,16 +144,90 @@ public class ClusterWorkerFactory {
     }
     
     /**
-     * Shutdown hazelcast instance from this factory.
+     * Shutdown all clusterWorker instances created by this factory. However, the hazelcast will be shutted down <b>if and only if</b>, 
+     * the hazelcast was created by this factory. That is, if the hazelcast instance 
+     * was provided to this factory when it was created, this method won't shutdown the hazelcast.
+     * </br></br><i>Note:</i> Any other dependency of internal hazelcast instance will be affected! Eg.: Another clusterworker instance.
+     * @see ClusterWorkerFactory#shutdown(boolean)
      */
 	public void shutdown() {
-
-    	logger.warn("Shutting down ClusterWorkerFactory and its hazelcast instance..");
+		shutdown(isDefaultHazelcastInstance);
+	}
+	
+	/**
+     * Shutdown this clusterWorker and its core (listeners, futures, etc). However, the hazelcast will be shutted down <b>if and only if</b>, 
+     * the hazelcast was created by this factory. That is, if the hazelcast instance 
+     * was provided to this factory when it was created, this method won't shutdown the hazelcast.
+     * </br></br><i>Note:</i> Any other dependency of internal hazelcast instance will be affected! Eg.: Another clusterworker instance.
+     * @param clusterWorker the clusterWorker to be shutted down
+     * @see ClusterWorkerFactory#shutdown(ClusterWorker, boolean)
+     */
+	public void shutdown(ClusterWorker<?> clusterWorker) {
+		shutdown(clusterWorker, isDefaultHazelcastInstance);
+	}
+	
+	/**
+	 * Shutdown all clusterWorker instances created by this factory.
+	 * </br></br><i>Note:</i> If <code>shutdownHazelcast</code> was set to true, any other dependency of this hazelcast instance
+	 * will be affected! Eg.: Another clusterworker instance.
+	 * @param shutdownHazelcast <code>true</code> if this method should shutdown its internal hazelcast instance,
+	 * <code>false</code> otherwise.
+	 */
+	public void shutdown(boolean shutdownHazelcast) {
 		
-		if (HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
-			hazelcastInstance.getLifecycleService().shutdown();
+		logger.warn("Shutting down ClusterWorkerFactory and its instances..");
+		
+    	for (ClusterWorker<?> clusterWorker : cwInstances) {
+			shutdown(clusterWorker, shutdownHazelcast);
 		}
 		
     	logger.warn("ClusterWorkerFactory shutdown completed!");
+	}
+	
+	/**
+	 * Shutdown this clusterWorker and its core (listeners, futures, etc).
+	 * </br></br><i>Note:</i> If <code>shutdownHazelcast</code> was set to true, any other dependency of this hazelcast instance
+	 * will be affected! Eg.: Another clusterworker instance.
+	 * @param clusterWorker the clusterWorker to be shutted down
+	 * @param shutdownHazelcast <code>true</code> if this method should shutdown its internal hazelcast instance,
+	 * <code>false</code> otherwise.
+	 */
+	public void shutdown(ClusterWorker<?> clusterWorker, boolean shutdownHazelcast) {
+
+		ClusterWorker<?> cwInstance = 
+				cwInstances.stream()
+					.filter(cw -> cw.equals(clusterWorker))
+					.findFirst().orElseGet(null);
+		
+		// Shutdown the clusterWorker, preserving its internal hazelcast instance
+		if (cwInstance != null) {
+			cwInstance.shutdown();
+			cwInstances.remove(clusterWorker);
+		}
+		
+		// Shutdown the hazelcast if it was created by this factory
+    	if (shutdownHazelcast) {
+    		shutdownHazelcast();
+		}
+	}
+	
+	/**
+	 * Adds this clusterWorker instance into collection and return the element.
+	 * @param clusterWorker to add into collection
+	 * @return clusterWorker
+	 */
+	private <T> ClusterWorker<T> addAndReturn(ClusterWorker<T> clusterWorker) {
+		cwInstances.add(clusterWorker);
+		return clusterWorker;
+	}
+	
+	/**
+	 * Shutdown the hazelcast intance if its running
+	 */
+	private void shutdownHazelcast() {
+		if (HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
+	    	logger.warn("Hazelcast instance will be shutted down ..");
+				hazelcastInstance.getLifecycleService().shutdown();
+		}
 	}
 }
