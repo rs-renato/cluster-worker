@@ -21,7 +21,7 @@
 ## From Client Perspective: Producer vs Processor  
 
 <p align="center">
-	<img alt="From Client Perspective: Producer vs Processor" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/blob/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bclient-perspective%5D.png?raw=true">
+	<img alt="From Client Perspective: Producer vs Processor" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bclient-perspective%5D.png?raw=true">
 </p>
 
 Cluster Worker knows how to manage client's tasks, everything you need is provide an implementation for producing and processing data. CW was designed to be task based, and comes in two flavors:
@@ -106,7 +106,7 @@ These tasks of production and processing will handle integer objects through the
 Cluster Worker allows you have an out of the box approach to control per demand your producing and consumption logic. You can manage when to produce and when to consume data directly to/from hazelcast distributed queue. Everything you need is create an instance of these objects  through `ClusterWorkerFactory`.
 
 <p align="center">
-	<img alt="Standalones: HazelcastQueueProducer & HazelcastQueueConsumer" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/blob/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bout-of-the-box%5D.png?raw=true">
+	<img alt="Standalones: HazelcastQueueProducer & HazelcastQueueConsumer" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bout-of-the-box%5D.png?raw=true">
 </p>
 
 #### HazelcastQueueProducer
@@ -143,7 +143,7 @@ for (int i = 0; i < 100; i++) {
 ## From API Perspective: Producer vs Consumer
 
 <p align="center">
-	<img alt="From API Perspective: Producer vs Consumer" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/blob/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png?raw=true">
+	<img alt="From API Perspective: Producer vs Consumer" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png?raw=true">
 </p>
 
 As said, Cluster Worker is an API based on `producer vs consumer architecture`. It uses hazelcast distibuted queue to  exchange data through the cluster members. Its internal uses  `Runnable's` that encapsulate the client's implementation of `ItemProducer` and `ItemConsumer`. It comes in two flavors:
