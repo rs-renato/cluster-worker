@@ -1,6 +1,10 @@
 
-# Cluster Worker - *Scale your task easily.*
-**Cluster Worker (CW)** is a Hazelcast based API that help you to scale yours tasks producing and processing  under a cluster environment. CW uses producer x consumer strategy on hazelcast distributed queues as central mechanism to distribute in an easily way the client's task implementations to be executed in all nodes, providing high availability and scalability for processing and exchange data through the cluster members.
+# Cluster Worker - *Scale Batch Application Easily.*
+**Cluster Worker (CW)** is a Hazelcast based API that help you to scale yours tasks producing and processing under a cluster environment. CW uses *producer vs consumer* strategy on hazelcast distributed queues as central mechanism to distribute in an easily way the client's task implementations to be executed in all nodes, providing high availability and scalability for processing and exchange data through the cluster members.
+
+<p align="center">
+	<img alt="ClusterWorker-Deployment Diagram [Scalable]" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/blob/master/ClusterWorker/Diagramas/ClusterWorker-Deployment%20Diagram%20%5BScalable%5D.png">
+</p>
 
 > *Hazelcast is an open source In-Memory Data Grid (IMDG). It provides elastically scalable distributed In-Memory computing, widely recognized as the fastest and most scalable approach to application performance. Hazelcast does this in open source and provides highly scalable and available (100% operational, never failing). Distributed applications can use Hazelcast for distributed caching, synchronization, clustering, processing, pub/sub messaging, etc (extracted from  [https://hazelcast.org](https://hazelcast.org))*.
 
@@ -21,7 +25,7 @@
 ## From Client Perspective: Producer vs Processor  
 
 <p align="center">
-	<img alt="From Client Perspective: Producer vs Processor" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bclient-perspective%5D.png?raw=true">
+	<img alt="From Client Perspective: Producer vs Processor" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bclient-perspective%5D.png">
 </p>
 
 Cluster Worker knows how to manage client's tasks, everything you need is provide an implementation for producing and processing data. CW was designed to be task based, and comes in two flavors:
@@ -112,7 +116,7 @@ These tasks of production and processing will handle integer objects through the
 Cluster Worker allows you have an out of the box approach to control per demand your producing and consumption logic. You can manage when to produce and when to consume data directly to/from hazelcast distributed queue. Everything you need is create an instance of these objects  through `ClusterWorkerFactory`.
 
 <p align="center">
-	<img alt="Standalones: HazelcastQueueProducer & HazelcastQueueConsumer" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bout-of-the-box%5D.png?raw=true">
+	<img alt="Standalones: HazelcastQueueProducer & HazelcastQueueConsumer" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bout-of-the-box%5D.png">
 </p>
 
 #### HazelcastQueueProducer
@@ -149,7 +153,7 @@ for (int i = 0; i < 100; i++) {
 ## From API Perspective: Producer vs Consumer
 
 <p align="center">
-	<img alt="From API Perspective: Producer vs Consumer" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png?raw=true">
+	<img alt="From API Perspective: Producer vs Consumer" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png">
 </p>
 
 As said, Cluster Worker is an API based on `producer vs consumer architecture`. It uses hazelcast distibuted queue to  exchange data through the cluster members. Its internal uses  `Runnable's` that encapsulate the client's implementation of `ItemProducer` and `ItemConsumer`. It comes in two flavors:
