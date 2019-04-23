@@ -21,7 +21,7 @@
      - [HazelcastRunnableProducer](#hazelcastrunnableproducer)
      - [HazelcastRunnableConsumer](#hazelcastrunnableconsumer)
   * [Configurations](#configurations)
-  * [Class Diagrams](#class-diagrams)          
+  * [Cluster Worker Class Diagram](#cluster-worker-class-diagram)          
 
 ## From Client Perspective: Producer vs Processor  
 
@@ -169,9 +169,7 @@ And the following optional property values:
 
 >*Note: The property cw.executor.max.pool.size defines the max pool size of executor service. That means, the value needs contemplate the sum of consumers and producers threads. If the number of consumers + producers threads was greather than max pool size, some threads execution may be ignored!*
 
-## Class Diagrams
-ClusterWorker Class Diagram
-
+## Cluster Worker Class Diagram
 <p align="center">
 	<img alt="ClusterWorker Class Diagram" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png">
 </p>
