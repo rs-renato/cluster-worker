@@ -1,5 +1,10 @@
-# Cluster Worker - *Scale your task easily.*
-**Cluster Worker (CW)** is a Hazelcast based API that help you to scale yours tasks producing and processing  under a cluster environment. CW uses producer x consumer strategy on hazelcast distributed queues as central mechanism to distribute in an easily way the client's task implementations to be executed in all nodes, providing high availability and scalability for processing and exchange data through the cluster members.
+
+# Cluster Worker - *Scale Batch Application Easily.*
+**Cluster Worker (CW)** is a Hazelcast based API that help you to scale yours tasks producing and processing under a cluster environment. CW uses *producer vs consumer* strategy on hazelcast distributed queues as central mechanism to distribute in an easily way the client's task implementations to be executed in all nodes, providing high availability and scalability for processing and exchange data through the cluster members.
+
+<p align="center">
+	<img alt="ClusterWorker-Deployment Diagram [Scalable]" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Deployment%20Diagram%20%5BScalable%5D.png">
+</p>
 
 > *Hazelcast is an open source In-Memory Data Grid (IMDG). It provides elastically scalable distributed In-Memory computing, widely recognized as the fastest and most scalable approach to application performance. Hazelcast does this in open source and provides highly scalable and available (100% operational, never failing). Distributed applications can use Hazelcast for distributed caching, synchronization, clustering, processing, pub/sub messaging, etc (extracted from  [https://hazelcast.org](https://hazelcast.org))*.
 
@@ -15,11 +20,13 @@
   * [From API Perspective: Producer vs Consumer](#from-api-perspective-producer-vs-consumer)
      - [HazelcastRunnableProducer](#hazelcastrunnableproducer)
      - [HazelcastRunnableConsumer](#hazelcastrunnableconsumer)
+  * [Configurations](#configurations)
+  * [Cluster Worker Class Diagram](#cluster-worker-class-diagram)          
 
 ## From Client Perspective: Producer vs Processor  
 
 <p align="center">
-	<img alt="From Client Perspective: Producer vs Processor" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/cluster-worker-client-perspective.png?raw=true">
+	<img alt="From Client Perspective: Producer vs Processor" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Component%20Diagram.png">
 </p>
 
 Cluster Worker knows how to manage client's tasks, everything you need is provide an implementation for producing and processing data. CW was designed to be task based, and comes in two flavors:
@@ -29,7 +36,7 @@ Cluster Worker knows how to manage client's tasks, everything you need is provid
 
 >*Note: You can have as many different item producer as you need, but in a cluster environment this task will produce only in one cluster's node to ensure the data won't be produced repeatedly and cause inconsistent processing. If a node fails, there is no problem, this producer is redundant beyond the entire cluster nodes and executed in a roundrobin strategy to grant HA producing and balancing.*
 
-The example bellow shows an  `ItemProducer` implementation that produces a collection of 100 integers to the queue named `cw.example.queue` with execution frequency of 60 seconds:
+The example bellow shows an  `ItemProducer` implementation that produces a collection of 100 integers to the queue named `cw.example.queue` with execution frequency of 60 seconds and set the max queue size to 100 items:
 
 ```java
 /**
@@ -37,7 +44,7 @@ The example bellow shows an  `ItemProducer` implementation that produces a colle
  * @author renato-rs
  * @since 1.0
  */
-@ProduceToQueue(queueName = "cw.example.queue", frequency = 60)
+@ProduceToQueue(queueName = "cw.example.queue", frequency = 60, maxSize = 100)
 public class IntegerItemProducer implements ItemProducer<Integer> {
 
     @Override
@@ -89,23 +96,25 @@ public class IntegerItemProcessor implements ItemProcessor<Integer> {
 `ClusterWorker` class is the executor of `ItemProducer` and `ItemProcessor` implementations. An instance of CW which will be handle integers, can be obtained as follow:
 
 ```java
+// Creates an ClusterWorkerFactory instance. This invocation creates an internal hazelcast instance named 'cw.name' with default configurations
+ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance("cw.name");
 // Creates an intance of Cluster Worker to handle integer objects
-ClusterWorker<Integer> clusterWorker = ClusterWorkerFactory.getInstance("cw.name").getClusterWorker(Integer.class);
+ClusterWorker<Integer> clusterWorker = cwFactory.getClusterWorker(Integer.class);
 
-// Executes item producer into cluster
-clusterWorker.executeItemProccessor(new IntegerItemProducer());
 // Executes item processor into cluster
+clusterWorker.executeItemProccessor(new IntegerItemProducer());
+// Executes item producer into cluster
 clusterWorker.executeItemProducer(new IntegerItemProcessor());
+
+// Shutdown the clusterWorker and its threads (producer and consumers)
+// This method shutdown the factory internal hazelcast instance, bacause that instance was created by this factory.
+cwFactory.shutdown(clusterWorker);
 ```
 
 These tasks of production and processing will handle integer objects through the cluster nodes.
 
 ### Standalones: HazelcastQueueProducer & HazelcastQueueConsumer
 Cluster Worker allows you have an out of the box approach to control per demand your producing and consumption logic. You can manage when to produce and when to consume data directly to/from hazelcast distributed queue. Everything you need is create an instance of these objects  through `ClusterWorkerFactory`.
-
-<p align="center">
-	<img alt="Standalones: HazelcastQueueProducer & HazelcastQueueConsumer" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/cluster-worker-out-of-the-box.png?raw=true">
-</p>
 
 #### HazelcastQueueProducer
 This producer is useful when you need to control your producing process just by calling a `produce()` method. This approach put the data directly into hazelcast distributed queue. The example below shows a `HazelcastQueueProducer` producing integers objects to the queue named `cw.example.queue`:
@@ -140,10 +149,6 @@ for (int i = 0; i < 100; i++) {
 
 ## From API Perspective: Producer vs Consumer
 
-<p align="center">
-	<img alt="From API Perspective: Producer vs Consumer" src="https://github.com/rs-renato/repository-images/blob/master/cluster-worker/cluster-worker-api-perspective.png?raw=true">
-</p>
-
 As said, Cluster Worker is an API based on `producer vs consumer architecture`. It uses hazelcast distibuted queue to  exchange data through the cluster members. Its internal uses  `Runnable's` that encapsulate the client's implementation of `ItemProducer` and `ItemConsumer`. It comes in two flavors:
 
 ### HazelcastRunnableProducer
@@ -151,3 +156,20 @@ As said, Cluster Worker is an API based on `producer vs consumer architecture`. 
 
 ### HazelcastRunnableConsumer
 `WorkerConsumer` is a `runnable` that encapsulate a `ItemProcess` and calls the client's implementation for processing data; These `runnables` are present and active in all cluster nodes, and lives till the cluster member lives.
+
+## Configurations
+Cw defines a file `cw-network.properties` with the following mandatory property values:
+* `cw.network.port`: defines the port which Hazelcast member will try to bind on.
+* `cw.network.ip.member`: defines the ip member to add to the cluster (could be comma separated).
+
+And the following optional property values:
+* `cw.network.multicast.enabled`: defines the multicast discovery mechanism. Default value is `true`.
+* `cw.network.trusted.interface`: defines the trusted interface. Default value is `127.0.0.1`.
+* `cw.executor.max.pool.size`: defines the number of executor threads used for Consumers/Processors threads. Default values is `10`. 
+
+>*Note: The property cw.executor.max.pool.size defines the max pool size of executor service. That means, the value needs contemplate the sum of consumers and producers threads. If the number of consumers + producers threads was greather than max pool size, some threads execution may be ignored!*
+
+## Cluster Worker Class Diagram
+<p align="center">
+	<img alt="ClusterWorker Class Diagram" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png">
+</p>
