@@ -3,7 +3,7 @@
 **Cluster Worker (CW)** is a Hazelcast based API that help you to scale yours tasks producing and processing under a cluster environment. CW uses *producer vs consumer* strategy on hazelcast distributed queues as central mechanism to distribute in an easily way the client's task implementations to be executed in all nodes, providing high availability and scalability for processing and exchange data through the cluster members.
 
 <p align="center">
-	<img alt="ClusterWorker-Deployment Diagram [Scalable]" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/blob/master/ClusterWorker/Diagramas/ClusterWorker-Deployment%20Diagram%20%5BScalable%5D.png">
+	<img alt="ClusterWorker-Deployment Diagram [Scalable]" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Deployment%20Diagram%20%5BScalable%5D.png">
 </p>
 
 > *Hazelcast is an open source In-Memory Data Grid (IMDG). It provides elastically scalable distributed In-Memory computing, widely recognized as the fastest and most scalable approach to application performance. Hazelcast does this in open source and provides highly scalable and available (100% operational, never failing). Distributed applications can use Hazelcast for distributed caching, synchronization, clustering, processing, pub/sub messaging, etc (extracted from  [https://hazelcast.org](https://hazelcast.org))*.
