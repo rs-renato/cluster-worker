@@ -20,12 +20,13 @@
   * [From API Perspective: Producer vs Consumer](#from-api-perspective-producer-vs-consumer)
      - [HazelcastRunnableProducer](#hazelcastrunnableproducer)
      - [HazelcastRunnableConsumer](#hazelcastrunnableconsumer)
-  * [Configurations](#configurations)     
+  * [Configurations](#configurations)
+  * [Class Diagrams](#class-diagrams)          
 
 ## From Client Perspective: Producer vs Processor  
 
 <p align="center">
-	<img alt="From Client Perspective: Producer vs Processor" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bclient-perspective%5D.png">
+	<img alt="From Client Perspective: Producer vs Processor" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Component%20Diagram.png">
 </p>
 
 Cluster Worker knows how to manage client's tasks, everything you need is provide an implementation for producing and processing data. CW was designed to be task based, and comes in two flavors:
@@ -115,10 +116,6 @@ These tasks of production and processing will handle integer objects through the
 ### Standalones: HazelcastQueueProducer & HazelcastQueueConsumer
 Cluster Worker allows you have an out of the box approach to control per demand your producing and consumption logic. You can manage when to produce and when to consume data directly to/from hazelcast distributed queue. Everything you need is create an instance of these objects  through `ClusterWorkerFactory`.
 
-<p align="center">
-	<img alt="Standalones: HazelcastQueueProducer & HazelcastQueueConsumer" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bout-of-the-box%5D.png">
-</p>
-
 #### HazelcastQueueProducer
 This producer is useful when you need to control your producing process just by calling a `produce()` method. This approach put the data directly into hazelcast distributed queue. The example below shows a `HazelcastQueueProducer` producing integers objects to the queue named `cw.example.queue`:
 
@@ -152,10 +149,6 @@ for (int i = 0; i < 100; i++) {
 
 ## From API Perspective: Producer vs Consumer
 
-<p align="center">
-	<img alt="From API Perspective: Producer vs Consumer" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png">
-</p>
-
 As said, Cluster Worker is an API based on `producer vs consumer architecture`. It uses hazelcast distibuted queue to  exchange data through the cluster members. Its internal uses  `Runnable's` that encapsulate the client's implementation of `ItemProducer` and `ItemConsumer`. It comes in two flavors:
 
 ### HazelcastRunnableProducer
@@ -175,3 +168,14 @@ And the following optional property values:
 * `cw.executor.max.pool.size`: defines the number of executor threads used for Consumers/Processors threads. Default values is `10`. 
 
 >*Note: The property cw.executor.max.pool.size defines the max pool size of executor service. That means, the value needs contemplate the sum of consumers and producers threads. If the number of consumers + producers threads was greather than max pool size, some threads execution may be ignored!*
+
+## Class Diagrams
+Standalones Overview
+<p align="center">
+	<img alt="Standalones Overview" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bout-of-the-box%5D.png">
+</p>
+
+Producer vs Consumer Overview
+<p align="center">
+	<img alt="Producer vs Consumer Overview" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png">
+</p>
