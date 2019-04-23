@@ -170,12 +170,8 @@ And the following optional property values:
 >*Note: The property cw.executor.max.pool.size defines the max pool size of executor service. That means, the value needs contemplate the sum of consumers and producers threads. If the number of consumers + producers threads was greather than max pool size, some threads execution may be ignored!*
 
 ## Class Diagrams
-Standalones Overview
-<p align="center">
-	<img alt="Standalones Overview" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bout-of-the-box%5D.png">
-</p>
+ClusterWorker Class Diagram
 
-Producer vs Consumer Overview
 <p align="center">
-	<img alt="Producer vs Consumer Overview" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png">
+	<img alt="ClusterWorker Class Diagram" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png">
 </p>
