@@ -91,13 +91,19 @@ public class IntegerItemProcessor implements ItemProcessor<Integer> {
 `ClusterWorker` class is the executor of `ItemProducer` and `ItemProcessor` implementations. An instance of CW which will be handle integers, can be obtained as follow:
 
 ```java
+// Creates an ClusterWorkerFactory instance. This invocation creates an internal hazelcast instance named 'cw.name' with default configurations
+ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance("cw.name");
 // Creates an intance of Cluster Worker to handle integer objects
-ClusterWorker<Integer> clusterWorker = ClusterWorkerFactory.getInstance("cw.name").getClusterWorker(Integer.class);
+ClusterWorker<Integer> clusterWorker = cwFactory.getClusterWorker(Integer.class);
 
-// Executes item producer into cluster
-clusterWorker.executeItemProccessor(new IntegerItemProducer());
 // Executes item processor into cluster
+clusterWorker.executeItemProccessor(new IntegerItemProducer());
+// Executes item producer into cluster
 clusterWorker.executeItemProducer(new IntegerItemProcessor());
+
+// Shutdown the clusterWorker and its threads (producer and consumers)
+// This method shutdown the factory internal hazelcast instance, bacause that instance was created by this factory.
+cwFactory.shutdown(clusterWorker);
 ```
 
 These tasks of production and processing will handle integer objects through the cluster nodes.
