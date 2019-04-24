@@ -60,9 +60,6 @@ stage('Packaging') {
 }
 
 stage('Deployment') {	
-	 timeout(time:3, unit:'DAYS') {
-		input message:'Deseja aprovar a instalacao do artefato no Nexus?', submitter: "$PROJECT_ADMIN_USERS"
-	}
     node {
        try {
 			withMaven(maven: "$MAVEN_INSTALLATION") {
