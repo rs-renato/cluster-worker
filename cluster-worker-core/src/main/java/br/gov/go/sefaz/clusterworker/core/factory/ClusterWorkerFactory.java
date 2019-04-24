@@ -175,7 +175,7 @@ public class ClusterWorkerFactory {
 	 */
 	public void shutdown(boolean shutdownHazelcast) {
 		
-		logger.warn("Shutting down ClusterWorkerFactory and its instances..");
+		logger.warn(String.format("Shutting down ClusterWorkerFactory and its instances! Shutdown inner hazelcast instance: %s", shutdownHazelcast));
 		
     	for (ClusterWorker<?> clusterWorker : cwInstances) {
 			shutdown(clusterWorker, shutdownHazelcast);
@@ -193,6 +193,8 @@ public class ClusterWorkerFactory {
 	 * <code>false</code> otherwise.
 	 */
 	public void shutdown(ClusterWorker<?> clusterWorker, boolean shutdownHazelcast) {
+
+    	logger.warn(String.format("Shutdown Clusterworker! Shutdown inner hazelcast instance: %s", shutdownHazelcast));
 
 		ClusterWorker<?> cwInstance = 
 				cwInstances.stream()

@@ -128,9 +128,9 @@ public final class ClusterWorker<T> {
      */
 	public void shutdown() {
 
-		logger.info("Shuttingdown ClusterWorker!");
+		logger.warn("Shuttingdown ClusterWorker!");
 
-		logger.info("Shuttingdown ScheduledFutures!");
+		logger.warn("Shuttingdown ScheduledFutures!");
 		this.scheduledFutures.forEach(future -> {
 			
 			if (!future.isCancelled()) {
@@ -138,14 +138,14 @@ public final class ClusterWorker<T> {
 			}
 		});
 		
-		logger.info("Shuttingdown Listeners ..");
+		logger.warn("Shuttingdown Listeners ..");
 		this.shutdownListeners.forEach(ShutdownListener::shutdown);
 		
 		// Clears lists
 		this.scheduledFutures.clear();
 		this.shutdownListeners.clear();
 		
-		logger.info("ClusterWorker shutdown completed!");
+		logger.warn("ClusterWorker shutdown completed!");
 	}
 	
 	/**
@@ -159,7 +159,7 @@ public final class ClusterWorker<T> {
 		
 		if (shutdownHazelcast && HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
 			this.hazelcastInstance.getLifecycleService().shutdown();
-			logger.info("Hazelcast LifecycleService finished!");
+			logger.warn("Hazelcast LifecycleService finished!");
 		}
         // Shutdown the clusterWoker core
 		shutdown();
