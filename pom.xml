@@ -5,7 +5,7 @@
     <artifactId>cluster-worker</artifactId>
     <groupId>br.gov.go.sefaz</groupId>
     <packaging>pom</packaging>
-    <version>1.0.0.RC7-SNAPSHOT</version>
+    <version>1.0.0.RC8-SNAPSHOT</version>
 
     <modules>
         <module>cluster-worker-core</module>
@@ -21,7 +21,7 @@
         <!-- Hazelcast -->
 		<org.apache.logging.log4j.version>2.8.2</org.apache.logging.log4j.version>
 		<!-- Log4j -->
-		<com.hazelcast.version>3.11.2</com.hazelcast.version>
+		<com.hazelcast.version>3.12</com.hazelcast.version>
     </properties>
     
     <distributionManagement>

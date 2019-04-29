@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.NetworkConfig;
+import com.hazelcast.config.RestApiConfig;
+import com.hazelcast.config.RestEndpointGroup;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
@@ -74,8 +76,16 @@ public final class HazelcastSupport {
         NetworkConfig network = config.getNetworkConfig();
        
         network.setPort(port)
-        	.setPortAutoIncrement(true)
-        	.setReuseAddress(true);
+        		.setPortAutoIncrement(true)
+        		.setReuseAddress(true)
+        	.getInterfaces()
+    			.setEnabled(true)
+    			.addInterface(trustedInterface);
+
+        // Configures Rest Api
+        network.setRestApiConfig(new RestApiConfig()
+        			.setEnabled(true)
+        			.enableGroups(RestEndpointGroup.HEALTH_CHECK,RestEndpointGroup.CLUSTER_READ,RestEndpointGroup.DATA));
         
         // Configure TPC-IP configuration 
         JoinConfig join = network.getJoin();
@@ -89,10 +99,6 @@ public final class HazelcastSupport {
         	.setConnectionTimeoutSeconds(ClusterWorkerConstants.CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT)
         	.addMember(ipMember);
 
-        network.getInterfaces()
-        	.setEnabled(true)
-        	.addInterface(trustedInterface);
-        
         // Configure Scheduel Executor Service used to schedule Producers
         config.getScheduledExecutorConfig(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME)
         	.setPoolSize(maxPoolSize);

@@ -17,7 +17,7 @@ public class ClusterWorkerConstants {
 	/**
 	 * Defines the maximum amount of time Hazelcast will try toconnect to a well known member
 	 */
-	public static int CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT				= 30;
+	public static int CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT				= 10;
 	
 	/**
 	 * Defines the default trusted interface
