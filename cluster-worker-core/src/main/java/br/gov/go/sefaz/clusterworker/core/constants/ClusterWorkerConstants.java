@@ -15,6 +15,11 @@ public class ClusterWorkerConstants {
 	private static final String LOCALHOST_IP							= "127.0.0.1";
 	
 	/**
+	 * Defines the maximum amount of time Hazelcast will try toconnect to a well known member
+	 */
+	public static int CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT				= 30;
+	
+	/**
 	 * Defines the default trusted interface
 	 */
 	public static final String CW_NETWORK_TRUSTED_INTERFACE_DEFAULT		= LOCALHOST_IP;

@@ -85,8 +85,9 @@ public final class HazelcastSupport {
         	.addTrustedInterface(trustedInterface);
 
         join.getTcpIpConfig()
-        	.addMember(ipMember)
-        	.setEnabled(true);
+        	.setEnabled(true)
+        	.setConnectionTimeoutSeconds(ClusterWorkerConstants.CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT)
+        	.addMember(ipMember);
 
         network.getInterfaces()
         	.setEnabled(true)
