@@ -3,7 +3,6 @@ package br.gov.go.sefaz.clusterworker.core;
 import org.junit.AfterClass;
 import org.junit.Test;
 
-import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
