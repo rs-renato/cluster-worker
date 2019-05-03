@@ -141,6 +141,10 @@ public final class ClusterWorker<T> {
 		logger.warn("Shuttingdown Listeners ..");
 		this.shutdownListeners.forEach(ShutdownListener::shutdown);
 		
+		logger.warn("Shuttingdown Executor Service ..");
+		this.scheduledExecutorService.shutdown();
+		this.scheduledExecutorService.destroy();
+		
 		// Clears lists
 		this.scheduledFutures.clear();
 		this.shutdownListeners.clear();

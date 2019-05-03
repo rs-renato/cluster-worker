@@ -54,7 +54,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
             	
             	// Process the item if it exists, or if the strategy is non-blocking, independently if the item exists 
                 if (item != null || !isBlocking()){
-                	logger.trace(String.format("Processing on the client's implementation. Strategy defined to %s.", getQueueStrategy()));
+                	logger.trace(String.format("Processing item (%s) on the client's implementation. Strategy defined to %s.", item, getQueueStrategy()));
                 	itemProcessor.process(item);
                 }
                 

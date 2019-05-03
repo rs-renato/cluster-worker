@@ -110,6 +110,7 @@ public class ClusterWorkerFactory {
         // Configures the queue size if this configuration wasn't set
         Config config = this.hazelcastInstance.getConfig();
 		if (!config.getQueueConfigs().containsKey(queueName)) {
+	        logger.debug(String.format("Updatig queue '%s' size to %s", produceToQueue.queueName(), produceToQueue.maxSize()));
 			config.getQueueConfig(queueName)
 				.setMaxSize(produceToQueue.maxSize());
 		}

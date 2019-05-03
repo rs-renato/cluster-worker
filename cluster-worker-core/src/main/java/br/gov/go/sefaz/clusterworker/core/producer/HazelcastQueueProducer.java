@@ -34,21 +34,26 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
     	this.hazelcastInstance = hazelcastInstance;
     	this.queueName = queueName;
     }
-
+    
     @Override
     public void produce(Collection<T> items) throws InterruptedException {
 
 		//Return the hazelcast distributed queue
 		IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
-		logger.debug(String.format("Producing %s items to '%s' queue. The queue has %s itens", items.size(), queueName, iQueue.size()));
-		
+		boolean contains = false;
+		int countItems = 0;
 		//Put a new item to the hazelcast queue
 		for (T item : items) {
-			if (!iQueue.contains(item)) {
+			contains = iQueue.contains(item);
+			logger.trace(String.format("The queue '%s' already contains the item (%s): %s", queueName, item, contains));
+			if (!contains) {
+				countItems++;
 				iQueue.put(item);
 			}
 		}
+		
+		logger.info(String.format("Produced %s items to '%s' queue. Duplicated items has ignored!", countItems, queueName));
     }
 
     /**

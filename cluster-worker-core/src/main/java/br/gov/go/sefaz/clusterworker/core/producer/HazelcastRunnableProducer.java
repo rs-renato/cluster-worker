@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.hazelcast.core.IMap;
-import com.hazelcast.core.IQueue;
 import com.hazelcast.core.Member;
 
 import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
@@ -39,25 +38,24 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
      * @param queueName queue name
      */
     public HazelcastRunnableProducer(ItemProducer<T> itemProducer, HazelcastInstance hazelcastInstance, String queueName) {
-        super(hazelcastInstance, queueName);
-        this.itemProducer = itemProducer;
-        this.hazelcastMemberRoundRobin = new HazelcastMemberRoundRobin(hazelcastInstance, ClusterWorkerConstants.CW_ROUND_ROBIN_MEMBER);
+    	 super(hazelcastInstance, queueName);
+         this.itemProducer = itemProducer;
+         this.hazelcastMemberRoundRobin = new HazelcastMemberRoundRobin(hazelcastInstance, ClusterWorkerConstants.CW_ROUND_ROBIN_MEMBER);
     }
 
     @Override
     public void run() {
 
-		String producerThreadName = buildThreadName();
+		String producerThreadName = getThreadName();
         logger.info(String.format("[%s] - Starting thread '%s'..", Thread.currentThread().getName(), producerThreadName));
-    	
-    	IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
-    	iMap.put(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION, Calendar.getInstance().getTimeInMillis());
+
+        updateLastExecutionTime();
     	
     	// Get the next member 
 		Member member = hazelcastMemberRoundRobin.select();
     	boolean isLocalMember = member.localMember();
     	
-    	if (isLocalMember) {
+		if (isLocalMember) {
     		
     		try{
     			
@@ -65,8 +63,6 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     			// This waits cause the other distibuted thread (producers) finish their proccess before this local member
     			Thread.sleep(100);
     			
-    			IQueue<Object> iQueue = hazelcastInstance.getQueue(queueName);
-    			logger.debug(String.format("Hazelcast queue '%s' has %s items..", queueName, iQueue.size()));
 				// Produces items from client's implementation
 				Collection<T> items = itemProducer.produce();
 
@@ -87,12 +83,20 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     	
 		logger.info(String.format("[%s] - Thread '%s' execution %s and finished on this member..", Thread.currentThread().getName(), producerThreadName, (isLocalMember ? "COMPLETED" : "IGNORED")));
     }
+
+    /**
+     * Updates the producer last execution time
+     */
+	private void updateLastExecutionTime() {
+		IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
+    	iMap.put(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION, Calendar.getInstance().getTimeInMillis());
+	}
     
     /**
-     * Builds a unique thread name for this producer
+     * Retrieves the unique thread name for this producer
      * @return the unique producer thread name
      */
-    private String buildThreadName() {
+    private String getThreadName() {
     	return String.format("%s.producer[%s]", hazelcastInstance.getName(), itemProducer.getClass().getSimpleName());
     }
 }

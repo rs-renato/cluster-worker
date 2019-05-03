@@ -59,11 +59,9 @@ public final class HazelcastSupport {
         logger.debug("Creating hazelcast configuration..");
 
         // Creates the default configuration
-        Config config = new Config();
+        Config config = new Config(hazelcastInstanceName);
         // Configures the log
         config.setProperty("hazelcast.logging.type", ClusterWorkerConstants.CW_LOGGING_TYPE);
-        
-        config.setInstanceName(hazelcastInstanceName);
         
         // Loads the property configuration values
         int port = cachedPropertyFile.getProperty("cw.network.port", Integer.class);
