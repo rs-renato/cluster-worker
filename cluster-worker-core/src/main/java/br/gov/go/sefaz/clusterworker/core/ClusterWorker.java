@@ -45,7 +45,7 @@ public final class ClusterWorker<T> {
      */
     public ClusterWorker(HazelcastInstance hazelcastInstance) {
     	this.hazelcastInstance = hazelcastInstance;
-    	this.scheduledExecutorService = hazelcastInstance.getScheduledExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
+        this.scheduledExecutorService = hazelcastInstance.getScheduledExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
     }
     
     /**
@@ -69,11 +69,8 @@ public final class ClusterWorker<T> {
             try {
             	// Executes the consumer on hazelcast local member
 				IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMember(hazelcastRunnableConsumer,getLocalMember(),0, TimeUnit.SECONDS);
-                
-				logger.debug(String.format("Adding listener for worker %s..", i));
+				this.scheduledFutures.add(scheduledFuture);
 				this.shutdownListeners.add(hazelcastRunnableConsumer);
-				logger.debug(String.format("Adding ScheduledFutures for worker %s..", i));
-                this.scheduledFutures.add(scheduledFuture);
             }catch (Exception e){
                 logger.error(String.format("Cannot execute a ItemProcessor on hazelcast executor service! Reason: %s", e.getMessage()));
             }
@@ -110,7 +107,8 @@ public final class ClusterWorker<T> {
         logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds (aproximated).", TimeUnit.MILLISECONDS.toSeconds(frequency), TimeUnit.MILLISECONDS.toSeconds(initialDelay)));
 
         // Schedule the execution to execute into local member
-        this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.MILLISECONDS);
+        IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.MILLISECONDS);
+        this.scheduledFutures.add(scheduledFuture);
     }
 
     /**
@@ -140,10 +138,6 @@ public final class ClusterWorker<T> {
 		
 		logger.warn("Shuttingdown Listeners ..");
 		this.shutdownListeners.forEach(ShutdownListener::shutdown);
-		
-		logger.warn("Shuttingdown Executor Service ..");
-		this.scheduledExecutorService.shutdown();
-		this.scheduledExecutorService.destroy();
 		
 		// Clears lists
 		this.scheduledFutures.clear();

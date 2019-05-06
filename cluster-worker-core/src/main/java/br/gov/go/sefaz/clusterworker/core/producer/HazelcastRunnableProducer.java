@@ -72,7 +72,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 				// Advances the round robin pivot
 				hazelcastMemberRoundRobin.advance();
             } catch (InterruptedException|HazelcastInstanceNotActiveException e) {
-				logger.error(String.format("Cannot produce to hazelcast '%s' queue! This thread will die! Reason: %s", queueName, e.getMessage()));
+				logger.error(String.format("Cannot produce to hazelcast '%s' queue! This thread will die! Reason: %s", queueName, e));
 				Thread.currentThread().interrupt();
     		}catch (ItemProducerException e){
     			logger.error(String.format("Cannot produce on client's implementation! Reason: %s", e.getMessage()));
