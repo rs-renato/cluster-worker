@@ -63,16 +63,16 @@ public final class ClusterWorker<T> {
 
         // Creates worker (HazelcastRunnableConsumer)
         HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableConsumer(itemProcessor);
+        this.shutdownListeners.add(hazelcastRunnableConsumer);
         
+        IScheduledFuture<?> scheduledFuture = null;
         for (int i = 1; i <=  workers; i++) {
-
             try {
             	// Executes the consumer on hazelcast local member
-				IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMember(hazelcastRunnableConsumer,getLocalMember(),0, TimeUnit.SECONDS);
+				scheduledFuture = this.scheduledExecutorService.scheduleOnMember(hazelcastRunnableConsumer,getLocalMember(),0, TimeUnit.SECONDS);
 				this.scheduledFutures.add(scheduledFuture);
-				this.shutdownListeners.add(hazelcastRunnableConsumer);
             }catch (Exception e){
-                logger.error(String.format("Cannot execute a ItemProcessor on hazelcast executor service! Reason: %s", e.getMessage()));
+                logger.error("Cannot execute a ItemProcessor on hazelcast executor service!", e);
             }
         }
     }
@@ -106,9 +106,13 @@ public final class ClusterWorker<T> {
         
         logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds (aproximated).", TimeUnit.MILLISECONDS.toSeconds(frequency), TimeUnit.MILLISECONDS.toSeconds(initialDelay)));
 
-        // Schedule the execution to execute into local member
-        IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.MILLISECONDS);
-        this.scheduledFutures.add(scheduledFuture);
+        try {
+        	// Schedule the execution to execute into local member
+        	 IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.MILLISECONDS);
+             this.scheduledFutures.add(scheduledFuture);
+        }catch (Exception e){
+            logger.error("Cannot execute a ItemProducer on hazelcast executor service!", e);
+        }
     }
 
     /**

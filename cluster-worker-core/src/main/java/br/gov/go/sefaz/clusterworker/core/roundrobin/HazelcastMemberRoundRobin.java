@@ -10,7 +10,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.cluster.ClusterState;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IAtomicLong;
 import com.hazelcast.core.Member;
 
 /**
@@ -22,12 +21,12 @@ public class HazelcastMemberRoundRobin{
 	
 	private static final Logger logger = LogManager.getLogger(HazelcastMemberRoundRobin.class);
 
-	private final IAtomicLong iAtomicLong;
     private final HazelcastInstance hazelcastInstance;
+    private final String roundRobinName;
     
 	public HazelcastMemberRoundRobin(HazelcastInstance hazelcastInstance, String roundRobinName) {
-		this.iAtomicLong = hazelcastInstance.getAtomicLong(roundRobinName);
 		this.hazelcastInstance = hazelcastInstance;
+		this.roundRobinName = roundRobinName;
 	}
 	
 	/**
@@ -38,8 +37,8 @@ public class HazelcastMemberRoundRobin{
 		ClusterState clusterState = getClusterState();
 		// Just update the pivot if the the cluster is active and has more than one member
 		if (clusterState.equals(ClusterState.ACTIVE) && getClusterMembers().size() > 1) {
-			logger.debug(String.format("Advancing round robin pivot '%s'", this.iAtomicLong.getName()));
-			this.iAtomicLong.incrementAndGet();
+			logger.debug(String.format("Advancing round robin pivot '%s'", this.roundRobinName));
+			hazelcastInstance.getAtomicLong(this.roundRobinName).incrementAndGet();
 		}
 		
         return this;
@@ -59,7 +58,7 @@ public class HazelcastMemberRoundRobin{
         
 		ClusterState clusterState = getClusterState();
 		int membersSize = clusterMembers.size();
-		int count = (int) iAtomicLong.get();
+		int count = (int) this.hazelcastInstance.getAtomicLong(this.roundRobinName).get();
 		
 		// Calculate module and get member index
 		int selectedMemberIndex = count % membersSize;

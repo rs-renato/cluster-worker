@@ -46,8 +46,8 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     @Override
     public void run() {
 
-		String producerThreadName = getThreadName();
-        logger.info(String.format("[%s] - Starting thread '%s'..", Thread.currentThread().getName(), producerThreadName));
+		String producerThreadName = getRunnableProducerName();
+		logger.info(String.format("Starting thread '%s'..", producerThreadName));
 
         updateLastExecutionTime();
     	
@@ -61,7 +61,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     			
     			// Forces this threads sleeps a while because of concurrence in distibuted producers in other JVM's
     			// This waits cause the other distibuted thread (producers) finish their proccess before this local member
-    			Thread.sleep(100);
+    			Thread.sleep(500);
     			
 				// Produces items from client's implementation
 				Collection<T> items = itemProducer.produce();
@@ -96,7 +96,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
      * Retrieves the unique thread name for this producer
      * @return the unique producer thread name
      */
-    private String getThreadName() {
+    private String getRunnableProducerName() {
     	return String.format("%s.producer[%s]", hazelcastInstance.getName(), itemProducer.getClass().getSimpleName());
     }
 }

@@ -21,7 +21,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
 	private static final transient long serialVersionUID = 5404415194904610053L;
 	private static final transient Logger logger = LogManager.getLogger(HazelcastRunnableConsumer.class);
     
-	private boolean stopped;
+	private volatile boolean stopped;
 
     private ItemProcessor<T> itemProcessor;
 
@@ -41,9 +41,9 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
     @Override
     public void run() {
 
-		String consumerThreadName = buildThreadName();
-		Thread.currentThread().setName(consumerThreadName);
-        logger.info(String.format("Starting thread '%s'..", consumerThreadName));
+		String consumerThreadName = getRunnableConsumerdName();
+
+		logger.info(String.format("Starting thread '%s'..", consumerThreadName));
 
         // Run this thread untill shutdown is called
         while(isRunning()) {
@@ -90,7 +90,8 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
      * Builds a unique thread name for this consumer
      * @return the unique consumer thread name
      */
-    private String buildThreadName() {
+    @SuppressWarnings("deprecation")
+	private String getRunnableConsumerdName() {
     	String threadName = String.format("%s.consumer[%s]-", hazelcastInstance.getName(), itemProcessor.getClass().getSimpleName());
 		long threadCount = hazelcastInstance.getAtomicLong(threadName).getAndIncrement();
 		return threadName + threadCount;

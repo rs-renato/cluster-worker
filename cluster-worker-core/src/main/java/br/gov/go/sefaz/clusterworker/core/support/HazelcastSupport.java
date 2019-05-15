@@ -57,11 +57,6 @@ public final class HazelcastSupport {
     public static Config createDefaultConfig(String hazelcastInstanceName){
 
         logger.debug("Creating hazelcast configuration..");
-
-        // Creates the default configuration
-        Config config = new Config(hazelcastInstanceName);
-        // Configures the log
-        config.setProperty("hazelcast.logging.type", ClusterWorkerConstants.CW_LOGGING_TYPE);
         
         // Loads the property configuration values
         int port = cachedPropertyFile.getProperty("cw.network.port", Integer.class);
@@ -70,6 +65,15 @@ public final class HazelcastSupport {
         String trustedInterface = cachedPropertyFile.getProperty("cw.network.trusted.interface", ClusterWorkerConstants.CW_NETWORK_TRUSTED_INTERFACE_DEFAULT);
         int maxPoolSize = cachedPropertyFile.getProperty("cw.executor.max.pool.size", Integer.class, ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_POOL_SIZE_DEFAULT);
 
+        // Creates the default configuration
+        Config config = new Config(hazelcastInstanceName);
+        // Configures the log
+        config.setProperty("hazelcast.logging.type", ClusterWorkerConstants.CW_LOGGING_TYPE);
+        
+        // Configures group
+        config.getGroupConfig()
+    		.setName(hazelcastInstanceName);
+        
         // Configures network
         NetworkConfig network = config.getNetworkConfig();
        
@@ -83,7 +87,10 @@ public final class HazelcastSupport {
         // Configures Rest Api
         network.setRestApiConfig(new RestApiConfig()
         			.setEnabled(true)
-        			.enableGroups(RestEndpointGroup.HEALTH_CHECK,RestEndpointGroup.CLUSTER_READ,RestEndpointGroup.DATA));
+        			.enableGroups(RestEndpointGroup.HEALTH_CHECK,
+        							RestEndpointGroup.CLUSTER_WRITE,
+        							RestEndpointGroup.CLUSTER_READ,
+        							RestEndpointGroup.DATA));
         
         // Configure TPC-IP configuration 
         JoinConfig join = network.getJoin();
