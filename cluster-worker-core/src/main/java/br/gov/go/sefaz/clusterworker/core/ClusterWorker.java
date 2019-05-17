@@ -45,16 +45,7 @@ public final class ClusterWorker<T> {
     private final HazelcastInstance hazelcastInstance;
     private final IExecutorService executorService;
     private final ArrayList<ShutdownListener> shutdownListeners = new ArrayList<>();
-    private static Scheduler itemProducerScheduler;
-    
-    static{
-    	try {
-    		itemProducerScheduler = new StdSchedulerFactory(QuartzPropertySupport.getDetaultQuartzProperty()).getScheduler();
-    		itemProducerScheduler.start();
-		} catch (Exception e) {
-            logger.error("Cannot create quartz scheduler!", e);
-		}
-    }
+    private Scheduler itemProducerScheduler = initializeScheduler();
     
     /**
      * Constructor for ClusterWorker.
@@ -133,15 +124,6 @@ public final class ClusterWorker<T> {
     }
 
     /**
-     * Returns the local cluster member.
-     * @return member
-     * @since 1.0
-     */
-    private Member getLocalMember() {
-        return this.hazelcastInstance.getCluster().getLocalMember();
-    }
-
-    /**
      * Shutdown the ClusterWorker core (listeners and futures).
      * </br></br><i>Note:</i> This method DOESN'T shutdown the internal hazelcast instance!
      * @since 1.0
@@ -182,4 +164,29 @@ public final class ClusterWorker<T> {
         // Shutdown the clusterWoker core
 		shutdown();
 	}
+	
+	/**
+	 * Initialize quartz scheduler
+	 * @return Scheduler
+	 * @since 1.0
+	 */
+	private Scheduler initializeScheduler() {
+		try {
+    		itemProducerScheduler = new StdSchedulerFactory(QuartzPropertySupport.getDetaultQuartzProperty()).getScheduler();
+    		itemProducerScheduler.start();
+		} catch (Exception e) {
+            logger.error("Cannot create quartz scheduler!", e);
+		}
+		
+		return itemProducerScheduler;
+	}
+    
+    /**
+     * Returns the local cluster member.
+     * @return member
+     * @since 1.0
+     */
+    private Member getLocalMember() {
+        return this.hazelcastInstance.getCluster().getLocalMember();
+    }
 }

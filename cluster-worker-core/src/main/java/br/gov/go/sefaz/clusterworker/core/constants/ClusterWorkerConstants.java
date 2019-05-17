@@ -63,6 +63,12 @@ public class ClusterWorkerConstants {
      */
 	public static final String CW_ROUND_ROBIN_MEMBER 					= "cw.roundrobin.member";
 	
+	 /**
+     * Defines the default name of distributed roundrobin last update name  
+     * @since 1.0
+     */
+	public static final String CW_ROUND_ROBIN_LAST_UPDATE				= "cw.roundrobin.last.update";
+	
 	
 	/***************************************
 	 * 			CW QUARTZ CONSTANTS

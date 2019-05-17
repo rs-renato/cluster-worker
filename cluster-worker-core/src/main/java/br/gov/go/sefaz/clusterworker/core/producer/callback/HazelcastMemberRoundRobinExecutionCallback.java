@@ -1,5 +1,8 @@
 package br.gov.go.sefaz.clusterworker.core.producer.callback;
 
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -30,8 +33,11 @@ public class HazelcastMemberRoundRobinExecutionCallback implements ExecutionCall
 	@Override
 	public void onResponse(Object response) {
 		logger.debug("ExecutionCallback was succesfully executed!");
-		// Advances the roundrobin pivot
-		hazelcastMemberRoundRobin.advance();
+		
+		// Advances the roundrobin pivot just if last update has more than one second (prevents fast pivot advance) 
+		if (TimeUnit.MILLISECONDS.toSeconds(Calendar.getInstance().getTimeInMillis() - hazelcastMemberRoundRobin.getPivotLastUpdateTimestamp()) > 1) {
+			hazelcastMemberRoundRobin.advance();
+		}
 	}
 
 	@Override
