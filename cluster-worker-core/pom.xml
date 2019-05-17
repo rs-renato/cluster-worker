@@ -18,6 +18,12 @@
             <artifactId>hazelcast</artifactId>
             <version>${com.hazelcast.version}</version>
         </dependency>
+        <!-- Quartz -->
+        <dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>${org.quartz-scheduler.version}</version>
+		</dependency>
       	<!-- Log4j -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>

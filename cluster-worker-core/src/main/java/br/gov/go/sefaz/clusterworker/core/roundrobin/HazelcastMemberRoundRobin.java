@@ -17,6 +17,7 @@ import com.hazelcast.core.Member;
  * @author renato-rs
  * @since 1.0
  */
+@SuppressWarnings("deprecation")
 public class HazelcastMemberRoundRobin{
 	
 	private static final Logger logger = LogManager.getLogger(HazelcastMemberRoundRobin.class);
@@ -32,6 +33,7 @@ public class HazelcastMemberRoundRobin{
 	/**
 	 * Advances the round robin pivot if and only if the cluster is active and its size is greather than 01
 	 * @return HazelcastMemberRoundRobin
+	 * @since 1.0
 	 */
 	public HazelcastMemberRoundRobin advance() {
 		ClusterState clusterState = getClusterState();
@@ -47,8 +49,9 @@ public class HazelcastMemberRoundRobin{
 	/**
 	 * Return actual cluster member (round robin selected) from hazelcast instance 
 	 * @return the cluster member
+	 * @since 1.0
 	 */
-    public Member select() {
+	public Member select() {
     	
     	Member member;
 
@@ -79,6 +82,7 @@ public class HazelcastMemberRoundRobin{
     /**
      * Retrieves the cluster state
      * @return the cluster state
+     * @since 1.0
      */
     private ClusterState getClusterState() {
     	return this.hazelcastInstance.getCluster().getClusterState();
@@ -87,6 +91,7 @@ public class HazelcastMemberRoundRobin{
     /**
      * Retrieves the cluster members
      * @return the cluster members
+     * @since 1.0
      */
     private Set<Member> getClusterMembers(){
     	return this.hazelcastInstance.getCluster().getMembers();

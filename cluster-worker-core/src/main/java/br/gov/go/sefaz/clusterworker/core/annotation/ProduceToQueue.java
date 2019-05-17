@@ -19,18 +19,21 @@ public @interface ProduceToQueue {
     /**
      * Queue name.
      * @return queueName
+     * @since 1.0
      */
     String queueName();
     
     /**
      * Max queue size. The default vaule is 1000 elements.
      * @return queue size
+     * @since 1.0
      */
     int maxSize() default 1000;
 
     /**
-     * Frequency of execution (in seconds) to the item producer. The default vaule is 60 seconds.
-     * @return timeout
+     * Cron Expression to define the frequency of producer execution
+     * @return cron expression
+     * @since 1.0
      */
-    int frequency() default 60;
+    String cronExpression();
 }

@@ -29,6 +29,7 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
      * Constructor for HazelcastQueueProducer
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
+     * @since 1.0
      */
     public HazelcastQueueProducer(HazelcastInstance hazelcastInstance, String queueName) {
     	this.hazelcastInstance = hazelcastInstance;
@@ -59,6 +60,7 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
     /**
      * Return the queue's name of this producer.
      * @return queueName
+     * @since 1.0
      */
     public String getQueueName() {
         return queueName;

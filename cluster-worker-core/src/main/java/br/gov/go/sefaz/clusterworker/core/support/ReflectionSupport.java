@@ -24,6 +24,7 @@ public class ReflectionSupport {
      * @return method
      * @throws NoSuchMethodException if there is no 'valueOf' method.
 	 * @throws ClassNotFoundException 
+	 * @since 1.0
      */
     public static <T> Method getValueOfMethod(Class<T> type) throws NoSuchMethodException {
 
@@ -41,6 +42,7 @@ public class ReflectionSupport {
      * Return the class name from type
      * @param type
      * @return the class name
+     * @since 1.0
      */
 	public static String getClassName(Type type) {
 		if (type == null) {
@@ -57,6 +59,7 @@ public class ReflectionSupport {
 	 * Return the class from type
 	 * @param type
 	 * @return the class
+	 * @since 1.0
 	 */
 	public static Class<?> getClass(Type type){
 		

@@ -30,6 +30,7 @@ class CachedPropertyFile{
     /**
      * Constructor of CachedPropertyFile
      * @param properties to be cached
+     * @since 1.0
      */
     public CachedPropertyFile(Properties properties) {
         this.properties = properties;
@@ -40,6 +41,7 @@ class CachedPropertyFile{
      * @param propertyName name of the property to be load form property file.
      * @param type of this property to be casted.
      * @return property if it exist.
+     * @since 1.0
      */
 	public <T> T getProperty(String propertyName, Class<T> type) {
 
@@ -59,6 +61,7 @@ class CachedPropertyFile{
      * @param type of this property to be casted.
 	 * @param defaultValue to return if property doesn't exists
 	 * @return an property value from cached property file or a default value
+	 * @since 1.0
 	 */
 	public <T> T getProperty(String propertyName, Class<T> type, T defaultValue) {
 
@@ -79,6 +82,7 @@ class CachedPropertyFile{
      * @param propertyName name of the property to be load form property file.
      * @param defaultValue to return if property doesn't exists
      * @return property if it exist, otherwise the default value
+     * @since 1.0
      */
 	public String getProperty(String propertyName, String defaultValue){
 		String value = getProperty(propertyName);
@@ -89,6 +93,7 @@ class CachedPropertyFile{
      * Return a specified property from this {@link CachedPropertyFile}
      * @param propertyName name of the property to be load form property file.
      * @return property if it exist.
+     * @since 1.0
      */
     public String getProperty(String propertyName){
         return properties.getProperty(propertyName);
@@ -103,6 +108,7 @@ class CachedPropertyFile{
      * @throws IllegalAccessException 
      * @throws NoSuchMethodException 
      * @throws Exception if cannot to load the property.
+     * @since 1.0
      */
     @SuppressWarnings("unchecked")
     private <T> T getCachedProperty(String propertyName, Class<T> type) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException  {

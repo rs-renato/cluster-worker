@@ -34,9 +34,9 @@ public class TestConstants {
 	public static final int CW_ITEM_PRODUCER_MAX_QUANTITY		= CW_ITEM_PRODUCER_QUANTITY;
 	
 	/**
-	 * Frequency of productioin in seconds
+	 * Cron expression to define the frequency of production
 	 */
-    public static final int CW_ITEM_PRODUCER_FREQUENCY			= 10;
+    public static final String CW_ITEM_PRODUCER_CRON_EXPRESSION	= "0/5 * * * * ?";
     
     /**
 	 * Quantity of workers (threads) of processors (queues consumers)

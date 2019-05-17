@@ -13,6 +13,7 @@ public interface ItemProcessor<T> extends Serializable{
 	/**
 	 * Process the item from the queue
 	 * @param item to be processed
+	 * @since 1.0
 	 */
 	void process(T item);
 }

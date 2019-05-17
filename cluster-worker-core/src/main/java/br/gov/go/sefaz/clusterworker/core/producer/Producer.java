@@ -14,6 +14,7 @@ public interface Producer<T>{
      * Produces a collection of T type.
      * @param items to produce.
      * @throws InterruptedException 
+     * @since 1.0
      */
     void produce(Collection<T> items) throws InterruptedException;
 }

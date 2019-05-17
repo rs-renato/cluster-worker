@@ -32,6 +32,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
      * @param queueName queue name
      * @param consumerStrategy Consumer queue strategy
      * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
+     * @since 1.0
      */
     public HazelcastRunnableConsumer(ItemProcessor<T> itemProcessor, HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
         super(hazelcastInstance, queueName, consumerStrategy, timeout);
@@ -44,7 +45,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
 		String consumerThreadName = getRunnableConsumerdName();
 
 		logger.info(String.format("Starting thread '%s'..", consumerThreadName));
-
+		
         // Run this thread untill shutdown is called
         while(isRunning()) {
 
@@ -69,7 +70,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
             }
         }
 
-        logger.warn(String.format("Thread execution '%s' FINISHED on this member..", consumerThreadName));
+        logger.warn(String.format("Thread execution '%s' FINISHED!", consumerThreadName));
     }
     
 	@Override
@@ -81,6 +82,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
     /**
      * Verifies if this runnable is running.
      * @return <code>true</code> if thread is running, <code>false</code> otherwise.
+     * @since 1.0
      */
     public boolean isRunning() {
     	return !this.stopped;
@@ -89,6 +91,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
     /**
      * Builds a unique thread name for this consumer
      * @return the unique consumer thread name
+     * @since 1.0
      */
     @SuppressWarnings("deprecation")
 	private String getRunnableConsumerdName() {

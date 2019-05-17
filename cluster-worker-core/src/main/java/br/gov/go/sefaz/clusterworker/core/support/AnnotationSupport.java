@@ -25,6 +25,7 @@ public class AnnotationSupport {
      * @param annotationClass to be found
      * @return annotation if there is any
      * @throws MandatoryAnnotationException if the given type hasn't the specified annotation
+     * @since 1.0
      */
     public static  <T,A extends Annotation> A assertMandatoryAnnotation(T type, Class<A> annotationClass){
     	Class<? extends Object> clazz = type.getClass();

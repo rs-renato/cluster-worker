@@ -4,7 +4,6 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -38,9 +37,7 @@ public class HazelcastQueueBlockingConsumerTest {
 					// Execute the item produder on cluster worker
 					clusterWorker.executeItemProducer(new IntegerItemProducer());
 				}
-			}, TIMER_DELAY,
-			TimeUnit.MILLISECONDS.convert(TestConstants.CW_ITEM_PRODUCER_FREQUENCY, TimeUnit.SECONDS)
-		);
+			}, TIMER_DELAY);
 	}
 
 	@AfterClass

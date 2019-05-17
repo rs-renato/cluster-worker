@@ -1,17 +1,22 @@
 package br.gov.go.sefaz.clusterworker.core;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.quartz.CronScheduleBuilder;
+import org.quartz.JobBuilder;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.TriggerBuilder;
+import org.quartz.impl.StdSchedulerFactory;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.core.IMap;
+import com.hazelcast.core.IExecutorService;
 import com.hazelcast.core.Member;
-import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
-import com.hazelcast.scheduledexecutor.IScheduledFuture;
 
 import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
 import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
@@ -22,8 +27,11 @@ import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
+import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastRunnableProducerSubmitter;
+import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastRunnableProducerSubmitterConfiguration;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
+import br.gov.go.sefaz.clusterworker.core.support.QuartzPropertySupport;
 /**
  * Central core to manage hazelcast executor services and it's lifecycle.
  * @author renato-rs
@@ -35,25 +43,36 @@ public final class ClusterWorker<T> {
 	private static final Logger logger = LogManager.getLogger(ClusterWorker.class);
 
     private final HazelcastInstance hazelcastInstance;
-    private final IScheduledExecutorService scheduledExecutorService;
+    private final IExecutorService executorService;
     private final ArrayList<ShutdownListener> shutdownListeners = new ArrayList<>();
-    private final ArrayList<IScheduledFuture<?>> scheduledFutures = new ArrayList<>();
+    private static Scheduler itemProducerScheduler;
+    
+    static{
+    	try {
+    		itemProducerScheduler = new StdSchedulerFactory(QuartzPropertySupport.getDetaultQuartzProperty()).getScheduler();
+    		itemProducerScheduler.start();
+		} catch (Exception e) {
+            logger.error("Cannot create quartz scheduler!", e);
+		}
+    }
     
     /**
      * Constructor for ClusterWorker.
      * @param hazelcastInstance instance of hazelcast.
+     * @since 1.0
      */
     public ClusterWorker(HazelcastInstance hazelcastInstance) {
     	this.hazelcastInstance = hazelcastInstance;
-        this.scheduledExecutorService = hazelcastInstance.getScheduledExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
+        this.executorService = hazelcastInstance.getExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
     }
     
     /**
      * Execute a {@link ItemProcessor} client's implementation on hazelcast executor service.
      * @param itemProcessor implementation of client item.
+     * @since 1.0
      */
     public void executeItemProccessor(ItemProcessor<T> itemProcessor){
-    	//Assert mandatory exception to create an ItemProcessor
+    	// Asserts mandatory exception to create an ItemProcessor
         ConsumeFromQueue consumeFromQueue = AnnotationSupport.assertMandatoryAnnotation(itemProcessor, ConsumeFromQueue.class);
 
         // Number of workers (threads)
@@ -65,12 +84,10 @@ public final class ClusterWorker<T> {
         HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableConsumer(itemProcessor);
         this.shutdownListeners.add(hazelcastRunnableConsumer);
         
-        IScheduledFuture<?> scheduledFuture = null;
-        for (int i = 1; i <=  workers; i++) {
+        for (int i = 0; i <  workers; i++) {
             try {
             	// Executes the consumer on hazelcast local member
-				scheduledFuture = this.scheduledExecutorService.scheduleOnMember(hazelcastRunnableConsumer,getLocalMember(),0, TimeUnit.SECONDS);
-				this.scheduledFutures.add(scheduledFuture);
+				this.executorService.executeOnMember(hazelcastRunnableConsumer, getLocalMember());
             }catch (Exception e){
                 logger.error("Cannot execute a ItemProcessor on hazelcast executor service!", e);
             }
@@ -80,44 +97,45 @@ public final class ClusterWorker<T> {
     /**
      * Execute a {@link ItemProducer} client's implementation on hazelcast executor service.
      * @param itemProducer implementation of client item.
+     * @since 1.0
      */
     public void executeItemProducer(final ItemProducer<T> itemProducer){
-    	//Assert mandatory exception to create an ItemProducer
-    	final ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
+    	// Asserts mandatory exception to create an ItemProducer
+    	ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
     	
-    	final HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableProducer(itemProducer);
-
-    	IMap<String, Long> iMap = hazelcastInstance.getMap(ClusterWorkerConstants.CW_PRODUCER_SYNC_EXECUTION);
+    	// Creates the Producer and its configuration
+		HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableProducer(itemProducer);
+		HazelcastRunnableProducerSubmitterConfiguration<T> produceConfig = new HazelcastRunnableProducerSubmitterConfiguration<>(hazelcastInstance, executorService, hazelcastRunnableProducer);
     	
-    	// Frequency of produce's execution (converted to milleseconds to grant more sync) 
-        long frequency = TimeUnit.SECONDS.toMillis(produceToQueue.frequency());
-        
-        // Try to syncronize the initial execution always on second 0
-        Calendar calendar = Calendar.getInstance();
-		long initialDelay = TimeUnit.SECONDS.toMillis(60L - calendar.get(Calendar.SECOND)) - calendar.get(Calendar.MILLISECOND);
-		
-		// Retrieve the last execution timestamp
-        if (iMap.containsKey(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION)) {
-        	// Check the difference from now 
-        	long difference = Calendar.getInstance().getTimeInMillis() - iMap.get(ClusterWorkerConstants.CW_PRODUCER_LAST_EXECUTION);
-        	// Calculate the initial delay to this execution
-        	initialDelay = frequency - difference;
-        }
-        
-        logger.info(String.format("Configuring ItemProducer implementation on hazelcast executor service with frequency of %s seconds and initial delay of %s seconds (aproximated).", TimeUnit.MILLISECONDS.toSeconds(frequency), TimeUnit.MILLISECONDS.toSeconds(initialDelay)));
+		// Creates the trigger
+		String itemProducerName = itemProducer.getClass().getSimpleName();
+    	Trigger itemProducerTrigger = TriggerBuilder.newTrigger()
+    				.withIdentity(itemProducerName, ClusterWorkerConstants.CW_QUARTZ_SCHEDULLER_NAME)
+    				.withSchedule(CronScheduleBuilder.cronSchedule(produceToQueue.cronExpression()))
+    				.build();
 
-        try {
-        	// Schedule the execution to execute into local member
-        	 IScheduledFuture<?> scheduledFuture = this.scheduledExecutorService.scheduleOnMemberAtFixedRate(hazelcastRunnableProducer, getLocalMember(), initialDelay, frequency, TimeUnit.MILLISECONDS);
-             this.scheduledFutures.add(scheduledFuture);
-        }catch (Exception e){
-            logger.error("Cannot execute a ItemProducer on hazelcast executor service!", e);
-        }
+    	// Creates the job map
+    	JobDataMap jobData = new JobDataMap();
+		jobData.put(ClusterWorkerConstants.CW_QUARTZ_PRODUCER_CONFIG_NAME, produceConfig);
+    	
+		// Creates the submitter
+		JobDetail itemProducerSubmitter = JobBuilder.newJob(HazelcastRunnableProducerSubmitter.class)
+    			.withIdentity(ClusterWorkerConstants.CW_QUARTZ_PRODUCER_JOB_DETAIL_NAME + itemProducerName)
+    			.usingJobData(jobData)
+    			.build();
+    	
+		try {
+			// Schedule the item producer execution
+			itemProducerScheduler.scheduleJob(itemProducerSubmitter, itemProducerTrigger);
+		} catch (SchedulerException e) {
+            logger.error("Cannot schedule a ItemProcessor on quartz!", e);
+		}
     }
 
     /**
      * Returns the local cluster member.
      * @return member
+     * @since 1.0
      */
     private Member getLocalMember() {
         return this.hazelcastInstance.getCluster().getLocalMember();
@@ -126,25 +144,22 @@ public final class ClusterWorker<T> {
     /**
      * Shutdown the ClusterWorker core (listeners and futures).
      * </br></br><i>Note:</i> This method DOESN'T shutdown the internal hazelcast instance!
+     * @since 1.0
      * @see ClusterWorker#shutdown(boolean)
      */
 	public void shutdown() {
 
 		logger.warn("Shuttingdown ClusterWorker!");
-
-		logger.warn("Shuttingdown ScheduledFutures!");
-		this.scheduledFutures.forEach(future -> {
-			
-			if (!future.isCancelled()) {
-				future.cancel(false);
-			}
-		});
 		
 		logger.warn("Shuttingdown Listeners ..");
 		this.shutdownListeners.forEach(ShutdownListener::shutdown);
 		
+		try {
+			itemProducerScheduler.shutdown();
+		} catch (SchedulerException e) {
+			logger.error("Cannot shutdown quartz scheduler!", e);
+		}
 		// Clears lists
-		this.scheduledFutures.clear();
 		this.shutdownListeners.clear();
 		
 		logger.warn("ClusterWorker shutdown completed!");
@@ -156,6 +171,7 @@ public final class ClusterWorker<T> {
 	 * will be affected! Eg.: Another clusterworker instance.
 	 * @param shutdownHazelcast <code>true</code> if this method should shutdown its internal hazelcast instance,
 	 * <code>false</code> otherwise.
+	 * @since 1.0
 	 */
 	public void shutdown(boolean shutdownHazelcast) {
 		

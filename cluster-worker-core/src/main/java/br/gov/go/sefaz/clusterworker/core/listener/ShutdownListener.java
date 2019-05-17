@@ -8,7 +8,8 @@ package br.gov.go.sefaz.clusterworker.core.listener;
 public interface ShutdownListener {
 
 	/**
-	 * Shutdown handle 
+	 * Shutdown handle
+	 * @since 1.0
 	 */
 	public void shutdown();
 }

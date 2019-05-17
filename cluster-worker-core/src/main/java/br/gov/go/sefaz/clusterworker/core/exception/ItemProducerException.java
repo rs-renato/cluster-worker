@@ -11,14 +11,30 @@ public class ItemProducerException extends ClusterWorkerException {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * 
+	 * @param cause
+	 * @since 1.0
+	 */
 	public ItemProducerException(Throwable cause) {
 		super(cause);
 	}
 	
+	/**
+	 * 
+	 * @param message
+	 * @since 1.0
+	 */
 	public ItemProducerException(String message) {
 		super(message);
 	}
 	
+	/**
+	 * 
+	 * @param message
+	 * @since 1.0
+	 * @param cause
+	 */
 	public ItemProducerException(String message, Throwable cause) {
 		super(message, cause);
 	}

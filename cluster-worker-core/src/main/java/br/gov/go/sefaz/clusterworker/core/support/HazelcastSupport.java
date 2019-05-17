@@ -32,6 +32,7 @@ public final class HazelcastSupport {
      * Gets or creates a new HazelcastInstance from default configuration.
      * @param hazelcastInstanceName  hazelcast instance name
      * @return hazelcastInstance
+     * @since 1.0
      */
     public static HazelcastInstance getOrcreateDefaultHazelcastInstance(String hazelcastInstanceName){
     	HazelcastInstance hazelcastInstance = Hazelcast.getHazelcastInstanceByName(hazelcastInstanceName); 
@@ -53,6 +54,7 @@ public final class HazelcastSupport {
 	 * Creates the hazelcast default configuration.
 	 * @param hazelcastInstanceName hazelcast instance name
 	 * @return hazelcast configuration
+	 * @since 1.0
 	 */
     public static Config createDefaultConfig(String hazelcastInstanceName){
 
@@ -117,6 +119,7 @@ public final class HazelcastSupport {
      * Verifies if there is any hazelcast instance running by its name
      * @param hazelcastInstanceName hazelcast instance name
      * @return <code>true<code> if this hazelcast instance is running, <code>false</code> otherwise.
+     * @since 1.0
      */
     public static boolean isHazelcastInstanceRunning(String hazelcastInstanceName){
         return isHazelcastInstanceRunning(Hazelcast.getHazelcastInstanceByName(hazelcastInstanceName));
@@ -126,6 +129,7 @@ public final class HazelcastSupport {
      * Verifies if the given hazelcast instance is running
      * @param hazelcastInstance hazelcast instance
      * @return <code>true<code> if this hazelcast instance is running, <code>false</code> otherwise.
+     * @since 1.0
      */
     public static boolean isHazelcastInstanceRunning(HazelcastInstance hazelcastInstance) {
 		return hazelcastInstance != null && hazelcastInstance.getLifecycleService().isRunning();
