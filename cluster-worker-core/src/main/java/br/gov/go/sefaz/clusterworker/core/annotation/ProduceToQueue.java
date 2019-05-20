@@ -31,7 +31,8 @@ public @interface ProduceToQueue {
     int maxSize() default 1000;
 
     /**
-     * Cron Expression to define the frequency of producer execution
+     * Cron Expression to define the frequency of producer execution.
+     * </br>Eg.: The expression <i><code>0/10 * * * * ?</code></i> executes at every 10 seconds.
      * @return cron expression
      * @since 1.0
      */

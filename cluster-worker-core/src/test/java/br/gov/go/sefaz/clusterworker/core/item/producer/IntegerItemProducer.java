@@ -1,4 +1,4 @@
-package br.gov.go.sefaz.clusterworker.core.item;
+package br.gov.go.sefaz.clusterworker.core.item.producer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
+import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 
 /**

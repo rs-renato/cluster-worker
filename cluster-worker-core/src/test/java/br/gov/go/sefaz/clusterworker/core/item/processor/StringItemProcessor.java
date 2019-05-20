@@ -1,10 +1,11 @@
-package br.gov.go.sefaz.clusterworker.core.item;
+package br.gov.go.sefaz.clusterworker.core.item.processor;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
 import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
+import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 
 /**

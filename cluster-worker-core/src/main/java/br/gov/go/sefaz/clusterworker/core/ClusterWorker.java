@@ -93,13 +93,13 @@ public final class ClusterWorker<T> {
     public void executeItemProducer(final ItemProducer<T> itemProducer){
     	// Asserts mandatory exception to create an ItemProducer
     	ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
+    	String itemProducerName = itemProducer.getClass().getSimpleName();
     	
     	// Creates the Producer and its configuration
 		HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableProducer(itemProducer);
-		HazelcastRunnableProducerSubmitterConfiguration<T> produceConfig = new HazelcastRunnableProducerSubmitterConfiguration<>(hazelcastInstance, executorService, hazelcastRunnableProducer);
-    	
+		HazelcastRunnableProducerSubmitterConfiguration<T> produceConfig = new HazelcastRunnableProducerSubmitterConfiguration<>(itemProducerName, hazelcastInstance, executorService, hazelcastRunnableProducer);
+
 		// Creates the trigger
-		String itemProducerName = itemProducer.getClass().getSimpleName();
     	Trigger itemProducerTrigger = TriggerBuilder.newTrigger()
     				.withIdentity(itemProducerName, ClusterWorkerConstants.CW_QUARTZ_SCHEDULLER_NAME)
     				.withSchedule(CronScheduleBuilder.cronSchedule(produceToQueue.cronExpression()))

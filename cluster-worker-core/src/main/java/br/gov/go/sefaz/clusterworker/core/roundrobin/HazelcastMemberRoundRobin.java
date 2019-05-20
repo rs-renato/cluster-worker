@@ -1,7 +1,6 @@
 package br.gov.go.sefaz.clusterworker.core.roundrobin;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -12,8 +11,6 @@ import org.apache.logging.log4j.Logger;
 import com.hazelcast.cluster.ClusterState;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
-
-import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
 
 /**
  * Hazelcast Member Round Robin strategy
@@ -44,19 +41,9 @@ public class HazelcastMemberRoundRobin{
 		if (clusterState.equals(ClusterState.ACTIVE) && getClusterMembers().size() > 1) {
 			logger.debug(String.format("Advancing round robin pivot '%s'", this.roundRobinName));
 			hazelcastInstance.getAtomicLong(this.roundRobinName).incrementAndGet();
-			hazelcastInstance.getAtomicLong(ClusterWorkerConstants.CW_ROUND_ROBIN_LAST_UPDATE).set(Calendar.getInstance().getTimeInMillis());
 		}
 		
         return this;
-	}
-	
-	/**
-	 * Returns the pivot last update timestamp
-	 * @return timestamp of last pivot update
-	 * @since 1.0
-	 */
-	public Long getPivotLastUpdateTimestamp() {
-		return hazelcastInstance.getAtomicLong(ClusterWorkerConstants.CW_ROUND_ROBIN_LAST_UPDATE).get();
 	}
 	
 	/**

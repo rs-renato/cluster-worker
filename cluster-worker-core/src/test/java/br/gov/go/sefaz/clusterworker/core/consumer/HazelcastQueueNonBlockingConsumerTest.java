@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
-import br.gov.go.sefaz.clusterworker.core.item.IntegerItemProducer;
+import br.gov.go.sefaz.clusterworker.core.item.producer.IntegerItemProducer;
 import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 
 /**
