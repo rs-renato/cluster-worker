@@ -35,7 +35,7 @@ import br.gov.go.sefaz.clusterworker.core.support.QuartzPropertySupport;
 /**
  * Central core to manage hazelcast executor services and it's lifecycle.
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  * @param <T> type which ClusterWorker will handle.
  */
 public final class ClusterWorker<T> {
@@ -50,7 +50,7 @@ public final class ClusterWorker<T> {
     /**
      * Constructor for ClusterWorker.
      * @param hazelcastInstance instance of hazelcast.
-     * @since 1.0
+     * @since 1.0.0
      */
     public ClusterWorker(HazelcastInstance hazelcastInstance) {
     	this.hazelcastInstance = hazelcastInstance;
@@ -60,7 +60,7 @@ public final class ClusterWorker<T> {
     /**
      * Execute a {@link ItemProcessor} client's implementation on hazelcast executor service.
      * @param itemProcessor implementation of client item.
-     * @since 1.0
+     * @since 1.0.0
      */
     public void executeItemProccessor(ItemProcessor<T> itemProcessor){
     	// Asserts mandatory exception to create an ItemProcessor
@@ -88,7 +88,7 @@ public final class ClusterWorker<T> {
     /**
      * Execute a {@link ItemProducer} client's implementation on hazelcast executor service.
      * @param itemProducer implementation of client item.
-     * @since 1.0
+     * @since 1.0.0
      */
     public void executeItemProducer(final ItemProducer<T> itemProducer){
     	// Asserts mandatory exception to create an ItemProducer
@@ -126,7 +126,7 @@ public final class ClusterWorker<T> {
     /**
      * Shutdown the ClusterWorker core (listeners and futures).
      * </br></br><i>Note:</i> This method DOESN'T shutdown the internal hazelcast instance!
-     * @since 1.0
+     * @since 1.0.0
      * @see ClusterWorker#shutdown(boolean)
      */
 	public void shutdown() {
@@ -153,7 +153,7 @@ public final class ClusterWorker<T> {
 	 * will be affected! Eg.: Another clusterworker instance.
 	 * @param shutdownHazelcast <code>true</code> if this method should shutdown its internal hazelcast instance,
 	 * <code>false</code> otherwise.
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public void shutdown(boolean shutdownHazelcast) {
 		
@@ -168,7 +168,7 @@ public final class ClusterWorker<T> {
 	/**
 	 * Initialize quartz scheduler
 	 * @return Scheduler
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	private Scheduler initializeScheduler() {
 		try {
@@ -184,7 +184,7 @@ public final class ClusterWorker<T> {
     /**
      * Returns the local cluster member.
      * @return member
-     * @since 1.0
+     * @since 1.0.0
      */
     private Member getLocalMember() {
         return this.hazelcastInstance.getCluster().getLocalMember();

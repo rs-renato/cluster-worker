@@ -23,7 +23,7 @@ import java.lang.reflect.Type;
  *
  * @author Arjen Poutsma/Rossen Stoyanchev (spring-projects)
  * @since 3.2 (Spring)
- * @since 1.0 (ClusterWorker)
+ * @since 1.0.0 (ClusterWorker)
  * @param <T> the referenced type
  * @see <a href="https://github.com/spring-projects/spring-framework/blob/master/spring-core/src/main/java/org/springframework/core/ParameterizedTypeReference.java">ParameterizedTypeReference Source Code</a>
  * @see <a href="https://gafter.blogspot.nl/2006/12/super-type-tokens.html">Neal Gafter on Super Type Tokens</a>
@@ -74,7 +74,7 @@ public abstract class ParameterizedTypeReference<T> {
 	 * @return a corresponding reference which may be passed into
 	 * {@code ParameterizedTypeReference}-accepting methods
 	 * @since 4.3.12 (Spring)
-	 * @since 1.0 (ClusterWorker)
+	 * @since 1.0.0 (ClusterWorker)
 	 */
 	public static <T> ParameterizedTypeReference<T> forType(Type type) {
 		return new ParameterizedTypeReference<T>(type) {

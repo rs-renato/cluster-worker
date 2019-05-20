@@ -5,7 +5,7 @@ import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 /**
  * Exception used in {@link ItemProducer} implementations
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  */
 public class ItemProducerException extends ClusterWorkerException {
 
@@ -14,7 +14,7 @@ public class ItemProducerException extends ClusterWorkerException {
 	/**
 	 * 
 	 * @param cause
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public ItemProducerException(Throwable cause) {
 		super(cause);
@@ -23,7 +23,7 @@ public class ItemProducerException extends ClusterWorkerException {
 	/**
 	 * 
 	 * @param message
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public ItemProducerException(String message) {
 		super(message);
@@ -32,7 +32,7 @@ public class ItemProducerException extends ClusterWorkerException {
 	/**
 	 * 
 	 * @param message
-	 * @since 1.0
+	 * @since 1.0.0
 	 * @param cause
 	 */
 	public ItemProducerException(String message, Throwable cause) {

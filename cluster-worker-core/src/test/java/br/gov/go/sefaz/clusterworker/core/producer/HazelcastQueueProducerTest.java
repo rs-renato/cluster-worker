@@ -17,7 +17,7 @@ import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 /**
  * HazelcastQueueProducer example of use
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  */
 public class HazelcastQueueProducerTest {
 

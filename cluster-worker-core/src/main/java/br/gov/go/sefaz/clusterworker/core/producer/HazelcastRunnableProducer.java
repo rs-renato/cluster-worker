@@ -15,7 +15,7 @@ import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 /**
  * Runnable of {@link HazelcastQueueProducer}, responsible for produces {@link ItemProducer} client's implementation.
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  * @param <T> type which this runnable will handle.
  */
 public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<T> implements Runnable{
@@ -30,7 +30,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
      * @param itemProducer ItemProducer client's implementation.
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
-     * @since 1.0
+     * @since 1.0.0
      */
     public HazelcastRunnableProducer(ItemProducer<T> itemProducer, HazelcastInstance hazelcastInstance, String queueName) {
     	 super(hazelcastInstance, queueName);
@@ -67,7 +67,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     /**
      * Retrieves the unique thread name for this producer
      * @return the unique producer thread name
-     * @since 1.0
+     * @since 1.0.0
      */
     private String getRunnableProducerName() {
     	return String.format("%s.producer[%s]", hazelcastInstance.getName(), itemProducer.getClass().getSimpleName());

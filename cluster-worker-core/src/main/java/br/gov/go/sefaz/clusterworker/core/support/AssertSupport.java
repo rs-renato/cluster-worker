@@ -32,7 +32,7 @@ package br.gov.go.sefaz.clusterworker.core.support;
  *
  * @author Keith Donald/Juergen Hoeller/Brannen/Colin Sampaleanu/Rob Harrop
  * @since 1.1.2 (Spring)
- * @since 1.0 (ClusterWorker)
+ * @since 1.0.0 (ClusterWorker)
  * @see <a href="https://github.com/spring-projects/spring-framework/blob/master/spring-core/src/main/java/org/springframework/util/Assert.java">Assert Source Code</a>
  */
 public abstract class AssertSupport {

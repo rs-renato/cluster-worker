@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Contract to item processor implementations.
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  * @param <T> type of data to be processed by this processor.
  */
 public interface ItemProcessor<T> extends Serializable{
@@ -13,7 +13,7 @@ public interface ItemProcessor<T> extends Serializable{
 	/**
 	 * Process the item from the queue
 	 * @param item to be processed
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	void process(T item);
 }

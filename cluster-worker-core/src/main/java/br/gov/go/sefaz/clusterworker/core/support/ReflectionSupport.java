@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Reflection support class.
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  */
 public class ReflectionSupport {
 
@@ -24,7 +24,7 @@ public class ReflectionSupport {
      * @return method
      * @throws NoSuchMethodException if there is no 'valueOf' method.
 	 * @throws ClassNotFoundException 
-	 * @since 1.0
+	 * @since 1.0.0
      */
     public static <T> Method getValueOfMethod(Class<T> type) throws NoSuchMethodException {
 
@@ -42,7 +42,7 @@ public class ReflectionSupport {
      * Return the class name from type
      * @param type
      * @return the class name
-     * @since 1.0
+     * @since 1.0.0
      */
 	public static String getClassName(Type type) {
 		if (type == null) {
@@ -59,7 +59,7 @@ public class ReflectionSupport {
 	 * Return the class from type
 	 * @param type
 	 * @return the class
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public static Class<?> getClass(Type type){
 		

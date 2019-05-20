@@ -13,7 +13,7 @@ import com.hazelcast.core.IQueue;
 /**
  * Implementation for Hazelcast Queue Produces.
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  * @param <T> type of data to be produced by this queue.
  */
 public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, HazelcastInstanceAware {
@@ -29,7 +29,7 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
      * Constructor for HazelcastQueueProducer
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
-     * @since 1.0
+     * @since 1.0.0
      */
     public HazelcastQueueProducer(HazelcastInstance hazelcastInstance, String queueName) {
     	this.hazelcastInstance = hazelcastInstance;
@@ -60,7 +60,7 @@ public class HazelcastQueueProducer<T> implements Producer<T>, Serializable, Haz
     /**
      * Return the queue's name of this producer.
      * @return queueName
-     * @since 1.0
+     * @since 1.0.0
      */
     public String getQueueName() {
         return queueName;

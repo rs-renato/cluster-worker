@@ -12,7 +12,7 @@ import br.gov.go.sefaz.clusterworker.core.exception.ClusterWorkerException;
 /**
  * CachedPropertyFile support class.
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  */
 public class CachedPropertyFileSupport {
 
@@ -33,7 +33,7 @@ public class CachedPropertyFileSupport {
      * @param fileName the cached file name 
      * @return cached property file
      * @throws ClusterWorkerException if some error occurs on file load
-     * @since 1.0
+     * @since 1.0.0
      */
     public static CachedPropertyFile getCachedPropertyFile(String fileName){
 
@@ -65,7 +65,7 @@ public class CachedPropertyFileSupport {
      * @param silentMode enables or disables the silent mode of loading. if this property is set to <code>true</code> 
      * and there is some error on file load, the errors will be ignored, that is, the property file is not mandatory. 
      * @return a cached property file
-     * @since 1.0
+     * @since 1.0.0
      */
     public static CachedPropertyFile getCachedPropertyFile(String fileName, SILENT_MODE silentMode){
 			

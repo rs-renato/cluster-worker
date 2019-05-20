@@ -3,7 +3,7 @@ package br.gov.go.sefaz.clusterworker.core.exception;
 /**
  * General exception for Cluster Worker
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  */
 public class ClusterWorkerException extends RuntimeException {
 
@@ -12,7 +12,7 @@ public class ClusterWorkerException extends RuntimeException {
 	/**
 	 * 
 	 * @param cause
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public ClusterWorkerException(Throwable cause) {
 		super(cause);
@@ -21,7 +21,7 @@ public class ClusterWorkerException extends RuntimeException {
 	/**
 	 * 
 	 * @param message
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public ClusterWorkerException(String message) {
 		super(message);
@@ -31,7 +31,7 @@ public class ClusterWorkerException extends RuntimeException {
 	 * 
 	 * @param message
 	 * @param cause
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public ClusterWorkerException(String message, Throwable cause) {
 		super(message, cause);

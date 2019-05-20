@@ -13,7 +13,7 @@ import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
 /**
  * Runnable of {@link HazelcastQueueConsumer}, responsible for process {@link ItemProcessor} client's implementation.
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  * @param <T> type which this runnable will handle.
  */
 public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T> implements Runnable, ShutdownListener{
@@ -32,7 +32,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
      * @param queueName queue name
      * @param consumerStrategy Consumer queue strategy
      * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
-     * @since 1.0
+     * @since 1.0.0
      */
     public HazelcastRunnableConsumer(ItemProcessor<T> itemProcessor, HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
         super(hazelcastInstance, queueName, consumerStrategy, timeout);
@@ -82,7 +82,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
     /**
      * Verifies if this runnable is running.
      * @return <code>true</code> if thread is running, <code>false</code> otherwise.
-     * @since 1.0
+     * @since 1.0.0
      */
     public boolean isRunning() {
     	return !this.stopped;
@@ -91,7 +91,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
     /**
      * Builds a unique thread name for this consumer
      * @return the unique consumer thread name
-     * @since 1.0
+     * @since 1.0.0
      */
     @SuppressWarnings("deprecation")
 	private String getRunnableConsumerdName() {

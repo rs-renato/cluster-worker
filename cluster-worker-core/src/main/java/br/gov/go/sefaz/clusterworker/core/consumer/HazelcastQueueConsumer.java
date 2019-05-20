@@ -13,7 +13,7 @@ import com.hazelcast.core.IQueue;
 /**
  * Implementation for Hazelcast Queue Consumer.
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  * @param <T> type of data to be consummed by this queue.
  */
 public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, HazelcastInstanceAware{
@@ -34,7 +34,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
      * Constructor for HazelcastQueueConsumer
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
-     * @since 1.0
+     * @since 1.0.0
      */
     public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName) {
     	this.hazelcastInstance = hazelcastInstance;
@@ -47,7 +47,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
      * @param consumerStrategy Consumer queue strategy
-     * @since 1.0
+     * @since 1.0.0
      */
 	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy) {
 		this.hazelcastInstance = hazelcastInstance;
@@ -62,7 +62,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 	 * @param queueName queue name
 	 * @param consumerStrategy Consumer queue strategy
 	 * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
 		this.hazelcastInstance = hazelcastInstance;
@@ -93,7 +93,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
      * Verifies if this consumer has blocking strategy
      * @see ConsumerStrategy
      * @return <code>true</code> if is blocking, <code>false</code> otherwise
-     * @since 1.0
+     * @since 1.0.0
      */
     public boolean isBlocking() {
 		return isBlocking;
@@ -102,7 +102,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     /**
      * Return the queue's name of this consumer.
      * @return queueName
-     * @since 1.0
+     * @since 1.0.0
      */
     public String getQueueName() {
         return queueName;
@@ -111,7 +111,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     /**
      * Return the queueStrategy of this consumer.
      * @return queueStrategy
-     * @since 1.0
+     * @since 1.0.0
      */
     public ConsumerStrategy getQueueStrategy() {
         return consumerStrategy;
@@ -120,7 +120,7 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     /**
      * Return the timeout of this consumer.
      * @return timeout
-     * @since 1.0
+     * @since 1.0.0
      */
     public int getTimeout() {
         return timeout;

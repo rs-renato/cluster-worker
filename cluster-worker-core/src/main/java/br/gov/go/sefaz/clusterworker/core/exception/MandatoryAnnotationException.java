@@ -3,7 +3,7 @@ package br.gov.go.sefaz.clusterworker.core.exception;
 /**
  * Exception used validations of mandatory annotations.
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  */
 public class MandatoryAnnotationException extends ClusterWorkerException {
 
@@ -12,7 +12,7 @@ public class MandatoryAnnotationException extends ClusterWorkerException {
 	/**
 	 * 
 	 * @param message
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public MandatoryAnnotationException(String message) {
         super(message);

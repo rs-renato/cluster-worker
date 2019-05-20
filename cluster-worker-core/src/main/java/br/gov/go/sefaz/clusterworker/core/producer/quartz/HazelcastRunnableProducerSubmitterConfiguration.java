@@ -11,7 +11,7 @@ import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobin;
 /**
  * Configuration for Quartz HazelcastRunnableProducer Submitter 
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  */
 public class HazelcastRunnableProducerSubmitterConfiguration<T>{
 	
@@ -26,7 +26,7 @@ public class HazelcastRunnableProducerSubmitterConfiguration<T>{
 	 * @param hazelcastInstance hazelcast instance
 	 * @param executorService executor service
 	 * @param hazelcastRunnableProducer runnable producer
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public HazelcastRunnableProducerSubmitterConfiguration(String configurationName, HazelcastInstance hazelcastInstance, IExecutorService executorService, HazelcastRunnableProducer<T> hazelcastRunnableProducer) {
 		this.executorService =executorService;
@@ -38,7 +38,7 @@ public class HazelcastRunnableProducerSubmitterConfiguration<T>{
 	/**
 	 * Retrieves hazelcastMemberRoundRobin
 	 * @return hazelcastMemberRoundRobin
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public HazelcastMemberRoundRobin getHazelcastMemberRoundRobin() {
 		return hazelcastMemberRoundRobin;
@@ -48,7 +48,7 @@ public class HazelcastRunnableProducerSubmitterConfiguration<T>{
 	/**
 	 * Retrieves HazelcastRunnableProducer
 	 * @return hazelcastRunnableProducer
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public HazelcastRunnableProducer<?> getHazelcastRunnableProducer() {
 		return hazelcastRunnableProducer;
@@ -57,7 +57,7 @@ public class HazelcastRunnableProducerSubmitterConfiguration<T>{
 	/**
 	 * Retrieves IExecutorService
 	 * @return executorService
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public IExecutorService getExecutorService() {
 		return executorService;
@@ -66,7 +66,7 @@ public class HazelcastRunnableProducerSubmitterConfiguration<T>{
 	/**
 	 * Retrieves HazelcastMemberRoundRobinExecutionCallback
 	 * @return executionCallback
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public HazelcastMemberRoundRobinExecutionCallback getHazelcastMemberRoundRobinExecutionCallback() {
 		return hazelcastMemberRoundRobinExecutionCallback;

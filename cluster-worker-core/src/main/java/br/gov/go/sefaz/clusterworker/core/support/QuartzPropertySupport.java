@@ -7,7 +7,7 @@ import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
 /**
  * Quartz Support class
  * @author renato.rsilva
- * @since 1.0
+ * @since 1.0.0
  */
 public class QuartzPropertySupport {
 
@@ -17,7 +17,7 @@ public class QuartzPropertySupport {
 	/**
 	 * Retrieves the default quartz properties
 	 * @return default properties
-	 * @since 1.0
+	 * @since 1.0.0
 	 */
 	public static Properties getDetaultQuartzProperty() {
 		Properties quartzDefaultProperties = new Properties();

@@ -11,7 +11,7 @@ import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 /**
  * Example of implementation of {@link ItemProcessor}
  * @author renato-rs
- * @since 1.0
+ * @since 1.0.0
  */
 @ConsumeFromQueue(queueName = TestConstants.CW_STRING_QUEUE_NAME, strategy = ConsumerStrategy.WAIT_ON_AVAILABLE, workers = TestConstants.CW_ITEM_PROCESSOR_WORKERS)
 public class StringItemProcessor implements ItemProcessor<String> {
