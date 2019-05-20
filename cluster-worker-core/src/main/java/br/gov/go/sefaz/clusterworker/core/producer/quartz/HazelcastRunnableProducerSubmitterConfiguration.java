@@ -10,7 +10,7 @@ import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobin;
 
 /**
  * Configuration for Quartz HazelcastRunnableProducer Submitter 
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class HazelcastRunnableProducerSubmitterConfiguration<T>{

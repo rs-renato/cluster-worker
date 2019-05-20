@@ -17,7 +17,7 @@ import com.hazelcast.core.Member;
 
 /**
  * HazelcastMemberRoundRobin example of use
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class HazelcastMemberRoundRobinTest {

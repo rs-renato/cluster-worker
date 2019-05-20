@@ -14,7 +14,7 @@ import com.hazelcast.core.Member;
 
 /**
  * Hazelcast Member Round Robin strategy
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 @SuppressWarnings("deprecation")

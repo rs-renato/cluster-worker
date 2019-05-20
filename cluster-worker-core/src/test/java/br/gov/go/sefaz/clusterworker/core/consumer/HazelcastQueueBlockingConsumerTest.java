@@ -16,7 +16,7 @@ import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 
 /**
  * HazelcastQueueConsumer example of use in blocking way
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class HazelcastQueueBlockingConsumerTest {

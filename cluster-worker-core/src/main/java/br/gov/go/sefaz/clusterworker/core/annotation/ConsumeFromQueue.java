@@ -10,7 +10,7 @@ import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
 
 /**
  * Annotation to configure a {@link ItemProcessor}.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 /**
  * Contract to item processor implementations.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  * @param <T> type of data to be processed by this processor.
  */

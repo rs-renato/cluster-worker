@@ -12,7 +12,7 @@ import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
 
 /**
  * Runnable of {@link HazelcastQueueConsumer}, responsible for process {@link ItemProcessor} client's implementation.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  * @param <T> type which this runnable will handle.
  */

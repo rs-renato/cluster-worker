@@ -2,7 +2,7 @@ package br.gov.go.sefaz.clusterworker.core.constants;
 
 /**
  * Constants for global definitions of ClusterWorker API
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class ClusterWorkerConstants {
@@ -40,6 +40,12 @@ public class ClusterWorkerConstants {
 	public static final int CW_EXECUTOR_SERVICE_MAX_POOL_SIZE_DEFAULT	= 10;
 	
 	/**
+	 * Defines the default number of executor threads per member for the executor.
+	 * @since 1.0.0
+	 */
+	public static final String[] CW_REST_API_GROUPS_DEFAULT	= 			new String[] {"HEALTH_CHECK","CLUSTER_WRITE","CLUSTER_READ","DATA"};
+	
+	/**
 	 * Defines the default multicast discovery mechanism
 	 * @since 1.0.0
 	 */
@@ -62,6 +68,7 @@ public class ClusterWorkerConstants {
      * @since 1.0.0
      */
 	public static final String CW_ROUND_ROBIN_MEMBER 					= "cw.roundrobin.member";
+	
 	
 	/***************************************
 	 * 			CW QUARTZ CONSTANTS

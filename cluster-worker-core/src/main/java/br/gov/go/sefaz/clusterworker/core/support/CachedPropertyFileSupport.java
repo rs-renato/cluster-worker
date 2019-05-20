@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
 import br.gov.go.sefaz.clusterworker.core.exception.ClusterWorkerException;
 /**
  * CachedPropertyFile support class.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class CachedPropertyFileSupport {

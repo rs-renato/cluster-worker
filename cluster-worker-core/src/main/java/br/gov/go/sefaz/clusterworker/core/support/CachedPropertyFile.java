@@ -1,6 +1,7 @@
 package br.gov.go.sefaz.clusterworker.core.support;
 
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -16,7 +17,7 @@ import br.gov.go.sefaz.clusterworker.core.exception.ClusterWorkerException;
 
 /**
  * CachedPropertyFile abstraction class.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 class CachedPropertyFile{
@@ -122,10 +123,23 @@ class CachedPropertyFile{
 				throw new ClusterWorkerException(String.format("Property '%s' not defined!", propertyName));
 			}
             
-            Method method = ReflectionSupport.getValueOfMethod(type);
-			T t = (T) method.invoke(null, property);
-
-            mapCached.put(propertyName, t);
+            if (type.isArray()) {
+				
+            	String[] prop = property.split(",");
+            	Class<?> componentType = type.getComponentType();
+            	
+				T[] propArray = (T[]) Array.newInstance(componentType, prop.length);
+            	
+            	for (int i = 0; i < prop.length; i++) {
+            		Method method = ReflectionSupport.getValueOfMethod(componentType);
+            		propArray[i] = (T) method.invoke(null, prop[i].trim());
+				}
+            	mapCached.put(propertyName, propArray);
+			}else {
+				Method method = ReflectionSupport.getValueOfMethod(type);
+				T t = (T) method.invoke(null, property);
+				mapCached.put(propertyName, t);
+			}
         }
         return (T) mapCached.get(propertyName);
     }

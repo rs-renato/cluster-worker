@@ -2,7 +2,7 @@ package br.gov.go.sefaz.clusterworker.core.support;
 
 /**
  * Constants defined for tests
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class TestConstants {

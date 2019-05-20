@@ -7,7 +7,7 @@ import java.util.Map;
 
 /**
  * Reflection support class.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class ReflectionSupport {
@@ -27,7 +27,7 @@ public class ReflectionSupport {
 	 * @since 1.0.0
      */
     public static <T> Method getValueOfMethod(Class<T> type) throws NoSuchMethodException {
-
+    	
     	boolean isStringClass = String.class.equals(ReflectionSupport.getClass(type));
     	
         if (!mapMethod.containsKey(type)){

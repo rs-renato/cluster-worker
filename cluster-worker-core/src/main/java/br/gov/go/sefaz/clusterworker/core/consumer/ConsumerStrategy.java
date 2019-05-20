@@ -2,7 +2,7 @@ package br.gov.go.sefaz.clusterworker.core.consumer;
 
 /**
  * Consumer queue strategy to the general client's {@link Consumer} implementation.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public enum ConsumerStrategy {

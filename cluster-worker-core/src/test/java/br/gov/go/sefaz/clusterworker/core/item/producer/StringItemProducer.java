@@ -14,7 +14,7 @@ import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 
 /**
  * Example of implementation of {@link ItemProducer}
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 @ProduceToQueue(queueName = TestConstants.CW_STRING_QUEUE_NAME, cronExpression = TestConstants.CW_ITEM_PRODUCER_CRON_EXPRESSION, maxSize = TestConstants.CW_ITEM_PRODUCER_MAX_QUANTITY)

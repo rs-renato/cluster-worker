@@ -9,7 +9,7 @@ import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobin;
 
 /**
  * Task Execution Callback responsible to advance the roundrobin pivot on success process
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class HazelcastMemberRoundRobinExecutionCallback implements ExecutionCallback<Object> {

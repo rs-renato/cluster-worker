@@ -2,7 +2,7 @@ package br.gov.go.sefaz.clusterworker.core.exception;
 
 /**
  * General exception for Cluster Worker
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class ClusterWorkerException extends RuntimeException {

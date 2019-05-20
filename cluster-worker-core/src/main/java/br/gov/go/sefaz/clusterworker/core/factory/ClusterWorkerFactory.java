@@ -27,7 +27,7 @@ import br.gov.go.sefaz.clusterworker.core.support.ParameterizedTypeReference;
 
 /**
  * Factory for create {@link Consumer}'s and {@link Producer}'s implementations
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class ClusterWorkerFactory {

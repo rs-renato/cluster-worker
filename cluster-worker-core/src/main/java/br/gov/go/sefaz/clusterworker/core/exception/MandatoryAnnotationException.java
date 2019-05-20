@@ -2,7 +2,7 @@ package br.gov.go.sefaz.clusterworker.core.exception;
 
 /**
  * Exception used validations of mandatory annotations.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class MandatoryAnnotationException extends ClusterWorkerException {

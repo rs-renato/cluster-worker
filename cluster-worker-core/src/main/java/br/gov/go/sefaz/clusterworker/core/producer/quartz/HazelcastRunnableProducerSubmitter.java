@@ -17,7 +17,7 @@ import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobin;
 
 /**
  * Quartz HazelcastRunnableProducer Submitter 
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public class HazelcastRunnableProducerSubmitter implements Job {

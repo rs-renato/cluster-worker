@@ -14,7 +14,7 @@ import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 
 /**
  * Runnable of {@link HazelcastQueueProducer}, responsible for produces {@link ItemProducer} client's implementation.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  * @param <T> type which this runnable will handle.
  */

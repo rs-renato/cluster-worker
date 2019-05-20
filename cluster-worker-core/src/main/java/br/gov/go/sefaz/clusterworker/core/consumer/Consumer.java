@@ -2,7 +2,7 @@ package br.gov.go.sefaz.clusterworker.core.consumer;
 
 /**
  * Contract to consumers implementations.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  * @param <T> type of data to be consummed by this consumer.
  */

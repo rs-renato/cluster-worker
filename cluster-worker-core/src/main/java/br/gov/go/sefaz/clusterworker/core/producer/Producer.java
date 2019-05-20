@@ -4,7 +4,7 @@ import java.util.Collection;
 
 /**
  * Contract to producers implementations.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  * @param <T> type of data to be consummed by this producer.
  */

@@ -34,7 +34,7 @@ import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
 import br.gov.go.sefaz.clusterworker.core.support.QuartzPropertySupport;
 /**
  * Central core to manage hazelcast executor services and it's lifecycle.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  * @param <T> type which ClusterWorker will handle.
  */

@@ -12,7 +12,7 @@ import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobinTe
 
 /**
  * Test Suite for Cluster Worker
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 @RunWith(Suite.class)

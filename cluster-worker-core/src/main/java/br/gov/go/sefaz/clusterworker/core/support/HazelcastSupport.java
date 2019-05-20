@@ -8,7 +8,6 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.JoinConfig;
 import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.RestApiConfig;
-import com.hazelcast.config.RestEndpointGroup;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 
@@ -17,7 +16,7 @@ import br.gov.go.sefaz.clusterworker.core.support.CachedPropertyFileSupport.SILE
 
 /**
  * Hazelcast support class.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 public final class HazelcastSupport {
@@ -66,6 +65,8 @@ public final class HazelcastSupport {
         String ipMember = cachedPropertyFile.getProperty("cw.network.ip.member", String.class);
         String trustedInterface = cachedPropertyFile.getProperty("cw.network.trusted.interface", ClusterWorkerConstants.CW_NETWORK_TRUSTED_INTERFACE_DEFAULT);
         int maxPoolSize = cachedPropertyFile.getProperty("cw.executor.max.pool.size", Integer.class, ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_POOL_SIZE_DEFAULT);
+        
+        String[] restApiGroups = cachedPropertyFile.getProperty("cw.rest.api.enable.group", String[].class, ClusterWorkerConstants.CW_REST_API_GROUPS_DEFAULT);
 
         // Creates the default configuration
         Config config = new Config(hazelcastInstanceName);
@@ -89,10 +90,7 @@ public final class HazelcastSupport {
         // Configures Rest Api
         network.setRestApiConfig(new RestApiConfig()
         			.setEnabled(true)
-        			.enableGroups(RestEndpointGroup.HEALTH_CHECK,
-        							RestEndpointGroup.CLUSTER_WRITE,
-        							RestEndpointGroup.CLUSTER_READ,
-        							RestEndpointGroup.DATA));
+        			.enableGroups(RestEndpointGroupSupport.converToRestEndpointGroup(restApiGroups)));
         
         // Configure TPC-IP configuration 
         JoinConfig join = network.getJoin();

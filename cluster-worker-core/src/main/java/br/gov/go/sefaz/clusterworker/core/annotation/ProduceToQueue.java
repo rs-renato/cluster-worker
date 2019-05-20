@@ -9,7 +9,7 @@ import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 
 /**
  * Annotation to configure a {@link ItemProducer}.
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)

@@ -10,7 +10,7 @@ import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
 
 /**
  * Example of implementation of {@link ItemProcessor}
- * @author renato-rs
+ * @author renato.rsilva
  * @since 1.0.0
  */
 @ConsumeFromQueue(queueName = TestConstants.CW_INTEGER_QUEUE_NAME, strategy = ConsumerStrategy.WAIT_ON_AVAILABLE, workers = TestConstants.CW_ITEM_PROCESSOR_WORKERS)
