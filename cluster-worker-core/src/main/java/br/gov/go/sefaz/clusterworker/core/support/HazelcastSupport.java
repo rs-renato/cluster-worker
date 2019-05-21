@@ -61,11 +61,12 @@ public final class HazelcastSupport {
         
         // Loads the property configuration values
         int port = cachedPropertyFile.getProperty("cw.network.port", Integer.class);
-        boolean multicastEnabled = cachedPropertyFile.getProperty("cw.network.multicast.enabled", Boolean.class, ClusterWorkerConstants.CW_MULTCAST_ENABLED_DEFAULT);
-        String ipMember = cachedPropertyFile.getProperty("cw.network.ip.member", String.class);
-        String trustedInterface = cachedPropertyFile.getProperty("cw.network.trusted.interface", ClusterWorkerConstants.CW_NETWORK_TRUSTED_INTERFACE_DEFAULT);
-        int maxPoolSize = cachedPropertyFile.getProperty("cw.executor.max.pool.size", Integer.class, ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_POOL_SIZE_DEFAULT);
+        String ipMember = cachedPropertyFile.getProperty("cw.network.ip.member");
         
+        String trustedInterface = cachedPropertyFile.getProperty("cw.network.trusted.interface", ClusterWorkerConstants.CW_NETWORK_TRUSTED_INTERFACE_DEFAULT);
+        int timeout = cachedPropertyFile.getProperty("cw.network.connection.timeout", Integer.class, ClusterWorkerConstants.CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT);
+        boolean multicastEnabled = cachedPropertyFile.getProperty("cw.network.multicast.enabled", Boolean.class, ClusterWorkerConstants.CW_MULTCAST_ENABLED_DEFAULT);
+        int maxPoolSize = cachedPropertyFile.getProperty("cw.executor.max.pool.size", Integer.class, ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_POOL_SIZE_DEFAULT);
         String[] restApiGroups = cachedPropertyFile.getProperty("cw.rest.api.enable.group", String[].class, ClusterWorkerConstants.CW_REST_API_GROUPS_DEFAULT);
 
         // Creates the default configuration
@@ -101,7 +102,7 @@ public final class HazelcastSupport {
 
         join.getTcpIpConfig()
         	.setEnabled(true)
-        	.setConnectionTimeoutSeconds(ClusterWorkerConstants.CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT)
+        	.setConnectionTimeoutSeconds(timeout)
         	.addMember(ipMember);
 
         // Configure Scheduel Executor Service used to schedule Producers

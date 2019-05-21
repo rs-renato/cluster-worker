@@ -4,6 +4,7 @@ package br.gov.go.sefaz.clusterworker.core.support;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -72,7 +73,7 @@ class CachedPropertyFile{
 			// Loads from cache if it exist.
 			value = getCachedProperty(propertyName, type);
 		} catch (Exception e) {
-			logger.warn(String.format("Could not retrieve cached property. Reason: %s. The default value '%s' will be returned", e.getMessage(), defaultValue));
+			logger.warn(String.format("Could not retrieve cached property. Reason: %s. The default value '%s' will be returned", e.getMessage(), defaultValue.getClass().isArray() ? Arrays.toString((Object[]) defaultValue) : defaultValue));
 		}
 		
 		return value != null ? value : defaultValue;
@@ -87,7 +88,11 @@ class CachedPropertyFile{
      */
 	public String getProperty(String propertyName, String defaultValue){
 		String value = getProperty(propertyName);
-		return value != null ? value : defaultValue;
+		if (StringUtil.isNullOrEmpty(value)) {
+			logger.warn(String.format("The default value '%s' for property '%s' will be returned", defaultValue, propertyName));
+			return defaultValue;
+		}
+		return value;
 	}
 	
     /**
