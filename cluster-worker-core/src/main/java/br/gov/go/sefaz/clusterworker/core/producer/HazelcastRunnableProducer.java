@@ -23,6 +23,8 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 	private static final transient long serialVersionUID = 2538609461091747126L;
 	private static final transient Logger logger = LogManager.getLogger(HazelcastRunnableProducer.class);
 	
+	private volatile boolean isRunning;
+	
     private ItemProducer<T> itemProducer;
 
     /**
@@ -40,6 +42,7 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
     @Override
     public void run() {
 
+    	this.isRunning = true;
 		String producerThreadName = getRunnableProducerName();
 		logger.info(String.format("Starting thread '%s'..", producerThreadName));
 		
@@ -61,7 +64,17 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 			logger.error(String.format("A general error occurs process on '%s'", producerThreadName), e);
         }
     	
+		this.isRunning = false;
 		logger.info(String.format("[%s] - Thread '%s' execution FINISHED!", Thread.currentThread().getName(), producerThreadName));
+    }
+
+	 /**
+     * Verifies if this runnable is running.
+     * @return <code>true</code> if thread is running, <code>false</code> otherwise.
+     * @since 1.0.0
+     */
+    public boolean isRunning() {
+    	return this.isRunning;
     }
     
     /**

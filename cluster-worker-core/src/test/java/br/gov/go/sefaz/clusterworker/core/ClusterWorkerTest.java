@@ -1,5 +1,7 @@
 package br.gov.go.sefaz.clusterworker.core;
 
+import java.util.concurrent.TimeUnit;
+
 import org.junit.AfterClass;
 import org.junit.Test;
 
@@ -39,8 +41,7 @@ public class ClusterWorkerTest {
         // Execute the item processor on cluster worker
         integerClusterWorker.executeItemProccessor(new IntegerItemProcessor());
         stringClusterWorker.executeItemProccessor(new StringItemProcessor());
-
-        //Just wait some seconds to execute this test
-        Thread.sleep(TestConstants.CW_EXECUTION_TIME);
+        
+        TimeUnit.SECONDS.sleep(TestConstants.CW_EXECUTION_TIME);
     }
 }

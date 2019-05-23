@@ -31,7 +31,7 @@ public class AnnotationSupport {
     	Class<? extends Object> clazz = type.getClass();
 
     	String className = clazz.getName();
-		logger.debug(String.format("Asserting if annotation '%s' is present on type '%s'", annotationClass, className));
+		logger.trace(String.format("Asserting if annotation '%s' is present on type '%s'", annotationClass, className));
     	
 		A annotation = clazz.getAnnotation(annotationClass);
 

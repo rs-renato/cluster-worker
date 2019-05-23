@@ -49,7 +49,7 @@ public class TestConstants {
     public static final int CW_QUEUEE_TIMEOUT					= 1;
 
     /**
-     * Time to execute a test (in milleseconds)
+     * Time to execute a test (in seconds)
      */
-	public static final long CW_EXECUTION_TIME 					= 30 * 1000;
+	public static final long CW_EXECUTION_TIME 					= 30;
 }

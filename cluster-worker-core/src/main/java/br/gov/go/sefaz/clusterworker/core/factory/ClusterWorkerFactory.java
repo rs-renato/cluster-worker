@@ -201,6 +201,8 @@ public class ClusterWorkerFactory {
 			shutdown(clusterWorker, shutdownHazelcast);
 		}
 		
+    	this.cwInstances.clear();
+    	
     	logger.warn("ClusterWorkerFactory shutdown completed!");
 	}
 	
@@ -216,17 +218,8 @@ public class ClusterWorkerFactory {
 	public void shutdown(ClusterWorker<?> clusterWorker, boolean shutdownHazelcast) {
 
     	logger.warn(String.format("Shutdown Clusterworker! Shutdown inner hazelcast instance: %s", shutdownHazelcast));
-
-		ClusterWorker<?> cwInstance = 
-				cwInstances.stream()
-					.filter(cw -> cw.equals(clusterWorker))
-					.findFirst().orElseGet(null);
-		
-		// Shutdown the clusterWorker, preserving its internal hazelcast instance
-		if (cwInstance != null) {
-			cwInstance.shutdown();
-			cwInstances.remove(clusterWorker);
-		}
+    	
+    	clusterWorker.shutdown(shutdownHazelcast);
 		
 		// Shutdown the hazelcast if it was created by this factory
     	if (shutdownHazelcast) {
@@ -250,9 +243,13 @@ public class ClusterWorkerFactory {
 	 * @since 1.0.0
 	 */
 	private void shutdownHazelcast() {
-		if (HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
-	    	logger.warn("Hazelcast instance will be shutted down ..");
-				hazelcastInstance.getLifecycleService().shutdown();
+		try {
+			if (HazelcastSupport.isHazelcastInstanceRunning(hazelcastInstance)) {
+		    	logger.warn("Hazelcast instance will be shutted down ..");
+					hazelcastInstance.getLifecycleService().shutdown();
+			}
+		} catch (Exception e) {
+	    	logger.error("Could not shutdown hazelcast instance!", e);
 		}
 	}
 }
