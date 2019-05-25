@@ -28,7 +28,7 @@ public class ClusterWorkerTest {
     private static StringItemProcessor stringItemProcessor = new StringItemProcessor();
 
     @AfterClass
-	public static void tearDownClass() throws InterruptedException {
+	public static void tearDownClass() {
         cwFactory.shutdown();
 	}
 
