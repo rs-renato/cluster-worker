@@ -1,7 +1,7 @@
 package br.gov.go.sefaz.clusterworker.core;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.Future;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,13 +24,13 @@ import com.hazelcast.core.Member;
 import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
 import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
 import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
-import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastRunnableConsumer;
+import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastCallableConsumer;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
-import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
-import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastRunnableProducerSubmitter;
-import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastRunnableProducerSubmitterConfiguration;
+import br.gov.go.sefaz.clusterworker.core.producer.HazelcastCallableProducer;
+import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastCallableProducerSubmitter;
+import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastCallableProducerSubmitterConfiguration;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
 import br.gov.go.sefaz.clusterworker.core.support.QuartzPropertySupport;
@@ -48,8 +48,8 @@ public final class ClusterWorker<T> {
     private final IExecutorService executorService;
     private Scheduler itemProducerScheduler = initializeScheduler();
     
-    private final Map<ItemProcessor<T>, HazelcastRunnableConsumer<T>> processors = new HashMap<>();
-    private final Map<ItemProducer<T>, HazelcastRunnableProducer<T>> producers = new HashMap<>();
+    private final Map<ItemProcessor<T>, List<Future<Void>>> processors = new HashMap<>();
+    private final Map<ItemProducer<T>, Date> producers = new HashMap<>();
 
     /**
      * Constructor for ClusterWorker.
@@ -80,19 +80,20 @@ public final class ClusterWorker<T> {
     		logger.info(String.format("Configuring ItemProcessor '%s' [queueName=%s, strategy=%s, timeout=%s, workers=%s]",
     				itemProcessor.getClass().getSimpleName(), consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout(), workers));
     		
-    		// Creates worker (HazelcastRunnableConsumer)
-    		HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableConsumer(itemProcessor);
-    		
-    		for (int i = 0; i <  workers; i++) {
+    		// Creates worker (HazelcastCallableConsumer)
+    		HazelcastCallableConsumer<T> hazelcastCallableConsumer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastCallableConsumer(itemProcessor);
+			ArrayList<Future<Void>> futures = new ArrayList<>();
+
+			for (int i = 0; i <  workers; i++) {
     			try {
     				// Executes the consumer on hazelcast local member
-    				this.executorService.executeOnMember(hazelcastRunnableConsumer, getLocalMember());
-    			}catch (Exception e){
+					futures.add(this.executorService.submitToMember(hazelcastCallableConsumer, getLocalMember()));
+				}catch (Exception e){
     				logger.error("Cannot execute a ItemProcessor on hazelcast executor service!", e);
     			}
     		}
-    		
-    		this.processors.put(itemProcessor, hazelcastRunnableConsumer);
+
+    		this.processors.put(itemProcessor, futures);
 		}
     }
 
@@ -114,9 +115,9 @@ public final class ClusterWorker<T> {
     				itemProducerName, produceToQueue.queueName(), produceToQueue.maxSize(), produceToQueue.cronExpression()));
     		
     		// Creates the Producer and its configuration
-    		HazelcastRunnableProducer<T> hazelcastRunnableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastRunnableProducer(itemProducer);
+    		HazelcastCallableProducer<T> hazelcastCallableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastCallableProducer(itemProducer);
     		
-    		HazelcastRunnableProducerSubmitterConfiguration<T> produceConfig = new HazelcastRunnableProducerSubmitterConfiguration<>(itemProducerName, hazelcastInstance, executorService, hazelcastRunnableProducer);
+    		HazelcastCallableProducerSubmitterConfiguration produceConfig = new HazelcastCallableProducerSubmitterConfiguration(itemProducerName, hazelcastInstance, executorService, hazelcastCallableProducer);
     		
     		// Creates the trigger
     		TriggerKey triggerKey = new TriggerKey(itemProducerName, ClusterWorkerConstants.CW_QUARTZ_SCHEDULLER_NAME);
@@ -131,59 +132,57 @@ public final class ClusterWorker<T> {
     		jobData.put(ClusterWorkerConstants.CW_QUARTZ_PRODUCER_CONFIG_NAME, produceConfig);
     		
     		// Creates the submitter
-    		JobDetail itemProducerSubmitter = JobBuilder.newJob(HazelcastRunnableProducerSubmitter.class)
+    		JobDetail itemProducerSubmitter = JobBuilder.newJob(HazelcastCallableProducerSubmitter.class)
     				.withIdentity(ClusterWorkerConstants.CW_QUARTZ_PRODUCER_JOB_DETAIL_NAME + itemProducerName)
     				.usingJobData(jobData)
     				.build();
     		
     		try {
     			// Schedule the item producer execution
-    			itemProducerScheduler.scheduleJob(itemProducerSubmitter, itemProducerTrigger);
+    			Date future = itemProducerScheduler.scheduleJob(itemProducerSubmitter, itemProducerTrigger);
+    			this.producers.put(itemProducer, future);
     		} catch (SchedulerException e) {
     			logger.error("Cannot schedule a ItemProcessor on quartz!", e);
     		}
-    		
-    		this.producers.put(itemProducer, hazelcastRunnableProducer);
 		}
     }
 
     /**
-     * Verifies if the thread {@link HazelcastRunnableConsumer} associated to this {@link ItemProcessor} is running.
-     * @param itemProcessor item processor to verifies if is running
-     * @return <code>true</code> if thread is running, <code>false</code> otherwise
+     * Verifies if the thread {@link HazelcastCallableConsumer} associated to this {@link ItemProcessor} had its task done.
+     * @param itemProcessor item processor to verifies if the task was done
+     * @return <code>true</code> if the task was done, <code>false</code> otherwise
      * @since 1.0.0
      */
-    public boolean isRunning(ItemProcessor<T> itemProcessor) {
-    	boolean isRunning = false;
+    public boolean isDone(ItemProcessor<T> itemProcessor) {
+    	boolean isDone = true;
     	
     	if (this.processors.containsKey(itemProcessor)) {
-			isRunning = this.processors.get(itemProcessor).isRunning();
+			isDone = this.processors.get(itemProcessor).stream().allMatch(future -> future.isDone());
 		}
     	
-    	return isRunning;
+    	return isDone;
     }
     
     /**
-     * Verifies if the thread {@link HazelcastRunnableProducer} associated to this {@link ItemProducer} is running
-     * OR if there any {@link TriggerKey} scheduled for this producer.
-     * @param itemProducer item producer to verifies if is running
-     * @return <code>true</code> if thread is running OR if there is any trigger scheduled, <code>false</code> otherwise
+     * Verifies if the thread {@link HazelcastCallableProducer} associated to this {@link ItemProducer} had its task done
+     * (there is none {@link TriggerKey} scheduled for this producer).
+     * @param itemProducer item producer to verifies if the task was done
+     * @return <code>true</code> if there is none trigger scheduled, <code>false</code> otherwise
      * @since 1.0.0
      */
-    public boolean isRunning(ItemProducer<T> itemProducer) {
-    	boolean isRunning = false;
+    public boolean isDone(ItemProducer<T> itemProducer) {
+    	boolean isDone = true;
     	
     	if (this.producers.containsKey(itemProducer)) {
-			isRunning = this.producers.get(itemProducer).isRunning();
 			try {
-				// Considers a job running if the thread is running or there is an schedule for this producer
-				isRunning |= this.itemProducerScheduler.checkExists(new TriggerKey(itemProducer.getClass().getSimpleName(), ClusterWorkerConstants.CW_QUARTZ_SCHEDULLER_NAME));
+				// Considers a job running if there is an schedule for this producer
+				isDone = !this.itemProducerScheduler.checkExists(new TriggerKey(itemProducer.getClass().getSimpleName(), ClusterWorkerConstants.CW_QUARTZ_SCHEDULLER_NAME));
 			} catch (SchedulerException e) {
 				logger.error("Could not check if quartz triggers exists. The thread running state will be returned!", e);
 			}
 		}
     	
-    	return isRunning;
+    	return isDone;
     }
     
     /**
@@ -196,7 +195,8 @@ public final class ClusterWorker<T> {
 
 		logger.warn("Shuttingdown ClusterWorker!");
 		
-		this.processors.values().forEach(HazelcastRunnableConsumer::shutdown);
+		this.processors.values()
+				.forEach(futures -> futures.forEach(future -> future.cancel(true)));
 		
 		try {
 			for (ItemProducer<T> itemProducer : this.producers.keySet()) {
@@ -206,11 +206,11 @@ public final class ClusterWorker<T> {
 					this.itemProducerScheduler.unscheduleJob(producerTriggerKey);
 				}
 			}
-			
+
 		} catch (SchedulerException e) {
 			logger.error("Could not unsheduling Quartz Triggers", e);
 		}
-		
+
 		// Clears lists
 		this.producers.clear();
 		this.processors.clear();
@@ -276,7 +276,7 @@ public final class ClusterWorker<T> {
 	public void shutdown(ItemProcessor<T> itemProcessor) {
 		if (this.processors.containsKey(itemProcessor)) {
 			logger.warn(String.format("Shutdown ItemProcessor '%s'!", itemProcessor.getClass().getSimpleName()));
-			this.processors.get(itemProcessor).shutdown();
+			this.processors.get(itemProcessor).forEach(future -> future.cancel(true));
 			this.processors.remove(itemProcessor);
 		}
 	}

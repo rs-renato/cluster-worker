@@ -8,25 +8,24 @@ import com.hazelcast.core.HazelcastInstanceNotActiveException;
 
 import br.gov.go.sefaz.clusterworker.core.exception.ItemProcessorException;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
-import br.gov.go.sefaz.clusterworker.core.listener.ShutdownListener;
+
+import java.util.concurrent.Callable;
 
 /**
- * Runnable of {@link HazelcastQueueConsumer}, responsible for process {@link ItemProcessor} client's implementation.
+ * Callable of {@link HazelcastQueueConsumer}, responsible for process {@link ItemProcessor} client's implementation.
  * @author renato.rsilva
  * @since 1.0.0
- * @param <T> type which this runnable will handle.
+ * @param <T> type which this callable will handle.
  */
-public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T> implements Runnable, ShutdownListener{
+public final class HazelcastCallableConsumer<T> extends HazelcastQueueConsumer<T> implements Callable<Void>{
 
 	private static final transient long serialVersionUID = 5404415194904610053L;
-	private static final transient Logger logger = LogManager.getLogger(HazelcastRunnableConsumer.class);
-    
-	private volatile boolean stopped;
+	private static final transient Logger logger = LogManager.getLogger(HazelcastCallableConsumer.class);
 
     private ItemProcessor<T> itemProcessor;
 
     /**
-     * Constructor of HazelcastRunnableConsumer
+     * Constructor of HazelcastCallableConsumer
      * @param itemProcessor ItemProcessor client's implementation.
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
@@ -34,15 +33,15 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
      * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
      * @since 1.0.0
      */
-    public HazelcastRunnableConsumer(ItemProcessor<T> itemProcessor, HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
+    public HazelcastCallableConsumer(ItemProcessor<T> itemProcessor, HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
         super(hazelcastInstance, queueName, consumerStrategy, timeout);
         this.itemProcessor = itemProcessor;
     }
 
     @Override
-    public void run() {
+    public Void call() {
 
-		String consumerThreadName = getRunnableConsumerdName();
+		String consumerThreadName = getCallableConsumerdName();
 
 		logger.info(String.format("Starting thread '%s'..", consumerThreadName));
 		
@@ -61,7 +60,6 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
                 
             } catch (InterruptedException|HazelcastInstanceNotActiveException e) {
                 logger.error(String.format("Cannot consume from hazelcast '%s' queue! This thread will die! Reason: %s", queueName, e));
-                shutdown();
                 Thread.currentThread().interrupt();
             }catch (ItemProcessorException e){
     			logger.error(String.format("Cannot process on client's implementation! Reason: %s", e.getMessage()));
@@ -71,21 +69,16 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
         }
 
         logger.warn(String.format("Thread execution '%s' FINISHED!", consumerThreadName));
+        return null;
     }
-    
-	@Override
-	public void shutdown() {
-		logger.warn(String.format("Shutting down '%s'..", Thread.currentThread().getName()));
-		this.stopped = true;
-	}
 	
     /**
-     * Verifies if this runnable is running.
+     * Verifies if this callable is running.
      * @return <code>true</code> if thread is running, <code>false</code> otherwise.
      * @since 1.0.0
      */
-    public boolean isRunning() {
-    	return !this.stopped;
+    private boolean isRunning() {
+    	return !Thread.currentThread().isInterrupted();
     }
 
     /**
@@ -94,7 +87,7 @@ public final class HazelcastRunnableConsumer<T> extends HazelcastQueueConsumer<T
      * @since 1.0.0
      */
     @SuppressWarnings("deprecation")
-	private String getRunnableConsumerdName() {
+	private String getCallableConsumerdName() {
     	String threadName = String.format("%s.consumer[%s]-", hazelcastInstance.getName(), itemProcessor.getClass().getSimpleName());
 		long threadCount = hazelcastInstance.getAtomicLong(threadName).getAndIncrement();
 		return threadName + threadCount;

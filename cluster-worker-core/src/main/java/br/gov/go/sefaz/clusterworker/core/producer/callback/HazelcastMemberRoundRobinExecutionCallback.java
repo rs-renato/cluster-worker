@@ -12,7 +12,7 @@ import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobin;
  * @author renato.rsilva
  * @since 1.0.0
  */
-public class HazelcastMemberRoundRobinExecutionCallback implements ExecutionCallback<Object> {
+public class HazelcastMemberRoundRobinExecutionCallback implements ExecutionCallback<Void> {
 
 	private static final Logger logger = LogManager.getLogger(HazelcastMemberRoundRobinExecutionCallback.class);
 
@@ -28,7 +28,7 @@ public class HazelcastMemberRoundRobinExecutionCallback implements ExecutionCall
 	}
 
 	@Override
-	public void onResponse(Object response) {
+	public void onResponse(Void response) {
 		logger.debug("ExecutionCallback was succesfully executed!");
 		hazelcastMemberRoundRobin.advance();
 	}

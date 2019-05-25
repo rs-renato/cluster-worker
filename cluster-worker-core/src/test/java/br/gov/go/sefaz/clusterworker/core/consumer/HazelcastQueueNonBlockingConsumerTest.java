@@ -7,18 +7,21 @@ import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.item.producer.IntegerItemProducer;
 import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
+import org.junit.runners.MethodSorters;
 
 /**
  * HazelcastQueueConsumer example of use in non-blocking way
  * @author renato.rsilva
  * @since 1.0.0
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class HazelcastQueueNonBlockingConsumerTest {
 
 	private static ClusterWorkerFactory cwFactory = ClusterWorkerFactory.getInstance(TestConstants.CW_NAME);
@@ -37,7 +40,7 @@ public class HazelcastQueueNonBlockingConsumerTest {
 	}
 
 	@Test
-	public void shouldExecuteHazelcastQueueConsumerAcceptNull() throws InterruptedException {
+	public void CW_T01_shouldExecuteHazelcastQueueConsumerAcceptNull() throws InterruptedException {
 
         // Creates an consumer to consumes the hazelcast queue
 		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_INTEGER_QUEUE_NAME, ConsumerStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT);

@@ -5,14 +5,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.Member;
+import org.junit.runners.MethodSorters;
 
 
 /**
@@ -20,6 +18,7 @@ import com.hazelcast.core.Member;
  * @author renato.rsilva
  * @since 1.0.0
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class HazelcastMemberRoundRobinTest {
 
 	private static int INSTANCES_QUANTITY	= 3; 
@@ -37,7 +36,7 @@ public class HazelcastMemberRoundRobinTest {
 	}
 	
 	@Test
-    public void shouldRoundRobinMember() {
+    public void CW_T01_shouldRoundRobinMember() {
         
 		HazelcastMemberRoundRobin hazelcastMemberRoundRobin = new HazelcastMemberRoundRobin(hazelcastInscantes.iterator().next(), "roundrobin");
 		  

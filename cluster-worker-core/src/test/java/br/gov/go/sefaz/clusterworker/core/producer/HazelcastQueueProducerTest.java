@@ -7,18 +7,21 @@ import java.util.ArrayList;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 
 import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueConsumer;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
+import org.junit.runners.MethodSorters;
 
 /**
  * HazelcastQueueProducer example of use
  * @author renato.rsilva
  * @since 1.0.0
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class HazelcastQueueProducerTest {
 
     private static ClusterWorkerFactory cwFactory;
@@ -35,7 +38,7 @@ public class HazelcastQueueProducerTest {
 	}
 	
     @Test
-	public void shouldExecuteHazelcastQueueProducer() throws InterruptedException {
+	public void CW_T01_shouldExecuteHazelcastQueueProducer() throws InterruptedException {
 
         // Creates an producer to produces into hazelcast queue
 		HazelcastQueueProducer<Integer> hazelcastQueueProducer = cwFactory.getHazelcastQueueProducer(TestConstants.CW_INTEGER_QUEUE_NAME);
@@ -48,7 +51,7 @@ public class HazelcastQueueProducerTest {
 	}
     
     @Test
-   	public void shouldExecuteHazelcastQueueConsumer() throws InterruptedException {
+   	public void CW_T02_shouldExecuteHazelcastQueueConsumer() throws InterruptedException {
         // Creates an consumer to consumes from hazelcast queue
    		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_INTEGER_QUEUE_NAME, ConsumerStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT);
 

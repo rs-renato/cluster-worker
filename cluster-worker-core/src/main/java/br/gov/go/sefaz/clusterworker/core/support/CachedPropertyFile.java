@@ -21,7 +21,7 @@ import br.gov.go.sefaz.clusterworker.core.exception.ClusterWorkerException;
  * @author renato.rsilva
  * @since 1.0.0
  */
-class CachedPropertyFile{
+public class CachedPropertyFile{
 
     private static final Logger logger = LogManager.getLogger(CachedPropertyFile.class);
 

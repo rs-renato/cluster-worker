@@ -18,8 +18,8 @@
       - [HazelcastQueueProducer ](#hazelcastqueueproducer )
       - [HazelcastQueueConsumer](#hazelcastqueueconsumer)
   * [From API Perspective: Producer vs Consumer](#from-api-perspective-producer-vs-consumer)
-     - [HazelcastRunnableProducer](#hazelcastrunnableproducer)
-     - [HazelcastRunnableConsumer](#hazelcastrunnableconsumer)
+     - [HazelcastCallableProducer](#hazelcastcallableproducer)
+     - [HazelcastCallableConsumer](#hazelcastcallableconsumer)
   * [Configurations](#configurations)
   * [Cluster Worker Class Diagram](#cluster-worker-class-diagram)          
 
@@ -32,7 +32,7 @@
 Cluster Worker knows how to manage client's tasks, everything you need is provide an implementation for producing and processing data. CW was designed to be task based, and comes in two flavors:
 
 ### Item Producer
-`ItemProducer's` are tasks managed by `HazelcastRunnableProducer` located into each cluster's node, but **only one will be activated at time, in roundrobin strategy, taking turns between nodes**. This task is responsible to execute a client's implementation  to obtain some items from any source, and CW's internals will put these items on hazelcast distributed queue. It can produce from source as files, web-services, database or whatever kind of source as you need.
+`ItemProducer's` are tasks managed by `HazelcastCallableProducer` located into each cluster's node, but **only one will be activated at time, in roundrobin strategy, taking turns between nodes**. This task is responsible to execute a client's implementation  to obtain some items from any source, and CW's internals will put these items on hazelcast distributed queue. It can produce from source as files, web-services, database or whatever kind of source as you need.
 
 >*Note: You can have as many different item producer as you need, but in a cluster environment this task will produce only in one cluster's node to ensure the data won't be produced repeatedly and cause inconsistent processing. If a node fails, there is no problem, this producer is redundant beyond the entire cluster nodes and executed in a roundrobin strategy to grant HA producing and balancing.*
 
@@ -62,7 +62,7 @@ public class IntegerItemProducer implements ItemProducer<Integer> {
 ```
         
 ### Item Processor
-`ItemProcessor's` are tasks managed by `HazelcastRunnableConsumer` allocated into each cluster's node (multithread per node). This task is responsible to execute the client's implementation to processing some data read from hazelcast distributed queue. It can process to files (eg. exporting a xml/json), database, web-services, pdf generation, etc.
+`ItemProcessor's` are tasks managed by `HazelcastCallableConsumer` allocated into each cluster's node (multithread per node). This task is responsible to execute the client's implementation to processing some data read from hazelcast distributed queue. It can process to files (eg. exporting a xml/json), database, web-services, pdf generation, etc.
 
 The example below shows an example of `ItemProcessor` which process one integer obtained from hazelcast distributed queue named `cw.example.queue` with `ConsumerStrategy.WAIT_ON_AVAILABLE` defined to wait an item until it become available (blocking way) and executing with 02 workers (Threads):
 
@@ -149,13 +149,13 @@ for (int i = 0; i < 100; i++) {
 
 ## From API Perspective: Producer vs Consumer
 
-As said, Cluster Worker is an API based on `producer vs consumer architecture`. It uses hazelcast distibuted queue to  exchange data through the cluster members. Its internal uses  `Runnable's` that encapsulate the client's implementation of `ItemProducer` and `ItemConsumer`. It comes in two flavors:
+As said, Cluster Worker is an API based on `producer vs consumer architecture`. It uses hazelcast distibuted queue to  exchange data through the cluster members. Its internal uses  `Callable's` that encapsulate the client's implementation of `ItemProducer` and `ItemConsumer`. It comes in two flavors:
 
-### HazelcastRunnableProducer
-`WorkerProducer` is a `runnable` that encapsulate a `ItemProduce` and calls the client's implementation for producing data; This `runnable` will be present in all cluster node, however, will be active at once in an atomic cycle, this means that this `runnable` will die after the production process.
+### HazelcastCallableProducer
+`WorkerProducer` is a `callable` that encapsulate a `ItemProduce` and calls the client's implementation for producing data; This `callable` will be present in all cluster node, however, will be active at once in an atomic cycle, this means that this `callable` will die after the production process.
 
-### HazelcastRunnableConsumer
-`WorkerConsumer` is a `runnable` that encapsulate a `ItemProcess` and calls the client's implementation for processing data; These `runnables` are present and active in all cluster nodes, and lives till the cluster member lives.
+### HazelcastCallableConsumer
+`WorkerConsumer` is a `callable` that encapsulate a `ItemProcess` and calls the client's implementation for processing data; These `callables` are present and active in all cluster nodes, and lives till the cluster member lives.
 
 ## Configurations
 Cw defines a file `cw-network.properties` with the following mandatory property values:

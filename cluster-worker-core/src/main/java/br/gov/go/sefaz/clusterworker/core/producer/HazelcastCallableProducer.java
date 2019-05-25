@@ -2,6 +2,7 @@ package br.gov.go.sefaz.clusterworker.core.producer;
 
 
 import java.util.Collection;
+import java.util.concurrent.Callable;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,37 +14,34 @@ import br.gov.go.sefaz.clusterworker.core.exception.ItemProducerException;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 
 /**
- * Runnable of {@link HazelcastQueueProducer}, responsible for produces {@link ItemProducer} client's implementation.
+ * Callable of {@link HazelcastQueueProducer}, responsible for produces {@link ItemProducer} client's implementation.
  * @author renato.rsilva
  * @since 1.0.0
- * @param <T> type which this runnable will handle.
+ * @param <T> type which this callable will handle.
  */
-public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<T> implements Runnable{
+public final class HazelcastCallableProducer<T>  extends HazelcastQueueProducer<T> implements Callable<Void> {
 
 	private static final transient long serialVersionUID = 2538609461091747126L;
-	private static final transient Logger logger = LogManager.getLogger(HazelcastRunnableProducer.class);
-	
-	private volatile boolean isRunning;
-	
+	private static final transient Logger logger = LogManager.getLogger(HazelcastCallableProducer.class);
+
     private ItemProducer<T> itemProducer;
 
     /**
-     * Constructor of HazelcastRunnableProducer
+     * Constructor of HazelcastCallableProducer
      * @param itemProducer ItemProducer client's implementation.
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
      * @since 1.0.0
      */
-    public HazelcastRunnableProducer(ItemProducer<T> itemProducer, HazelcastInstance hazelcastInstance, String queueName) {
+    public HazelcastCallableProducer(ItemProducer<T> itemProducer, HazelcastInstance hazelcastInstance, String queueName) {
     	 super(hazelcastInstance, queueName);
          this.itemProducer = itemProducer;
     }
 
     @Override
-    public void run() {
+    public Void call() {
 
-    	this.isRunning = true;
-		String producerThreadName = getRunnableProducerName();
+		String producerThreadName = getCallableProducerName();
 		logger.info(String.format("Starting thread '%s'..", producerThreadName));
 		
 		try{
@@ -64,25 +62,17 @@ public final class HazelcastRunnableProducer<T>  extends HazelcastQueueProducer<
 			logger.error(String.format("A general error occurs process on '%s'", producerThreadName), e);
         }
     	
-		this.isRunning = false;
 		logger.info(String.format("[%s] - Thread '%s' execution FINISHED!", Thread.currentThread().getName(), producerThreadName));
+
+		return null;
     }
 
-	 /**
-     * Verifies if this runnable is running.
-     * @return <code>true</code> if thread is running, <code>false</code> otherwise.
-     * @since 1.0.0
-     */
-    public boolean isRunning() {
-    	return this.isRunning;
-    }
-    
     /**
      * Retrieves the unique thread name for this producer
      * @return the unique producer thread name
      * @since 1.0.0
      */
-    private String getRunnableProducerName() {
+    private String getCallableProducerName() {
     	return String.format("%s.producer[%s]", hazelcastInstance.getName(), itemProducer.getClass().getSimpleName());
     }
 }

@@ -15,11 +15,11 @@ import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
 import br.gov.go.sefaz.clusterworker.core.consumer.Consumer;
 import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueConsumer;
-import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastRunnableConsumer;
+import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastCallableConsumer;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducer;
-import br.gov.go.sefaz.clusterworker.core.producer.HazelcastRunnableProducer;
+import br.gov.go.sefaz.clusterworker.core.producer.HazelcastCallableProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.Producer;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
@@ -52,7 +52,7 @@ public class ClusterWorkerFactory {
     /**
      * Creates a new ClusterWorkerFactory with the given from hazelcast instance name.
      * The {@link HazelcastInstance} is mantained into this factory, that means all
-     * objects created from this factory ({@link ClusterWorker}, {@link HazelcastRunnableConsumer}, {@link HazelcastRunnableProducer},
+     * objects created from this factory ({@link ClusterWorker}, {@link HazelcastCallableConsumer}, {@link HazelcastCallableProducer},
      * {@link HazelcastQueueProducer}, {@link HazelcastQueueConsumer}), will keep its reference.
      * @return a ClusterWorkerFactory instance
      * @since 1.0.0
@@ -65,7 +65,7 @@ public class ClusterWorkerFactory {
     /**
      * Creates a new ClusterWorkerFactory with the given from hazelcast instance.
      * The {@link HazelcastInstance} is mantained into this factory, that means all
-     * objects created from this factory ({@link ClusterWorker}, {@link HazelcastRunnableConsumer}, {@link HazelcastRunnableProducer},
+     * objects created from this factory ({@link ClusterWorker}, {@link HazelcastCallableConsumer}, {@link HazelcastCallableProducer},
      * {@link HazelcastQueueProducer}, {@link HazelcastQueueConsumer}), will keep its reference.
      * @return a ClusterWorkerFactory instance
      * @since 1.0.0
@@ -96,27 +96,27 @@ public class ClusterWorkerFactory {
     }
 
     /**
-     * Create a new {@link HazelcastRunnableConsumer} instance of T type.
-     * @param itemProcessor the item process that will be executed by this {@link HazelcastRunnableConsumer}.
-     * @return {@link HazelcastRunnableConsumer} instance
+     * Create a new {@link HazelcastCallableConsumer} instance of T type.
+     * @param itemProcessor the item process that will be executed by this {@link HazelcastCallableConsumer}.
+     * @return {@link HazelcastCallableConsumer} instance
      * @since 1.0.0
      */
-    public <T> HazelcastRunnableConsumer<T> getHazelcastRunnableConsumer(ItemProcessor<T> itemProcessor){
-    	//Assert mandatory exception to create an HazelcastRunnableConsumer
+    public <T> HazelcastCallableConsumer<T> getHazelcastCallableConsumer(ItemProcessor<T> itemProcessor){
+    	//Assert mandatory exception to create an HazelcastCallableConsumer
         ConsumeFromQueue consumeFromQueue = AnnotationSupport.assertMandatoryAnnotation(itemProcessor, ConsumeFromQueue.class);
-        HazelcastRunnableConsumer<T> hazelcastRunnableConsumer = new HazelcastRunnableConsumer<>(itemProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
-		logger.debug(String.format("Created HazelcastRunnableProducer: %s", hazelcastRunnableConsumer));
-		return hazelcastRunnableConsumer;
+        HazelcastCallableConsumer<T> hazelcastCallableConsumer = new HazelcastCallableConsumer<>(itemProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
+		logger.debug(String.format("Created HazelcastCallableProducer: %s", hazelcastCallableConsumer));
+		return hazelcastCallableConsumer;
     }
 
     /**
-     * Create a new {@link HazelcastRunnableProducer} instance of T type.
-     * @param itemProducer the item process that will be executed by this {@link HazelcastRunnableProducer}.
-     * @return {@link HazelcastRunnableProducer} instance
+     * Create a new {@link HazelcastCallableProducer} instance of T type.
+     * @param itemProducer the item process that will be executed by this {@link HazelcastCallableProducer}.
+     * @return {@link HazelcastCallableProducer} instance
      * @since 1.0.0
      */
-    public <T> HazelcastRunnableProducer<T> getHazelcastRunnableProducer(ItemProducer<T> itemProducer){
-    	//Assert mandatory exception to create an HazelcastRunnableProducer
+    public <T> HazelcastCallableProducer<T> getHazelcastCallableProducer(ItemProducer<T> itemProducer){
+    	//Assert mandatory exception to create an HazelcastCallableProducer
         ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
         
         String queueName = produceToQueue.queueName();
@@ -129,9 +129,9 @@ public class ClusterWorkerFactory {
 				.setMaxSize(produceToQueue.maxSize());
 		}
 		
-		HazelcastRunnableProducer<T> hazelcastRunnableProducer = new HazelcastRunnableProducer<>(itemProducer, hazelcastInstance, queueName);
-        logger.debug(String.format("Created HazelcastRunnableProducer: %s", hazelcastRunnableProducer));
-		return hazelcastRunnableProducer;
+		HazelcastCallableProducer<T> hazelcastCallableProducer = new HazelcastCallableProducer<>(itemProducer, hazelcastInstance, queueName);
+        logger.debug(String.format("Created HazelcastCallableProducer: %s", hazelcastCallableProducer));
+		return hazelcastCallableProducer;
     }
 
     /**
