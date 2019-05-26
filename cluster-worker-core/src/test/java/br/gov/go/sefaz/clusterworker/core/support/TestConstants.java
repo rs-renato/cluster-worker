@@ -51,5 +51,5 @@ public class TestConstants {
     /**
      * Time to execute a test (in seconds)
      */
-	public static final long CW_EXECUTION_TIME 					= 30;
+	public static final long CW_EXECUTION_TIME 					= 20;
 }

@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.QueueConfig;
 import com.hazelcast.core.HazelcastInstance;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
@@ -123,10 +124,12 @@ public class ClusterWorkerFactory {
         
         // Configures the queue size if this configuration wasn't set
         Config config = this.hazelcastInstance.getConfig();
+        
 		if (!config.getQueueConfigs().containsKey(queueName)) {
-	        logger.debug(String.format("Updatig queue '%s' size to %s", produceToQueue.queueName(), produceToQueue.maxSize()));
-			config.getQueueConfig(queueName)
-				.setMaxSize(produceToQueue.maxSize());
+            logger.debug(String.format("Updatig queue '%s' size to %s", produceToQueue.queueName(), produceToQueue.maxSize()));
+            QueueConfig queueConfig = new QueueConfig(queueName);
+            queueConfig.setMaxSize(produceToQueue.maxSize());
+            config.addQueueConfig(queueConfig);
 		}
 		
 		HazelcastCallableProducer<T> hazelcastCallableProducer = new HazelcastCallableProducer<>(itemProducer, hazelcastInstance, queueName);
