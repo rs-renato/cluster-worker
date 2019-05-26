@@ -3,6 +3,7 @@ package br.gov.go.sefaz.clusterworker.core;
 import java.util.*;
 import java.util.concurrent.Future;
 
+import br.gov.go.sefaz.clusterworker.core.support.ItemSupport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quartz.CronScheduleBuilder;
@@ -45,7 +46,6 @@ public final class ClusterWorker<T> {
 	private static final Logger logger = LogManager.getLogger(ClusterWorker.class);
 
     private final HazelcastInstance hazelcastInstance;
-    private final IExecutorService executorService;
     private Scheduler itemProducerScheduler = initializeScheduler();
     
     private final Map<ItemProcessor<T>, List<Future<Void>>> processors = new HashMap<>();
@@ -58,7 +58,6 @@ public final class ClusterWorker<T> {
      */
     public ClusterWorker(HazelcastInstance hazelcastInstance) {
     	this.hazelcastInstance = hazelcastInstance;
-        this.executorService = hazelcastInstance.getExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
     }
     
     /**
@@ -75,19 +74,24 @@ public final class ClusterWorker<T> {
     		ConsumeFromQueue consumeFromQueue = AnnotationSupport.assertMandatoryAnnotation(itemProcessor, ConsumeFromQueue.class);
     		
     		// Number of workers (threads)
-    		int workers = consumeFromQueue.workers();
+			int workers = consumeFromQueue.workers();
+			String itemProcessorName = itemProcessor.getClass().getSimpleName();
     		
     		logger.info(String.format("Configuring ItemProcessor '%s' [queueName=%s, strategy=%s, timeout=%s, workers=%s]",
-    				itemProcessor.getClass().getSimpleName(), consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout(), workers));
+					itemProcessorName, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout(), workers));
     		
     		// Creates worker (HazelcastCallableConsumer)
     		HazelcastCallableConsumer<T> hazelcastCallableConsumer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastCallableConsumer(itemProcessor);
 			ArrayList<Future<Void>> futures = new ArrayList<>();
 
+			String executorServiceName = ItemSupport.getExecutorServiceNameFor(itemProcessor);
+			// Creates an executor service per itemProcessor. That's because itemProcessors are long running threads managed by that executor
+			IExecutorService executorService = this.hazelcastInstance.getExecutorService(executorServiceName);
+
 			for (int i = 0; i <  workers; i++) {
     			try {
     				// Executes the consumer on hazelcast local member
-					futures.add(this.executorService.submitToMember(hazelcastCallableConsumer, getLocalMember()));
+					futures.add(executorService.submitToMember(hazelcastCallableConsumer, getLocalMember()));
 				}catch (Exception e){
     				logger.error("Cannot execute a ItemProcessor on hazelcast executor service!", e);
     			}
@@ -117,7 +121,7 @@ public final class ClusterWorker<T> {
     		// Creates the Producer and its configuration
     		HazelcastCallableProducer<T> hazelcastCallableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastCallableProducer(itemProducer);
     		
-    		HazelcastCallableProducerSubmitterConfiguration produceConfig = new HazelcastCallableProducerSubmitterConfiguration(itemProducerName, hazelcastInstance, executorService, hazelcastCallableProducer);
+    		HazelcastCallableProducerSubmitterConfiguration produceConfig = new HazelcastCallableProducerSubmitterConfiguration(itemProducerName, hazelcastInstance, hazelcastCallableProducer);
     		
     		// Creates the trigger
     		TriggerKey triggerKey = new TriggerKey(itemProducerName, ClusterWorkerConstants.CW_QUARTZ_SCHEDULLER_NAME);
@@ -194,10 +198,24 @@ public final class ClusterWorker<T> {
 	public void shutdown() {
 
 		logger.warn("Shuttingdown ClusterWorker!");
-		
+
+		// Shutdown all processors executor services 
+		if (HazelcastSupport.isHazelcastInstanceRunning(this.hazelcastInstance)){
+
+			this.processors.keySet().forEach(itemProcessor -> {
+				String executorServiceName = ItemSupport.getExecutorServiceNameFor(itemProcessor); 
+				logger.warn(String.format("Shutdown executor service '%s'", executorServiceName));
+				IExecutorService executorService = this.hazelcastInstance.getExecutorService(executorServiceName);
+				executorService.shutdownNow();
+				executorService.destroy();
+			});
+		}
+
+		// Cancels all processors futures 
 		this.processors.values()
 				.forEach(futures -> futures.forEach(future -> future.cancel(true)));
 		
+		// Unschedule all quartz scheduler task
 		try {
 			for (ItemProducer<T> itemProducer : this.producers.keySet()) {
 	    		TriggerKey producerTriggerKey = new TriggerKey(itemProducer.getClass().getSimpleName(), ClusterWorkerConstants.CW_QUARTZ_SCHEDULLER_NAME);
@@ -232,6 +250,7 @@ public final class ClusterWorker<T> {
 			this.hazelcastInstance.getLifecycleService().shutdown();
 			logger.warn("Hazelcast LifecycleService finished!");
 			
+			// Shutdown quartz scheduler
 			try {
 				if (!this.itemProducerScheduler.isShutdown()) {
 					this.itemProducerScheduler.shutdown();
@@ -278,6 +297,10 @@ public final class ClusterWorker<T> {
 			logger.warn(String.format("Shutdown ItemProcessor '%s'!", itemProcessor.getClass().getSimpleName()));
 			this.processors.get(itemProcessor).forEach(future -> future.cancel(true));
 			this.processors.remove(itemProcessor);
+			// Shutdown executor service associated to this processor
+			IExecutorService executorService = this.hazelcastInstance.getExecutorService(ItemSupport.getExecutorServiceNameFor(itemProcessor));
+			executorService.shutdownNow();
+			executorService.destroy();
 		}
 	}
 	

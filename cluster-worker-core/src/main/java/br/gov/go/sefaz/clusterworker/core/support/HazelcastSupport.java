@@ -73,7 +73,12 @@ public final class HazelcastSupport {
         Config config = new Config(hazelcastInstanceName);
         // Configures the log
         config.setProperty("hazelcast.logging.type", ClusterWorkerConstants.CW_LOGGING_TYPE);
-        
+        // Configures hz threads
+        config.setProperty("hazelcast.event.thread.count", "2");
+        config.setProperty("hazelcast.io.thread.count", "2");
+        config.setProperty("hazelcast.operation.thread.count", "2");
+        config.setProperty("hazelcast.operation.generic.thread.count", "2");
+
         // Configures group
         config.getGroupConfig()
     		.setName(hazelcastInstanceName);
@@ -90,8 +95,8 @@ public final class HazelcastSupport {
 
         // Configures Rest Api
         network.setRestApiConfig(new RestApiConfig()
-        			.setEnabled(true)
-        			.enableGroups(RestEndpointGroupSupport.converToRestEndpointGroup(restApiGroups)));
+        	.setEnabled(true)
+        	.enableGroups(RestEndpointGroupSupport.converToRestEndpointGroup(restApiGroups)));
         
         // Configure TPC-IP configuration 
         JoinConfig join = network.getJoin();
@@ -105,9 +110,11 @@ public final class HazelcastSupport {
         	.setConnectionTimeoutSeconds(timeout)
         	.addMember(ipMember);
 
-        // Configure Scheduel Executor Service used to schedule Producers
-        config.getScheduledExecutorConfig(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME)
-        	.setPoolSize(maxPoolSize);
+        // Configures Executor Service used to execute producers
+        config.getExecutorConfig("default")
+            .setPoolSize(maxPoolSize)
+            .setStatisticsEnabled(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_STATISTICS_ENABLED_DEFAULT)
+            .setQueueCapacity(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_QUEUE_CAPACITY_DEFAULT);
 
         logger.info(String.format("Hazelcast configurations finished: %s", config));
 

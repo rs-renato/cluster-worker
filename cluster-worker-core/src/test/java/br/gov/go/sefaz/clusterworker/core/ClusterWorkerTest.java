@@ -57,4 +57,18 @@ public class ClusterWorkerTest {
         stringClusterWorker.shutdown(stringItemProcessor);
         Assert.assertTrue(stringClusterWorker.isDone(stringItemProcessor));
     }
+
+    @Test
+    public void CW_T05_shouldReExecuteItemProducer() {
+        // Execute the item produder on cluster worker
+        stringClusterWorker.executeItemProducer(stringItemProducer);
+    }
+
+    @Test
+    public void CW_T06_shouldReExecuteItemProcessor() throws InterruptedException {
+        // Execute the item processor on cluster worker
+        stringClusterWorker.executeItemProccessor(stringItemProcessor);
+        // Just process for a while
+        TimeUnit.SECONDS.sleep(TestConstants.CW_EXECUTION_TIME);
+    }
 }

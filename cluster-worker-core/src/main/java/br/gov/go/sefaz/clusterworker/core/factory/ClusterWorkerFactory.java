@@ -3,16 +3,19 @@ package br.gov.go.sefaz.clusterworker.core.factory;
 import java.util.HashSet;
 import java.util.Set;
 
+import br.gov.go.sefaz.clusterworker.core.support.ItemSupport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.ExecutorConfig;
 import com.hazelcast.config.QueueConfig;
 import com.hazelcast.core.HazelcastInstance;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.annotation.ConsumeFromQueue;
 import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
+import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
 import br.gov.go.sefaz.clusterworker.core.consumer.Consumer;
 import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueConsumer;
@@ -105,6 +108,22 @@ public class ClusterWorkerFactory {
     public <T> HazelcastCallableConsumer<T> getHazelcastCallableConsumer(ItemProcessor<T> itemProcessor){
     	//Assert mandatory exception to create an HazelcastCallableConsumer
         ConsumeFromQueue consumeFromQueue = AnnotationSupport.assertMandatoryAnnotation(itemProcessor, ConsumeFromQueue.class);
+
+        // Configures the executor service size if this configuration wasn't set
+        Config config = this.hazelcastInstance.getConfig();
+
+        String executorServiceName = ItemSupport.getExecutorServiceNameFor(itemProcessor);
+
+		int poolSize = consumeFromQueue.workers();
+
+        if(!config.getExecutorConfigs().containsKey(executorServiceName)){
+            logger.debug(String.format("Updating executor service '%s' pool site to '%s' ", executorServiceName, poolSize));
+            ExecutorConfig executorConfig = new ExecutorConfig(executorServiceName, poolSize);
+            executorConfig.setQueueCapacity(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_QUEUE_CAPACITY_DEFAULT);
+            executorConfig.setStatisticsEnabled(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_STATISTICS_ENABLED_DEFAULT);
+            config.addExecutorConfig(executorConfig);
+        }
+
         HazelcastCallableConsumer<T> hazelcastCallableConsumer = new HazelcastCallableConsumer<>(itemProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
 		logger.debug(String.format("Created HazelcastCallableProducer: %s", hazelcastCallableConsumer));
 		return hazelcastCallableConsumer;
@@ -121,16 +140,17 @@ public class ClusterWorkerFactory {
         ProduceToQueue produceToQueue = AnnotationSupport.assertMandatoryAnnotation(itemProducer, ProduceToQueue.class);
         
         String queueName = produceToQueue.queueName();
+        int maxSize = produceToQueue.maxSize();
         
         // Configures the queue size if this configuration wasn't set
         Config config = this.hazelcastInstance.getConfig();
         
 		if (!config.getQueueConfigs().containsKey(queueName)) {
-            logger.debug(String.format("Updatig queue '%s' size to %s", produceToQueue.queueName(), produceToQueue.maxSize()));
+            logger.debug(String.format("Updating queue '%s' size to %s", queueName, maxSize));
             QueueConfig queueConfig = new QueueConfig(queueName);
-            queueConfig.setMaxSize(produceToQueue.maxSize());
+            queueConfig.setMaxSize(maxSize);
             config.addQueueConfig(queueConfig);
-		}
+        }
 		
 		HazelcastCallableProducer<T> hazelcastCallableProducer = new HazelcastCallableProducer<>(itemProducer, hazelcastInstance, queueName);
         logger.debug(String.format("Created HazelcastCallableProducer: %s", hazelcastCallableProducer));

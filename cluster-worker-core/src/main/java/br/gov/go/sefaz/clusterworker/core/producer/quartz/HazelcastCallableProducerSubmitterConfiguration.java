@@ -24,12 +24,11 @@ public class HazelcastCallableProducerSubmitterConfiguration{
      * Constructor for HazelcastCallableProducerSubmitterConfiguration.
      * @param configurationName configuration name to be used as roundrobin key. The roundrobin is per configuration
 	 * @param hazelcastInstance hazelcast instance
-	 * @param executorService executor service
 	 * @param hazelcastCallableProducer callable producer
 	 * @since 1.0.0
 	 */
-	public HazelcastCallableProducerSubmitterConfiguration(String configurationName, HazelcastInstance hazelcastInstance, IExecutorService executorService, HazelcastCallableProducer<?> hazelcastCallableProducer) {
-		this.executorService = executorService;
+	public HazelcastCallableProducerSubmitterConfiguration(String configurationName, HazelcastInstance hazelcastInstance, HazelcastCallableProducer<?> hazelcastCallableProducer) {
+		this.executorService = hazelcastInstance.getExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
 		this.hazelcastCallableProducer = hazelcastCallableProducer;
 		this.hazelcastMemberRoundRobin = new HazelcastMemberRoundRobin(hazelcastInstance, String.format("%s[%s]", ClusterWorkerConstants.CW_ROUND_ROBIN_MEMBER, configurationName));
 		this.hazelcastMemberRoundRobinExecutionCallback = new HazelcastMemberRoundRobinExecutionCallback(hazelcastMemberRoundRobin);

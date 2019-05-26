@@ -10,7 +10,6 @@ public class ClusterWorkerConstants {
 	private ClusterWorkerConstants() {
 	}
 	
-	
 	/***************************************
 	 * 			CW GENERAL CONSTANTS
 	 ***************************************/
@@ -34,13 +33,31 @@ public class ClusterWorkerConstants {
 	public static final String CW_NETWORK_TRUSTED_INTERFACE_DEFAULT		= LOCALHOST_IP;
 
 	/**
-	 * Defines the default number of executor threads per member for the executor.
+	 * Defines the default distributed executor service name
 	 * @since 1.0.0
 	 */
-	public static final int CW_EXECUTOR_SERVICE_MAX_POOL_SIZE_DEFAULT	= 10;
+	public static final String CW_EXECUTOR_SERVICE_NAME 				= "cw.executor.service";
 	
 	/**
 	 * Defines the default number of executor threads per member for the executor.
+	 * @since 1.0.0
+	 */
+	public static final int CW_EXECUTOR_SERVICE_MAX_POOL_SIZE_DEFAULT	= 2;
+
+	/**
+	 * Defines the default number of executor queue capacity.
+	 * @since 1.0.0
+	 */
+	public static final int CW_EXECUTOR_SERVICE_MAX_QUEUE_CAPACITY_DEFAULT	= 100;
+
+	/**
+	 * Defines the default statistics enabled.
+	 * @since 1.0.0
+	 */
+	public static final boolean CW_EXECUTOR_SERVICE_STATISTICS_ENABLED_DEFAULT	= false;
+	
+	/**
+	 * Defines the default rest api groups.
 	 * @since 1.0.0
 	 */
 	public static final String[] CW_REST_API_GROUPS_DEFAULT	= 			new String[] {"HEALTH_CHECK","CLUSTER_WRITE","CLUSTER_READ","DATA"};
@@ -56,12 +73,6 @@ public class ClusterWorkerConstants {
      * @since 1.0.0
      */
     public static final String CW_LOGGING_TYPE 							= "slf4j";
-	
-	/**
-	 * Defines the default distributed executor service name
-	 * @since 1.0.0
-	 */
-    public static final String CW_EXECUTOR_SERVICE_NAME 				= "cw.executor.service";
     
     /**
      * Defines the default name of distributed roundrobin member name  
@@ -87,7 +98,7 @@ public class ClusterWorkerConstants {
 	public static final String CW_QUARTZ_SCHEDULLER_AS_DAEMON			= "true";
 	
 	/**
-     * Defines the default quartz scheduller as daemon thread  
+     * Defines the default quartz job's interruption on shutdown   
      * @since 1.0.0
      */
 	public static final String CW_QUARTZ_INTERRUPT_JOB_ON_SHUTDOWN		= "true";
