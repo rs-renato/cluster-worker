@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -43,7 +44,7 @@ public class HazelcastQueueNonBlockingConsumerTest {
 	public void CW_T01_shouldExecuteHazelcastQueueConsumerAcceptNull() throws InterruptedException {
 
         // Creates an consumer to consumes the hazelcast queue
-		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_INTEGER_QUEUE_NAME, ConsumerStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT);
+		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_INTEGER_QUEUE_NAME, ConsumerStrategy.ACCEPT_NULL, TestConstants.CW_QUEUEE_TIMEOUT, TimeUnit.SECONDS);
 
 		int loop = TestConstants.CW_ITEM_PRODUCER_QUANTITY * 3;
 

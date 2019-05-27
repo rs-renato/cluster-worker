@@ -4,6 +4,7 @@ package br.gov.go.sefaz.clusterworker.core.producer;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -53,7 +54,7 @@ public class HazelcastQueueProducerTest {
     @Test
    	public void CW_T02_shouldExecuteHazelcastQueueConsumer() throws InterruptedException {
         // Creates an consumer to consumes from hazelcast queue
-   		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_INTEGER_QUEUE_NAME, ConsumerStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT);
+   		HazelcastQueueConsumer<Integer> hazelcastQueueConsumer = cwFactory.getHazelcastQueueConsumer(TestConstants.CW_INTEGER_QUEUE_NAME, ConsumerStrategy.WAIT_ON_AVAILABLE, TestConstants.CW_QUEUEE_TIMEOUT, TimeUnit.SECONDS);
 
    		Integer result;
 

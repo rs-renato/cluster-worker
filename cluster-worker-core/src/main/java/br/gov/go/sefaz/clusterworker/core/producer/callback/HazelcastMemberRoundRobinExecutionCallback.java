@@ -29,7 +29,7 @@ public class HazelcastMemberRoundRobinExecutionCallback implements ExecutionCall
 
 	@Override
 	public void onResponse(Void response) {
-		logger.debug("ExecutionCallback was succesfully executed!");
+		logger.trace("ExecutionCallback was succesfully executed!");
 		hazelcastMemberRoundRobin.advance();
 	}
 

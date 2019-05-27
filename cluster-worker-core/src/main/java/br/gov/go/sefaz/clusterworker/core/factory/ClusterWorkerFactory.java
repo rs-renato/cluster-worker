@@ -2,6 +2,7 @@ package br.gov.go.sefaz.clusterworker.core.factory;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import br.gov.go.sefaz.clusterworker.core.support.ItemSupport;
 import org.apache.logging.log4j.LogManager;
@@ -124,7 +125,7 @@ public class ClusterWorkerFactory {
             config.addExecutorConfig(executorConfig);
         }
 
-        HazelcastCallableConsumer<T> hazelcastCallableConsumer = new HazelcastCallableConsumer<>(itemProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout());
+        HazelcastCallableConsumer<T> hazelcastCallableConsumer = new HazelcastCallableConsumer<>(itemProcessor, hazelcastInstance, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout(), consumeFromQueue.timeUnit());
 		logger.debug(String.format("Created HazelcastCallableProducer: %s", hazelcastCallableConsumer));
 		return hazelcastCallableConsumer;
     }
@@ -170,26 +171,41 @@ public class ClusterWorkerFactory {
     }
     
     /**
-     * Create a new {@link HazelcastQueueConsumer} instance of T type.
+     * Create a new {@link HazelcastQueueConsumer} instance of T type, using the default configuration for timeout and non-blocking strategy.
      * @param queueName queue name
-     * @param consumerStrategy Consumer queue strategy
-     * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
      * @return {@link HazelcastQueueConsumer} instance
      * @since 1.0.0
+     * @see {@link ConsumerStrategy#ACCEPT_NULL}
      */
-    public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, ConsumerStrategy consumerStrategy, int timeout){
-    	HazelcastQueueConsumer<T> hazelcastQueueConsumer = new HazelcastQueueConsumer<>(hazelcastInstance, queueName, consumerStrategy, timeout);
+    public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName){
+    	HazelcastQueueConsumer<T> hazelcastQueueConsumer = new HazelcastQueueConsumer<>(hazelcastInstance, queueName);
     	logger.debug(String.format("Created HazelcastQueueConsumer: %s", hazelcastQueueConsumer));
 		return hazelcastQueueConsumer;
     }
+    
+    /**
+     * Create a new {@link HazelcastQueueConsumer} instance of T type.
+     * @param queueName queue name
+     * @param consumerStrategy Consumer queue strategy
+     * @param timeout Timeout of execution to the item processor before to return null on queue consumption.
+     * @param timeUnit Time duration of timeout
+     * @return {@link HazelcastQueueConsumer} instance
+     * @since 1.0.0
+     */
+    public <T> HazelcastQueueConsumer<T> getHazelcastQueueConsumer(String queueName, ConsumerStrategy consumerStrategy, int timeout, TimeUnit timeUnit){
+    	HazelcastQueueConsumer<T> hazelcastQueueConsumer = new HazelcastQueueConsumer<>(hazelcastInstance, queueName, consumerStrategy, timeout, timeUnit);
+    	logger.debug(String.format("Created HazelcastQueueConsumer: %s", hazelcastQueueConsumer));
+		return hazelcastQueueConsumer;
+    }
+    
     
     /**
      * Shutdown all clusterWorker instances created by this factory. However, the hazelcast will be shutted down <b>if and only if</b>, 
      * the hazelcast was created by this factory. That is, if the hazelcast instance 
      * was provided to this factory when it was created, this method won't shutdown the hazelcast.
      * </br></br><i>Note:</i> Any other dependency of internal hazelcast instance will be affected! Eg.: Another clusterworker instance.
-     * @see ClusterWorkerFactory#shutdown(boolean)
      * @since 1.0.0
+     * @see ClusterWorkerFactory#shutdown(boolean)
      */
 	public void shutdown() {
 		shutdown(isDefaultHazelcastInstance);
@@ -201,8 +217,8 @@ public class ClusterWorkerFactory {
      * was provided to this factory when it was created, this method won't shutdown the hazelcast.
      * </br></br><i>Note:</i> Any other dependency of internal hazelcast instance will be affected! Eg.: Another clusterworker instance.
      * @param clusterWorker the clusterWorker to be shutted down
-     * @see ClusterWorkerFactory#shutdown(ClusterWorker, boolean)
      * @since 1.0.0
+     * @see ClusterWorkerFactory#shutdown(ClusterWorker, boolean)
      */
 	public void shutdown(ClusterWorker<?> clusterWorker) {
 		shutdown(clusterWorker, isDefaultHazelcastInstance);

@@ -12,9 +12,11 @@ import com.hazelcast.core.IQueue;
 
 /**
  * Implementation for Hazelcast Queue Consumer.
+ * <br><br> Note: The default strategy configuration for this consumer is <code>non-blocking</code>
  * @author renato.rsilva
- * @since 1.0.0
  * @param <T> type of data to be consummed by this queue.
+ * @since 1.0.0
+ * @see {@link ConsumerStrategy#ACCEPT_NULL}
  */
 public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, HazelcastInstanceAware{
 
@@ -28,8 +30,8 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     private ConsumerStrategy consumerStrategy = ConsumerStrategy.ACCEPT_NULL;
     private boolean isBlocking = false;
     private int timeout = 1;
+    private TimeUnit timeUnit = TimeUnit.SECONDS;
     
-
     /**
      * Constructor for HazelcastQueueConsumer
      * @param hazelcastInstance instance of hazelcast.
@@ -39,21 +41,6 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName) {
     	this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
-		this.isBlocking = ConsumerStrategy.WAIT_ON_AVAILABLE.equals(consumerStrategy);
-	}
-    
-    /**
-     * Constructor for HazelcastQueueConsumer
-     * @param hazelcastInstance instance of hazelcast.
-     * @param queueName queue name
-     * @param consumerStrategy Consumer queue strategy
-     * @since 1.0.0
-     */
-	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy) {
-		this.hazelcastInstance = hazelcastInstance;
-		this.queueName = queueName;
-		this.consumerStrategy = consumerStrategy;
-		this.isBlocking = ConsumerStrategy.WAIT_ON_AVAILABLE.equals(consumerStrategy);
 	}
     
 	/**
@@ -61,14 +48,16 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 	 * @param hazelcastInstance instance of hazelcast.
 	 * @param queueName queue name
 	 * @param consumerStrategy Consumer queue strategy
-	 * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
+	 * @param timeout Timeout of execution to the item processor before to return null on queue consumption.
+	 * @param timeUnit Time duration of timeout
 	 * @since 1.0.0
 	 */
-	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
+	public HazelcastQueueConsumer(HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout, TimeUnit timeUnit) {
 		this.hazelcastInstance = hazelcastInstance;
 		this.queueName = queueName;
 		this.consumerStrategy = consumerStrategy;
 		this.timeout = timeout;
+		this.timeUnit = timeUnit;
 		this.isBlocking = ConsumerStrategy.WAIT_ON_AVAILABLE.equals(consumerStrategy);
 	}
 
@@ -78,22 +67,22 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     	// Return the hazelcast distributed queue
         IQueue<T> iQueue = hazelcastInstance.getQueue(queueName);
 
-        logger.trace(String.format("Trying to consume item from hazelcast '%s' queue. Is Blocking: %s - Timeout (case of non-blocking): %s seconds", queueName, isBlocking(), timeout));
+        logger.trace(String.format("Trying to consume item from hazelcast '%s' queue. Is Blocking: %s - Timeout (case of non-blocking): '%s %s'", queueName, isBlocking(), timeout, timeUnit));
         
         // Blocking on take() only if strategy is {@link QueueStrategy#WAIT_ON_AVAILABLE}.
         // Otherwise, wait until timeout and return null if there is no item to process.
-		T item = isBlocking() ? iQueue.take() : iQueue.poll(timeout, TimeUnit.SECONDS);
+		T item = isBlocking() ? iQueue.take() : iQueue.poll(timeout, timeUnit);
 
-        logger.trace(String.format("Consumed item '%s' from hazelcast queue.", item));
+        logger.debug(String.format("Consumed item '%s' from hazelcast queue.", item));
 
         return item;
     }
     
     /**
      * Verifies if this consumer has blocking strategy
-     * @see ConsumerStrategy
      * @return <code>true</code> if is blocking, <code>false</code> otherwise
      * @since 1.0.0
+     * @see ConsumerStrategy
      */
     public boolean isBlocking() {
 		return isBlocking;
@@ -134,6 +123,6 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
 	@Override
 	public String toString() {
 		return "HazelcastQueueConsumer [queueName=" + queueName + ", consumerStrategy=" + consumerStrategy + ", isBlocking="
-				+ isBlocking + ", timeout=" + timeout + "]";
+				+ isBlocking + ", timeout=" + timeout + ", timeUnit=" + timeUnit + "]";
 	}
 }

@@ -10,6 +10,7 @@ import br.gov.go.sefaz.clusterworker.core.exception.ItemProcessorException;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Callable of {@link HazelcastQueueConsumer}, responsible for process {@link ItemProcessor} client's implementation.
@@ -30,11 +31,12 @@ public final class HazelcastCallableConsumer<T> extends HazelcastQueueConsumer<T
      * @param hazelcastInstance instance of hazelcast.
      * @param queueName queue name
      * @param consumerStrategy Consumer queue strategy
-     * @param timeout Timeout of execution (in seconds) to the item processor before to return null on queue consumption.
+     * @param timeout Timeout of execution to the item processor before to return null on queue consumption.
+     * @param timeUnit Time duration of timeout
      * @since 1.0.0
      */
-    public HazelcastCallableConsumer(ItemProcessor<T> itemProcessor, HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout) {
-        super(hazelcastInstance, queueName, consumerStrategy, timeout);
+    public HazelcastCallableConsumer(ItemProcessor<T> itemProcessor, HazelcastInstance hazelcastInstance, String queueName, ConsumerStrategy consumerStrategy, int timeout, TimeUnit timeUnit) {
+        super(hazelcastInstance, queueName, consumerStrategy, timeout, timeUnit);
         this.itemProcessor = itemProcessor;
     }
 

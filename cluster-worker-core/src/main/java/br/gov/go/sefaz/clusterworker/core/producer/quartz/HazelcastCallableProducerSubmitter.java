@@ -40,7 +40,7 @@ public class HazelcastCallableProducerSubmitter implements Job {
 
 			logger.debug(String.format("'%s' Producer TimerTask execution %s!", context.getTrigger().getKey().getName(), isLocalMember ? "COMPLETED" : "IGNORED"));
 		} catch (Exception e) {
-            logger.error("Cannot execute a ItemProducer on hazelcast executor service!", e);
+            logger.error("Cannot execute a Producer TimerTask on hazelcast executor service!", e);
 		}
 	}
 }

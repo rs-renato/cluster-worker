@@ -77,8 +77,8 @@ public final class ClusterWorker<T> {
 			int workers = consumeFromQueue.workers();
 			String itemProcessorName = itemProcessor.getClass().getSimpleName();
     		
-    		logger.info(String.format("Configuring ItemProcessor '%s' [queueName=%s, strategy=%s, timeout=%s, workers=%s]",
-					itemProcessorName, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout(), workers));
+    		logger.info(String.format("Configuring ItemProcessor '%s' [queueName=%s, strategy=%s, timeout=%s, timeUnit=%s, workers=%s]",
+					itemProcessorName, consumeFromQueue.queueName(), consumeFromQueue.strategy(), consumeFromQueue.timeout(), consumeFromQueue.timeUnit(), workers));
     		
     		// Creates worker (HazelcastCallableConsumer)
     		HazelcastCallableConsumer<T> hazelcastCallableConsumer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastCallableConsumer(itemProcessor);
