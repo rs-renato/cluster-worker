@@ -48,6 +48,7 @@ public class HazelcastQueueBlockingConsumerTest {
 	public static void tearDownClass() {
         // Shutdown cluster worker internals
 		cwFactory.shutdown(clusterWorker);
+		timerItemProducer.cancel();
 	}
 
 	@Test
