@@ -120,8 +120,8 @@ public class ClusterWorkerFactory {
         if(!config.getExecutorConfigs().containsKey(executorServiceName)){
             logger.debug(String.format("Updating executor service '%s' pool site to '%s' ", executorServiceName, poolSize));
             ExecutorConfig executorConfig = new ExecutorConfig(executorServiceName, poolSize);
-            executorConfig.setQueueCapacity(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_QUEUE_CAPACITY_DEFAULT);
-            executorConfig.setStatisticsEnabled(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_STATISTICS_ENABLED_DEFAULT);
+            executorConfig.setQueueCapacity(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_QUEUE_CAPACITY);
+            executorConfig.setStatisticsEnabled(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_STATISTICS_ENABLED);
             config.addExecutorConfig(executorConfig);
         }
 

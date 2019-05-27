@@ -63,11 +63,11 @@ public final class HazelcastSupport {
         int port = cachedPropertyFile.getProperty("cw.network.port", Integer.class);
         String ipMember = cachedPropertyFile.getProperty("cw.network.ip.member");
         
-        String trustedInterface = cachedPropertyFile.getProperty("cw.network.trusted.interface", ClusterWorkerConstants.CW_NETWORK_TRUSTED_INTERFACE_DEFAULT);
+        String trustedInterface = cachedPropertyFile.getProperty("cw.network.trusted.interface", ClusterWorkerConstants.CW_NETWORK_TRUSTED_INTERFACE);
         int timeout = cachedPropertyFile.getProperty("cw.network.connection.timeout", Integer.class, ClusterWorkerConstants.CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT);
-        boolean multicastEnabled = cachedPropertyFile.getProperty("cw.network.multicast.enabled", Boolean.class, ClusterWorkerConstants.CW_MULTCAST_ENABLED_DEFAULT);
-        int maxPoolSize = cachedPropertyFile.getProperty("cw.executor.max.pool.size", Integer.class, ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_POOL_SIZE_DEFAULT);
-        String[] restApiGroups = cachedPropertyFile.getProperty("cw.rest.api.enable.group", String[].class, ClusterWorkerConstants.CW_REST_API_GROUPS_DEFAULT);
+        boolean multicastEnabled = cachedPropertyFile.getProperty("cw.network.multicast.enabled", Boolean.class, ClusterWorkerConstants.CW_MULTCAST_ENABLED);
+        int maxPoolSize = cachedPropertyFile.getProperty("cw.executor.max.pool.size", Integer.class, ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_POOL_SIZE);
+        String[] restApiGroups = cachedPropertyFile.getProperty("cw.rest.api.enable.group", String[].class, ClusterWorkerConstants.CW_REST_API_GROUPS);
 
         // Creates the default configuration
         Config config = new Config(hazelcastInstanceName);
@@ -113,8 +113,8 @@ public final class HazelcastSupport {
         // Configures Executor Service used to execute producers
         config.getExecutorConfig("default")
             .setPoolSize(maxPoolSize)
-            .setStatisticsEnabled(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_STATISTICS_ENABLED_DEFAULT)
-            .setQueueCapacity(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_QUEUE_CAPACITY_DEFAULT);
+            .setStatisticsEnabled(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_STATISTICS_ENABLED)
+            .setQueueCapacity(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_QUEUE_CAPACITY);
 
         logger.info(String.format("Hazelcast configurations finished: %s", config));
 

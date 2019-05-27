@@ -1,5 +1,9 @@
 package br.gov.go.sefaz.clusterworker.core.constants;
 
+import java.util.concurrent.TimeUnit;
+
+import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
+
 /**
  * Constants for global definitions of ClusterWorker API
  * @author renato.rsilva
@@ -10,9 +14,33 @@ public class ClusterWorkerConstants {
 	private ClusterWorkerConstants() {
 	}
 	
-	/***************************************
-	 * 			CW GENERAL CONSTANTS
-	 ***************************************/
+	
+	/*******************************************************************************************************
+	 * 											CW GENERAL CONSTANTS									   *
+	 *******************************************************************************************************/
+	
+	/**
+	 * Defines the default queue consumer strategy
+	 * @since 1.0.0
+	 */
+	public static final ConsumerStrategy CW_QUEUE_CONSUMER_STRATEGY 	= ConsumerStrategy.ACCEPT_NULL;
+	
+	/**
+	 * Defines the default timeout for queue consumption
+	 * @since 1.0.0
+	 */
+	public static final int CW_QUEUE_TIMEOUT			 				= 1;
+	
+	/**
+	 * Defines the default time unit for queue consumption timeout
+	 * @since 1.0.0
+	 */
+	public static final TimeUnit CW_QUEUE_TIMEOUT_TIMEUNIT 				= TimeUnit.SECONDS;
+	
+	
+	/*******************************************************************************************************
+	 * 									CW HAZELCAST CONFIGURATION CONSTANTS							   *
+	 *******************************************************************************************************/
 	
 	/**
 	 * Defines the default localhost IP
@@ -30,7 +58,7 @@ public class ClusterWorkerConstants {
 	 * Defines the default trusted interface
 	 * @since 1.0.0
 	 */
-	public static final String CW_NETWORK_TRUSTED_INTERFACE_DEFAULT		= LOCALHOST_IP;
+	public static final String CW_NETWORK_TRUSTED_INTERFACE				= LOCALHOST_IP;
 
 	/**
 	 * Defines the default distributed executor service name
@@ -42,31 +70,31 @@ public class ClusterWorkerConstants {
 	 * Defines the default number of executor threads per member for the executor.
 	 * @since 1.0.0
 	 */
-	public static final int CW_EXECUTOR_SERVICE_MAX_POOL_SIZE_DEFAULT	= 2;
+	public static final int CW_EXECUTOR_SERVICE_MAX_POOL_SIZE			= 2;
 
 	/**
 	 * Defines the default number of executor queue capacity.
 	 * @since 1.0.0
 	 */
-	public static final int CW_EXECUTOR_SERVICE_MAX_QUEUE_CAPACITY_DEFAULT	= 100;
+	public static final int CW_EXECUTOR_SERVICE_MAX_QUEUE_CAPACITY		= 100;
 
 	/**
 	 * Defines the default statistics enabled.
 	 * @since 1.0.0
 	 */
-	public static final boolean CW_EXECUTOR_SERVICE_STATISTICS_ENABLED_DEFAULT	= false;
+	public static final boolean CW_EXECUTOR_SERVICE_STATISTICS_ENABLED	= false;
 	
 	/**
 	 * Defines the default rest api groups.
 	 * @since 1.0.0
 	 */
-	public static final String[] CW_REST_API_GROUPS_DEFAULT	= 			new String[] {"HEALTH_CHECK","CLUSTER_WRITE","CLUSTER_READ","DATA"};
+	public static final String[] CW_REST_API_GROUPS						= 			new String[] {"HEALTH_CHECK","CLUSTER_WRITE","CLUSTER_READ","DATA"};
 	
 	/**
 	 * Defines the default multicast discovery mechanism
 	 * @since 1.0.0
 	 */
-	public static final boolean CW_MULTCAST_ENABLED_DEFAULT				= false;
+	public static final boolean CW_MULTCAST_ENABLED						= false;
 	
 	 /**
      * Defines the default type of logging strategy
@@ -81,9 +109,10 @@ public class ClusterWorkerConstants {
 	public static final String CW_ROUND_ROBIN_MEMBER 					= "cw.roundrobin.member";
 	
 	
-	/***************************************
-	 * 			CW QUARTZ CONSTANTS
-	 ***************************************/
+	
+	/*******************************************************************************************************
+	 * 										CW QUARTZ CONSTANTS											   *
+	 *******************************************************************************************************/
 
 	 /**
      * Defines the defalut quartz thread pool count  

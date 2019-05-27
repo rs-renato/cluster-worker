@@ -10,6 +10,8 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.IQueue;
 
+import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
+
 /**
  * Implementation for Hazelcast Queue Consumer.
  * <br><br> Note: The default strategy configuration for this consumer is <code>non-blocking</code>
@@ -27,10 +29,10 @@ public class HazelcastQueueConsumer<T> implements Consumer<T>, Serializable, Haz
     protected transient HazelcastInstance hazelcastInstance;
 
     protected String queueName;
-    private ConsumerStrategy consumerStrategy = ConsumerStrategy.ACCEPT_NULL;
-    private boolean isBlocking = false;
-    private int timeout = 1;
-    private TimeUnit timeUnit = TimeUnit.SECONDS;
+    private ConsumerStrategy consumerStrategy = ClusterWorkerConstants.CW_QUEUE_CONSUMER_STRATEGY;
+    private int timeout = ClusterWorkerConstants.CW_QUEUE_TIMEOUT;
+    private TimeUnit timeUnit = ClusterWorkerConstants.CW_QUEUE_TIMEOUT_TIMEUNIT;
+    private boolean isBlocking;
     
     /**
      * Constructor for HazelcastQueueConsumer
