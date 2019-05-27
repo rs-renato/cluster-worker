@@ -6,12 +6,12 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.item.processor.StringItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.item.producer.StringItemProducer;
 import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
-import org.junit.runners.MethodSorters;
 
 /**
  * Cluster Worker example of use

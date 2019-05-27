@@ -1,9 +1,12 @@
 package br.gov.go.sefaz.clusterworker.core;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
-import br.gov.go.sefaz.clusterworker.core.support.ItemSupport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quartz.CronScheduleBuilder;
@@ -34,6 +37,7 @@ import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastCallableProdu
 import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastCallableProducerSubmitterConfiguration;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
+import br.gov.go.sefaz.clusterworker.core.support.ItemSupport;
 import br.gov.go.sefaz.clusterworker.core.support.QuartzPropertySupport;
 /**
  * Central core to manage hazelcast executor services and it's lifecycle.

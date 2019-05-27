@@ -10,12 +10,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import br.gov.go.sefaz.clusterworker.core.ClusterWorker;
 import br.gov.go.sefaz.clusterworker.core.factory.ClusterWorkerFactory;
 import br.gov.go.sefaz.clusterworker.core.item.producer.IntegerItemProducer;
 import br.gov.go.sefaz.clusterworker.core.support.TestConstants;
-import org.junit.runners.MethodSorters;
 
 /**
  * HazelcastQueueConsumer example of use in non-blocking way

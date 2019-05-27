@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import br.gov.go.sefaz.clusterworker.core.support.ItemSupport;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,15 +18,16 @@ import br.gov.go.sefaz.clusterworker.core.annotation.ProduceToQueue;
 import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
 import br.gov.go.sefaz.clusterworker.core.consumer.Consumer;
 import br.gov.go.sefaz.clusterworker.core.consumer.ConsumerStrategy;
-import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueConsumer;
 import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastCallableConsumer;
+import br.gov.go.sefaz.clusterworker.core.consumer.HazelcastQueueConsumer;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
-import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastCallableProducer;
+import br.gov.go.sefaz.clusterworker.core.producer.HazelcastQueueProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.Producer;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
+import br.gov.go.sefaz.clusterworker.core.support.ItemSupport;
 import br.gov.go.sefaz.clusterworker.core.support.ParameterizedTypeReference;
 
 /**

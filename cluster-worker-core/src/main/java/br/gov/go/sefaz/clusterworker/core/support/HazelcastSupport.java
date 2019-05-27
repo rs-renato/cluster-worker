@@ -10,6 +10,7 @@ import com.hazelcast.config.NetworkConfig;
 import com.hazelcast.config.RestApiConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.spi.properties.GroupProperty;
 
 import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
 import br.gov.go.sefaz.clusterworker.core.support.CachedPropertyFileSupport.SILENT_MODE;
@@ -71,14 +72,14 @@ public final class HazelcastSupport {
 
         // Creates the default configuration
         Config config = new Config(hazelcastInstanceName);
-        // Configures the log
-        config.setProperty("hazelcast.logging.type", ClusterWorkerConstants.CW_LOGGING_TYPE);
-        // Configures hz threads
-        config.setProperty("hazelcast.event.thread.count", "2");
-        config.setProperty("hazelcast.io.thread.count", "2");
-        config.setProperty("hazelcast.operation.thread.count", "2");
-        config.setProperty("hazelcast.operation.generic.thread.count", "2");
-
+        
+        // Configures hazelcast configurations for logs and threads
+        config.setProperty(GroupProperty.LOGGING_TYPE.getName(), ClusterWorkerConstants.CW_LOGGING_TYPE);
+        config.setProperty(GroupProperty.EVENT_THREAD_COUNT.getName(), cachedPropertyFile.getProperty(GroupProperty.EVENT_THREAD_COUNT.getName(), ClusterWorkerConstants.CW_THREAD_COUNT));
+        config.setProperty(GroupProperty.IO_THREAD_COUNT.getName(), cachedPropertyFile.getProperty(GroupProperty.IO_THREAD_COUNT.getName(), ClusterWorkerConstants.CW_THREAD_COUNT));
+        config.setProperty(GroupProperty.PARTITION_OPERATION_THREAD_COUNT.getName(), cachedPropertyFile.getProperty(GroupProperty.PARTITION_OPERATION_THREAD_COUNT.getName(), ClusterWorkerConstants.CW_THREAD_COUNT));
+        config.setProperty(GroupProperty.GENERIC_OPERATION_THREAD_COUNT.getName(), cachedPropertyFile.getProperty(GroupProperty.GENERIC_OPERATION_THREAD_COUNT.getName(), ClusterWorkerConstants.CW_THREAD_COUNT));
+        
         // Configures group
         config.getGroupConfig()
     		.setName(hazelcastInstanceName);

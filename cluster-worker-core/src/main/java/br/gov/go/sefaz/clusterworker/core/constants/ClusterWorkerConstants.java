@@ -37,28 +37,28 @@ public class ClusterWorkerConstants {
 	 */
 	public static final TimeUnit CW_QUEUE_TIMEOUT_TIMEUNIT 				= TimeUnit.SECONDS;
 	
+	/**
+     * Defines the default name of distributed roundrobin member name  
+     * @since 1.0.0
+     */
+	public static final String CW_ROUND_ROBIN_MEMBER 					= "cw.roundrobin.member";
+	
 	
 	/*******************************************************************************************************
 	 * 									CW HAZELCAST CONFIGURATION CONSTANTS							   *
 	 *******************************************************************************************************/
 	
 	/**
-	 * Defines the default localhost IP
-	 * @since 1.0.0
-	 */
-	private static final String LOCALHOST_IP							= "127.0.0.1";
-	
-	/**
 	 * Defines the default maximum amount of time Hazelcast will try toconnect to a well known member
 	 * @since 1.0.0
 	 */
-	public static int CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT				= 10;
+	public static final int CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT		= 10;
 	
 	/**
 	 * Defines the default trusted interface
 	 * @since 1.0.0
 	 */
-	public static final String CW_NETWORK_TRUSTED_INTERFACE				= LOCALHOST_IP;
+	public static final String CW_NETWORK_TRUSTED_INTERFACE				= "127.0.0.1";
 
 	/**
 	 * Defines the default distributed executor service name
@@ -103,12 +103,11 @@ public class ClusterWorkerConstants {
     public static final String CW_LOGGING_TYPE 							= "slf4j";
     
     /**
-     * Defines the default name of distributed roundrobin member name  
+     * Defines the default thread count for each hazelcast threads (events, io, partition operation and generic operation) 
      * @since 1.0.0
      */
-	public static final String CW_ROUND_ROBIN_MEMBER 					= "cw.roundrobin.member";
-	
-	
+	public static final String CW_THREAD_COUNT 							= "2";
+    
 	
 	/*******************************************************************************************************
 	 * 										CW QUARTZ CONSTANTS											   *

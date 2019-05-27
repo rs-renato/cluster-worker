@@ -1,5 +1,8 @@
 package br.gov.go.sefaz.clusterworker.core.consumer;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,9 +11,6 @@ import com.hazelcast.core.HazelcastInstanceNotActiveException;
 
 import br.gov.go.sefaz.clusterworker.core.exception.ItemProcessorException;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Callable of {@link HazelcastQueueConsumer}, responsible for process {@link ItemProcessor} client's implementation.
