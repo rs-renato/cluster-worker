@@ -105,8 +105,9 @@ public final class ClusterWorker<T> {
 				this.processors.put(itemProcessor, futures);
 				
     		}catch (Exception e){
+    			logger.error("Cannot execute a ItemProcessor on hazelcast executor service!", e);
     			shutdown(itemProcessor);
-    			throw new ItemProcessorException("Cannot execute a ItemProcessor on hazelcast executor service!", e);
+    			throw new ItemProcessorException(e.getMessage(), e);
 			}
 		}
     }
@@ -157,8 +158,9 @@ public final class ClusterWorker<T> {
     			Date future = itemProducerScheduler.scheduleJob(itemProducerSubmitter, itemProducerTrigger);
     			this.producers.put(itemProducer, future);
     		} catch (Exception e) {
+    			logger.error("Cannot schedule a ItemProcessor on quartz!", e);
     			shutdown(itemProducer);
-    			throw new ItemProducerException("Cannot schedule a ItemProcessor on quartz!", e);
+    			throw new ItemProducerException(e.getMessage(), e);
     		}
 		}
     }
