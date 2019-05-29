@@ -68,7 +68,7 @@ public final class HazelcastSupport {
         int timeout = cachedPropertyFile.getProperty("cw.network.connection.timeout", Integer.class, ClusterWorkerConstants.CW_NETWORK_TCP_IP_CONNECTION_TIMEOUT);
         boolean multicastEnabled = cachedPropertyFile.getProperty("cw.network.multicast.enabled", Boolean.class, ClusterWorkerConstants.CW_MULTCAST_ENABLED);
         int maxPoolSize = cachedPropertyFile.getProperty("cw.executor.max.pool.size", Integer.class, ClusterWorkerConstants.CW_EXECUTOR_SERVICE_MAX_POOL_SIZE);
-        String[] restApiGroups = cachedPropertyFile.getProperty("cw.rest.api.enable.group", String[].class, ClusterWorkerConstants.CW_REST_API_GROUPS);
+        String[] restApiGroups = cachedPropertyFile.getProperty("cw.rest.api.enable.groups", String[].class, ClusterWorkerConstants.CW_REST_API_GROUPS);
 
         // Creates the default configuration
         Config config = new Config(hazelcastInstanceName);
