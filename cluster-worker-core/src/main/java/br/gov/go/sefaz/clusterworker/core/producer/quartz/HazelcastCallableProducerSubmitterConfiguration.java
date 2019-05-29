@@ -2,6 +2,7 @@ package br.gov.go.sefaz.clusterworker.core.producer.quartz;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IExecutorService;
+import com.hazelcast.core.ILock;
 
 import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastCallableProducer;
@@ -13,11 +14,13 @@ import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobin;
  * @author renato.rsilva
  * @since 1.0.0
  */
+@SuppressWarnings("deprecation")
 public class HazelcastCallableProducerSubmitterConfiguration{
 	
-	private HazelcastMemberRoundRobin hazelcastMemberRoundRobin;
-	private HazelcastCallableProducer<?> hazelcastCallableProducer;
 	private IExecutorService executorService;
+	private ILock producerSubmitterLock;
+	private HazelcastCallableProducer<?> hazelcastCallableProducer;
+	private HazelcastMemberRoundRobin hazelcastMemberRoundRobin;
 	private HazelcastMemberRoundRobinExecutionCallback hazelcastMemberRoundRobinExecutionCallback;
 	
 	/**
@@ -29,9 +32,37 @@ public class HazelcastCallableProducerSubmitterConfiguration{
 	 */
 	public HazelcastCallableProducerSubmitterConfiguration(String configurationName, HazelcastInstance hazelcastInstance, HazelcastCallableProducer<?> hazelcastCallableProducer) {
 		this.executorService = hazelcastInstance.getExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
+		this.producerSubmitterLock = hazelcastInstance.getLock(configurationName);
 		this.hazelcastCallableProducer = hazelcastCallableProducer;
 		this.hazelcastMemberRoundRobin = new HazelcastMemberRoundRobin(hazelcastInstance, String.format("%s[%s]", ClusterWorkerConstants.CW_ROUND_ROBIN_MEMBER, configurationName));
 		this.hazelcastMemberRoundRobinExecutionCallback = new HazelcastMemberRoundRobinExecutionCallback(hazelcastMemberRoundRobin);
+	}
+	
+	/**
+	 * Retrieves IExecutorService
+	 * @return executorService
+	 * @since 1.0.0
+	 */
+	public IExecutorService getExecutorService() {
+		return executorService;
+	}
+	
+	/**
+	 * Retrieves the lock for this producer submitter
+	 * @return producer submitter lock
+	 * @since 1.0.0
+	 */
+	public ILock getProducerSubmitterLock() {
+		return producerSubmitterLock;
+	}
+	
+	/**
+	 * Retrieves HazelcastCallableProducer
+	 * @return hazelcastCallableProducer
+	 * @since 1.0.0
+	 */
+	public HazelcastCallableProducer<?> getHazelcastCallableProducer() {
+		return hazelcastCallableProducer;
 	}
 	
 	/**
@@ -42,26 +73,7 @@ public class HazelcastCallableProducerSubmitterConfiguration{
 	public HazelcastMemberRoundRobin getHazelcastMemberRoundRobin() {
 		return hazelcastMemberRoundRobin;
 	}
-
-
-	/**
-	 * Retrieves HazelcastCallableProducer
-	 * @return hazelcastCallableProducer
-	 * @since 1.0.0
-	 */
-	public HazelcastCallableProducer<?> getHazelcastCallableProducer() {
-		return hazelcastCallableProducer;
-	}
-
-	/**
-	 * Retrieves IExecutorService
-	 * @return executorService
-	 * @since 1.0.0
-	 */
-	public IExecutorService getExecutorService() {
-		return executorService;
-	}
-
+	
 	/**
 	 * Retrieves HazelcastMemberRoundRobinExecutionCallback
 	 * @return executionCallback

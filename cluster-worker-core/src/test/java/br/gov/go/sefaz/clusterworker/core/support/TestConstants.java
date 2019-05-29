@@ -36,7 +36,7 @@ public class TestConstants {
 	/**
 	 * Cron expression to define the frequency of production
 	 */
-    public static final String CW_ITEM_PRODUCER_CRON_EXPRESSION	= "0/10 * * * * ?";
+    public static final String CW_ITEM_PRODUCER_CRON_EXPRESSION	= "0/5 * * * * ?";
     
     /**
 	 * Quantity of workers (threads) of processors (queues consumers)
