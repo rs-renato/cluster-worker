@@ -5,6 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.quartz.CronExpression;
+
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 
 /**
@@ -24,14 +26,14 @@ public @interface ProduceToQueue {
     String queueName();
     
     /**
-     * Max queue size. The default vaule is 1000 elements.
+     * Max queue size to configure a boundary queue. The default vaule is 1000 elements.
      * @return queue size
      * @since 1.0.0
      */
     int maxSize() default 1000;
 
     /**
-     * Cron Expression to define the frequency of producer execution.
+     * {@link CronExpression} to define the frequency of producer execution.
      * </br>Eg.: The expression <i><code>0/10 * * * * ?</code></i> executes at every 10 seconds.
      * @return cron expression
      * @since 1.0.0
