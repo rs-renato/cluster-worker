@@ -1,5 +1,3 @@
-
-
 # Cluster Worker - *Scalable Batch Application Easily.*
 **Cluster Worker (CW)** is a Hazelcast java based API that helps to scale traditional batch application
 just applying separation of concerns in producing and processing tasks. CW uses *producer vs consumer* strategy on hazelcast distributed queues as central mechanism to distribute work under a cluster environment, providing high availability and vertical & horizontal scalability for processing and exchange data through the cluster members.
