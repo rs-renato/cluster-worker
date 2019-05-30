@@ -48,7 +48,7 @@ stage('Packaging') {
     node {
 		 try {
 			withMaven(maven: "$MAVEN_INSTALLATION") {
-    			sh "mvn clean package -U -DskipTests -X"    			
+    			sh "mvn clean package -U -DskipTests"    			
 	    	}			
         } catch (e) {           
             currentBuild.result = 'FAILURE'
