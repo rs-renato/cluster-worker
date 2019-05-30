@@ -23,8 +23,7 @@ just applying separation of concerns in producing and processing tasks. CW uses 
   * [Configurations](#configurations)
       - [Default CW Configurations](#default-cw-configurations)
       - [Default Hazelcast Configurations](#default-hazelcast-configurations)
-  * [Best Practices](#best-practices)
-  * [Cluster Worker Class Diagram](#cluster-worker-class-diagram)         
+  * [External Links](#external-links)
 
 ## What's Cluster Worker intend to solve?  
 Traditional batch application --*these which initially was designed without cares about scalabillity, untill it really needs*-- usually lacks on separation of concerns on *reads & writes* operations, which may cause innumerous inconsistences on processing data flow, if that application have been deployed as clustered application. That's because many read operations will be executed at same time on different JVM, reading and processing the same data set,  causing re-work between nodes and data inconsistences. 
@@ -296,10 +295,8 @@ hazelcast.operation.generic.thread.count=
 ```
 >*Note: If these configuration doesn't meet the needs, nothing prevents to configure the HazelcastInstance as wished.*
 
-## Best Practices
-As follow...
+## External Links
+The major dependencies that Cluster Worker depends is Hazelcast and Quartz:
 
-## Cluster Worker Class Diagram
-<p align="center">
-	<img alt="ClusterWorker Class Diagram" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Class%20Diagram%20%5Bapi-perspective%5D.png">
-</p>
+ - [https://hazelcast.org/documentation/](https://hazelcast.org/documentation/)
+ - [https://www.quartz-scheduler.org/documentation/](https://www.quartz-scheduler.org/documentation/)
