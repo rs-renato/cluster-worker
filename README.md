@@ -5,16 +5,16 @@ just applying separation of concerns in producing and processing tasks. CW uses 
 > [https://hazelcast.org](https://hazelcast.org)*
 
 **Table of Content**
-  * [What's Cluster Worker intend to solve?](#whats-cluster-worker-intend-to-solve)
+  * [Which Problem Cluster Worker intend to solve?](#which-problem-cluster-worker-intend-to-solve)
   * [From Client Perspective: Producer vs Processor](#from-client-perspective-producer-vs-processor)
     + [Item Producer](#item-producer)
     + [Item Processor](#item-processor)
       + [Consumer Strategy](#consumer-strategy)
     + [Executing Tasks](#executing-tasks)
-    + [Standalones: HazelcastQueueProducer & HazelcastQueueConsumer](#standalones-hazelcastqueueproducer--hazelcastqueueconsumer)
+    + [Standalones: HazelcastQueueProducer & HazelcastQueueConsumer](#standalones-hazelcastqueueproducer-hazelcastqueueconsumer)
       - [HazelcastQueueProducer ](#hazelcastqueueproducer )
       - [HazelcastQueueConsumer](#hazelcastqueueconsumer)
-      - [Hybrid Usage: Spring Batch & Cluster Worker](#hybrid-usage-spring-batch--cluster-worker)
+      - [Hybrid Usage: Spring Batch & Cluster Worker](#hybrid-usage-spring-batch-cluster-worker)
   * [From API Perspective: Producer vs Consumer](#from-api-perspective-producer-vs-consumer)
      - [HazelcastCallableProducer](#hazelcastcallableproducer)
      - [HazelcastCallableConsumer](#hazelcastcallableconsumer)
@@ -23,7 +23,7 @@ just applying separation of concerns in producing and processing tasks. CW uses 
       - [Default Hazelcast Configurations](#default-hazelcast-configurations)
   * [External Links](#external-links)
 
-## What's Cluster Worker intend to solve?  
+## Which Problem Cluster Worker intend to solve?  
 Traditional batch application --*these which initially was designed without cares about scalabillity, untill it really needs*-- usually lacks on separation of concerns on *reads & writes* operations, which may cause innumerous inconsistences on processing data flow, if that application have been deployed as clustered application. That's because many read operations will be executed at same time on different JVM, reading and processing the same data set,  causing re-work between nodes and data inconsistences. 
 
 Usually this kind of batch application is deployed as ACTIVE-PASSIVE (faillover or round-robin tournament strategy) and just grants high disponibility, where only one node is activated at time. In that case, this application won't cover scalability because of concurrency in distributed environment, which in that case, prevents an cluster deployment.
