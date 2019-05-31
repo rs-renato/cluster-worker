@@ -45,7 +45,7 @@ public final class HazelcastCallableConsumer<T> extends HazelcastQueueConsumer<T
 
 		String consumerThreadName = getCallableConsumerdName();
 
-		logger.info(String.format("Starting thread '%s'..", consumerThreadName));
+		logger.info(String.format("[%s] - Starting thread '%s'..", Thread.currentThread().getName(),  consumerThreadName));
 		
         // Run this thread untill shutdown is called
         while(isRunning()) {
@@ -64,13 +64,15 @@ public final class HazelcastCallableConsumer<T> extends HazelcastQueueConsumer<T
                 logger.error(String.format("Cannot consume from hazelcast '%s' queue! This thread will die! Reason: %s", queueName, e));
                 Thread.currentThread().interrupt();
             }catch (ItemProcessorException e){
-    			logger.error(String.format("Cannot process on client's implementation! Reason: %s", e.getMessage()));
+    			logger.error("Cannot process on client's implementation!", e);
             }catch (Exception e){
     			logger.error(String.format("A general error occurs process on '%s'", consumerThreadName), e);
             }
         }
 
-        logger.warn(String.format("Thread execution '%s' FINISHED!", consumerThreadName));
+        logger.warn(String.format("[%s] - Thread execution '%s' FINISHED!", Thread.currentThread().getName(), consumerThreadName));
+        
+    	// This Callable<Void>
         return null;
     }
 	
@@ -89,7 +91,7 @@ public final class HazelcastCallableConsumer<T> extends HazelcastQueueConsumer<T
      * @since 1.0.0
      */
     @SuppressWarnings("deprecation")
-	private String getCallableConsumerdName() {
+	public String getCallableConsumerdName() {
     	String threadName = String.format("%s.consumer[%s]-", hazelcastInstance.getName(), itemProcessor.getClass().getSimpleName());
 		long threadCount = hazelcastInstance.getAtomicLong(threadName).getAndIncrement();
 		return threadName + threadCount;

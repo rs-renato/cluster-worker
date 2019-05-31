@@ -13,6 +13,7 @@ import com.hazelcast.core.ILock;
 import com.hazelcast.core.Member;
 
 import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
+import br.gov.go.sefaz.clusterworker.core.producer.HazelcastCallableProducer;
 
 /**
  * Quartz HazelcastCallableProducer Submitter
@@ -22,8 +23,9 @@ import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
 @SuppressWarnings("deprecation")
 public class HazelcastCallableProducerSubmitter implements Job {
 
-	private static final Logger logger 		= LogManager.getLogger(HazelcastCallableProducerSubmitter.class);
-	private static final int LOCK_TIMEOUT 	= 1;
+	private static final Logger logger 				= LogManager.getLogger(HazelcastCallableProducerSubmitter.class);
+	private static final int LOCK_TIMEOUT 			= 1;
+	private static final String LOG_MESSAGE_PATTERN	="'%s' Producer TimerTask execution %s!";
 	
 	@Override
 	public void execute(JobExecutionContext context) throws JobExecutionException {
@@ -33,25 +35,36 @@ public class HazelcastCallableProducerSubmitter implements Job {
 		try {
 			// Retrieves the parameters
 			JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
-			HazelcastCallableProducerSubmitterConfiguration submitterConfig = (HazelcastCallableProducerSubmitterConfiguration) jobDataMap.get(ClusterWorkerConstants.CW_QUARTZ_PRODUCER_CONFIG_NAME);
-
+			HazelcastCallableProducerSubmitterDetail produceSubmitterDetail = (HazelcastCallableProducerSubmitterDetail) jobDataMap.get(ClusterWorkerConstants.CW_QUARTZ_PRODUCER_CONFIG_DETAIL_NAME);
+			HazelcastCallableProducer<?> hazelcastCallableProducer = produceSubmitterDetail.getHazelcastCallableProducer();
+				
 			// Select hazelcast cluster member
-			Member member = submitterConfig.getHazelcastMemberRoundRobin().select();
+			Member member = produceSubmitterDetail.getHazelcastMemberRoundRobin().select();
 			
-			producerSubmitterLock = submitterConfig.getProducerSubmitterLock();
+			producerSubmitterLock = produceSubmitterDetail.getProducerSubmitterLock();
 			
 			boolean isLocalMember = member.localMember();
-
+			String triggerKey = context.getTrigger().getKey().getName();
+			
 			// Retrieves the lock for produces on distributed environment
 			producerSubmitterLock.lock(LOCK_TIMEOUT, TimeUnit.SECONDS);
 			
 			// Executes this task only if is an local member
 			if (isLocalMember) {
-				submitterConfig.getExecutorService()
-					.submitToMember(submitterConfig.getHazelcastCallableProducer(), member, submitterConfig.getHazelcastMemberRoundRobinExecutionCallback());
-			}
+				// Executes the producer only if is not running
+				if (!hazelcastCallableProducer.isRunning()) {
+					produceSubmitterDetail.getExecutorService()
+						.submitToMember(hazelcastCallableProducer, member, produceSubmitterDetail.getHazelcastMemberRoundRobinExecutionCallback());
+					
+					logger.info(String.format(LOG_MESSAGE_PATTERN, triggerKey, "COMPLETED (SELECTED LOCAL MEMBER)"));
 
-			logger.debug(String.format("'%s' Producer TimerTask execution %s!", context.getTrigger().getKey().getName(), isLocalMember ? "COMPLETED" : "IGNORED"));
+				}else {
+					logger.warn(String.format(LOG_MESSAGE_PATTERN, triggerKey, "IGNORED (PRODUCER ALREADY RUNNING)"));
+				}
+			}else {
+				logger.warn(String.format(LOG_MESSAGE_PATTERN, triggerKey, "IGNORED (SELECTED REMOTE MEMBER)"));
+			}
+			
 		} catch (Exception e) {
             logger.error("Cannot execute a Producer TimerTask on hazelcast executor service!", e);
 		}finally {

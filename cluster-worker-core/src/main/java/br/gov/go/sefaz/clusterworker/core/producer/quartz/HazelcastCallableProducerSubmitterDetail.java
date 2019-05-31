@@ -10,12 +10,12 @@ import br.gov.go.sefaz.clusterworker.core.producer.callback.HazelcastMemberRound
 import br.gov.go.sefaz.clusterworker.core.roundrobin.HazelcastMemberRoundRobin;
 
 /**
- * Configuration for Quartz HazelcastCallableProducer Submitter
+ * Configuration Details for Quartz HazelcastCallableProducer Submitter
  * @author renato.rsilva
  * @since 1.0.0
  */
 @SuppressWarnings("deprecation")
-public class HazelcastCallableProducerSubmitterConfiguration{
+public class HazelcastCallableProducerSubmitterDetail{
 	
 	private IExecutorService executorService;
 	private ILock producerSubmitterLock;
@@ -24,13 +24,13 @@ public class HazelcastCallableProducerSubmitterConfiguration{
 	private HazelcastMemberRoundRobinExecutionCallback hazelcastMemberRoundRobinExecutionCallback;
 	
 	/**
-     * Constructor for HazelcastCallableProducerSubmitterConfiguration.
+     * Constructor for HazelcastCallableProducerSubmitterDetail.
      * @param configurationName configuration name to be used as roundrobin key. The roundrobin is per configuration
 	 * @param hazelcastInstance hazelcast instance
 	 * @param hazelcastCallableProducer callable producer
 	 * @since 1.0.0
 	 */
-	public HazelcastCallableProducerSubmitterConfiguration(String configurationName, HazelcastInstance hazelcastInstance, HazelcastCallableProducer<?> hazelcastCallableProducer) {
+	public HazelcastCallableProducerSubmitterDetail(String configurationName, HazelcastInstance hazelcastInstance, HazelcastCallableProducer<?> hazelcastCallableProducer) {
 		this.executorService = hazelcastInstance.getExecutorService(ClusterWorkerConstants.CW_EXECUTOR_SERVICE_NAME);
 		this.producerSubmitterLock = hazelcastInstance.getLock(configurationName);
 		this.hazelcastCallableProducer = hazelcastCallableProducer;

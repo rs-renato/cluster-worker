@@ -36,7 +36,7 @@ import br.gov.go.sefaz.clusterworker.core.item.ItemProcessor;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.HazelcastCallableProducer;
 import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastCallableProducerSubmitter;
-import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastCallableProducerSubmitterConfiguration;
+import br.gov.go.sefaz.clusterworker.core.producer.quartz.HazelcastCallableProducerSubmitterDetail;
 import br.gov.go.sefaz.clusterworker.core.support.AnnotationSupport;
 import br.gov.go.sefaz.clusterworker.core.support.HazelcastSupport;
 import br.gov.go.sefaz.clusterworker.core.support.ItemSupport;
@@ -134,7 +134,7 @@ public final class ClusterWorker<T> {
 	    		// Creates the Producer and its configuration
 	    		HazelcastCallableProducer<T> hazelcastCallableProducer = ClusterWorkerFactory.getInstance(this.hazelcastInstance).getHazelcastCallableProducer(itemProducer);
 	    		
-	    		HazelcastCallableProducerSubmitterConfiguration produceConfig = new HazelcastCallableProducerSubmitterConfiguration(itemProducerName, hazelcastInstance, hazelcastCallableProducer);
+	    		HazelcastCallableProducerSubmitterDetail produceSubmitterDetail = new HazelcastCallableProducerSubmitterDetail(itemProducerName, hazelcastInstance, hazelcastCallableProducer);
 	    		
 	    		// Creates the trigger
 	    		TriggerKey triggerKey = new TriggerKey(itemProducerName, ClusterWorkerConstants.CW_QUARTZ_SCHEDULLER_NAME);
@@ -146,7 +146,7 @@ public final class ClusterWorker<T> {
 	    		
 	    		// Creates the job map
 	    		JobDataMap jobData = new JobDataMap();
-	    		jobData.put(ClusterWorkerConstants.CW_QUARTZ_PRODUCER_CONFIG_NAME, produceConfig);
+	    		jobData.put(ClusterWorkerConstants.CW_QUARTZ_PRODUCER_CONFIG_DETAIL_NAME, produceSubmitterDetail);
 	    		
 	    		// Creates the submitter
 	    		JobDetail itemProducerSubmitter = JobBuilder.newJob(HazelcastCallableProducerSubmitter.class)

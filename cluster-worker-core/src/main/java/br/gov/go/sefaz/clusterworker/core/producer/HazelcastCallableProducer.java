@@ -9,7 +9,9 @@ import org.apache.logging.log4j.Logger;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
+import com.hazelcast.core.IMap;
 
+import br.gov.go.sefaz.clusterworker.core.constants.ClusterWorkerConstants;
 import br.gov.go.sefaz.clusterworker.core.exception.ItemProducerException;
 import br.gov.go.sefaz.clusterworker.core.item.ItemProducer;
 
@@ -41,10 +43,13 @@ public final class HazelcastCallableProducer<T>  extends HazelcastQueueProducer<
     @Override
     public Void call() {
 
-		String producerThreadName = getCallableProducerName();
-		logger.info(String.format("Starting thread '%s'..", producerThreadName));
-		
+    	String producerThreadName = getCallableProducerName();
+    	
 		try{
+			
+			setRunning(true);
+			
+			logger.info(String.format("[%s] - Starting thread '%s'..", Thread.currentThread().getName(), producerThreadName));
 			
 			// Produces items from client's implementation
 			Collection<T> items = itemProducer.produce();
@@ -57,22 +62,48 @@ public final class HazelcastCallableProducer<T>  extends HazelcastQueueProducer<
 			logger.error(String.format("Cannot produce to hazelcast '%s' queue! This thread will die! Reason: %s", queueName, e));
 			Thread.currentThread().interrupt();
 		}catch (ItemProducerException e){
-			logger.error(String.format("Cannot produce on client's implementation! Reason: %s", e.getMessage()));
+			logger.error("Cannot produce on client's implementation!", e);
 		}catch (Exception e){
 			logger.error(String.format("A general error occurs process on '%s'", producerThreadName), e);
+        }finally {
+        	logger.info(String.format("[%s] - Thread '%s' execution FINISHED!", Thread.currentThread().getName(), producerThreadName));
+        	setRunning(false);
         }
     	
-		logger.info(String.format("[%s] - Thread '%s' execution FINISHED!", Thread.currentThread().getName(), producerThreadName));
-
+		// This Callable<Void>
 		return null;
     }
-
+    
     /**
      * Retrieves the unique thread name for this producer
      * @return the unique producer thread name
      * @since 1.0.0
      */
-    private String getCallableProducerName() {
+    public String getCallableProducerName() {
     	return String.format("%s.producer[%s]", hazelcastInstance.getName(), itemProducer.getClass().getSimpleName());
+    }
+    
+    /**
+     * Returns the state running of this producer
+     * @return <code>true</code> if this producer is running <code>false</code> otherwise
+     */
+    public boolean isRunning() {
+    	return getRunningProducers().getOrDefault(getCallableProducerName(), false);
+    }
+
+    /**
+     * Updates running status for this producer
+     * @param running indicates if this producer is running
+     */
+    private void setRunning(boolean running) {
+    	getRunningProducers().put(getCallableProducerName(), running);
+    }
+    
+    /**
+     * Retrieves all state running producers
+     * @return Map with state running producers 
+     */
+    private IMap<String, Boolean> getRunningProducers(){
+    	return hazelcastInstance.getMap(ClusterWorkerConstants.CW_RUNNING_PRODUCER);
     }
 }

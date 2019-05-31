@@ -33,7 +33,7 @@ stage('Preparation') {
 		POM = readMavenPom file: 'pom.xml'
 		
 		// Users who approve the deployment (to separate multiple users, do not use white spaces, just commas) 
-		PROJECT_ADMIN_USERS = 'renato-rsilva'
+		PROJECT_ADMIN_USERS = 'renato-rsilva,thiago-cherubino'
 		
 		MAIL_DEPLOYMENT_APPROVAL_SUBJECT = "$env.JOB_NAME: Solicitacao de Aprovacao de Deployment no Nexus"
 		MAIL_DEPLOYMENT_APPROVAL_CONTENT = '<h3>Nova solicitacao de publicacao disponivel para o artefato ' + POM.artifactId + ' (' + POM.version + ')</h3><p>Por favor <a href=' + "$env.BUILD_URL" + '>acesse o Jenkins</a> e realize a aprovacao manualmente.<br/><b>ATENCAO: Veja primeiro se os indices de qualidade estao aderentes ao projeto.</b></p>'

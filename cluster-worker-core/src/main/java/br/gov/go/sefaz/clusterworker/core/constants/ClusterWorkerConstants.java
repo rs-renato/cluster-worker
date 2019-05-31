@@ -43,6 +43,12 @@ public class ClusterWorkerConstants {
      */
 	public static final String CW_ROUND_ROBIN_MEMBER 					= "cw.roundrobin.member";
 	
+	/**
+	 * Defines the default name of key for running producers  
+	 * @since 1.0.0
+	 */
+	public static final String CW_RUNNING_PRODUCER 						= "cw.running.producer";
+	
 	
 	/*******************************************************************************************************
 	 * 									CW HAZELCAST CONFIGURATION CONSTANTS							   *
@@ -150,10 +156,10 @@ public class ClusterWorkerConstants {
 	public static final String CW_QUARTZ_PRODUCER_TIGGER_NAME 			= "cw.quartz.producer.trigger";
 	
 	/**
-     * Defines the default quartz producer configuration name 
+     * Defines the default quartz producer configuration detail name
      * @since 1.0.0
      */
-	public static final String CW_QUARTZ_PRODUCER_CONFIG_NAME 			= "cw.quartz.producer.config";
+	public static final String CW_QUARTZ_PRODUCER_CONFIG_DETAIL_NAME 	= "cw.quartz.producer.detail";
 	
 	/**
      * Defines the default quartz producer job detail name 
