@@ -37,7 +37,7 @@
             <AppenderRef ref="console" level="DEBUG"/>
         </Root>
         
- 		<Logger name="br.gov.go.sefaz" additivity="TRUE" level="DEBUG">
+ 		<Logger name="org.com" additivity="TRUE" level="DEBUG">
           	<AppenderRef ref="log" level="DEBUG" />
 			<AppenderRef ref="error-log" level="ERROR" />
         </Logger>

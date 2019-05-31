@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>cluster-worker</artifactId>
-    <groupId>br.gov.go.sefaz</groupId>
+    <groupId>org.com</groupId>
     <packaging>pom</packaging>
     <version>1.0.0.RC10-SNAPSHOT</version>
 
@@ -24,17 +24,6 @@
 		<!-- Log4j -->
 		<com.hazelcast.version>3.12</com.hazelcast.version>
     </properties>
-    
-    <distributionManagement>
-		<repository>
-			<id>deployments-releases</id>
-			<url>https://nexus.sefaz.go.gov.br/content/repositories/deployments-releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>deployments-snapshots</id>
-			<url>https://nexus.sefaz.go.gov.br/content/repositories/deployments-snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 
     <build>
         <finalName>${project.artifactId}-${project.version}</finalName>

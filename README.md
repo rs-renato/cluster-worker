@@ -29,7 +29,7 @@ Traditional batch application --*these which initially was designed without care
 Usually this kind of batch application is deployed as ACTIVE-PASSIVE (failover or round-robin tournament strategy) and just grants high disponibility, where only one node is activated at time. In that case, this application won't cover scalability because of concurrency in distributed environment, which in that case, prevents a cluster deployment.
 
 <p align="center">
-	<img alt="ClusterWorker-Deployment Diagram [Scalable]" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Deployment%20Diagram%20%5BNon-Scalable%5D.png">
+	<img alt="ClusterWorker-Deployment Diagram [Scalable]" src="https://raw.githubusercontent.com/rs-renato/repository-images/master/cluster-worker/ClusterWorker-Deployment%20Diagram%20%5BNon-Scalable%5D.png">
 </p>
 
 That way, CW comes to cover this lack, and its an option for non-scalable batch application which needs to scale-up or scale-out without too much effort for re-design. The only thing is need is the separation of concerns between read operation (obtain the data set to be processed) and write operation (the processing itself).
@@ -40,7 +40,7 @@ Cluster Worker knows how to manage client’s tasks, everything that is need is 
 The main work that CW does is orchestrate the process of reads defined by client's implementation of `ItemProducer`. After reads the data, CW produces these data into *Hazelcast Distributed Queue*, on the other hand, `ItemProcessor's` process their work in cluster-wide concurrent fashion. Simple like that!
 
 <p align="center">
-	<img alt="ClusterWorker-Deployment Diagram [Scalable]" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Deployment%20Diagram%20%5BScalable%5D.png">
+	<img alt="ClusterWorker-Deployment Diagram [Scalable]" src="https://raw.githubusercontent.com/rs-renato/repository-images/master/cluster-worker/ClusterWorker-Deployment%20Diagram%20%5BScalable%5D.png">
 </p>
 
 ### Item Producer
@@ -53,7 +53,7 @@ The example bellow shows an `ItemProducer` implementation that produces a collec
 ```java
 /**
  * Example of implementation of {@link ItemProducer}
- * @author renato.rsilva
+ * @author rs-renato
  * @since 1.0.0
  */
 @ProduceToQueue(queueName = "cw.example.queue", cronExpression= "0/30 * * * * ?", maxSize = 100)
@@ -82,7 +82,7 @@ The example below shows an example of `ItemProcessor` which process one integer 
 ```java
 /**
  * Example of implementation of {@link ItemProcessor}
- * @author renato.rsilva
+ * @author rs-renato
  * @since 1.0.0
  */
 @ConsumeFromQueue(queueName = "cw.example.queue", strategy = ConsumerStrategy.WAIT_ON_AVAILABLE, workers = 2)
@@ -169,7 +169,7 @@ Its also possible use Cluster Worker in a hybrid way, For example: letting CW ma
 ```java
 /**
  * Example of Cluster Worker Spring Configuration
- * @author renato.rsilva
+ * @author rs-renato
  * @since 1.0.0
  */
 @Configuration
@@ -196,7 +196,7 @@ public class ClusterWorkerConfiguration {
 ```java
 /**
  * Example of Cluster Worker Spring ItemReader
- * @author renato.rsilva
+ * @author rs-renato
  * @since 1.0.0
  */
 @Component
@@ -235,7 +235,7 @@ try {
 As said, Cluster Worker is an API based on `producer vs consumer architecture`. It uses hazelcast distributed queue to exchange data through the cluster members. It's internals uses `Callable's` that encapsulate the client's implementation of `ItemProducer` and `ItemConsumer`. 
 
 <p align="center">
-	<img alt="From Client Perspective: Producer vs Processor" src="https://gitlab.sefaz.go.gov.br/supervisao-arquitetura/documentacoes/raw/master/ClusterWorker/Diagramas/ClusterWorker-Component%20Diagram.png">
+	<img alt="From Client Perspective: Producer vs Processor" src="https://raw.githubusercontent.com/rs-renato/repository-images/master/cluster-worker/ClusterWorker-Component%20Diagram.png">
 </p>
 
 ### HazelcastCallableProducer
