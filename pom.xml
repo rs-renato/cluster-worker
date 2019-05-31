@@ -5,7 +5,7 @@
     <artifactId>cluster-worker</artifactId>
     <groupId>org.com</groupId>
     <packaging>pom</packaging>
-    <version>1.0.0.RC10-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <modules>
         <module>cluster-worker-core</module>
