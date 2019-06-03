@@ -166,6 +166,7 @@ for (int i = 0; i < 100; i++) {
 Its also possible use Cluster Worker in a hybrid way, For example: letting CW manages the scheduled production (responsability of reads data from the source in a defined frequency), and letting Spring Batch ItemReader consumes from distributed queue. The configuration bellow shows how to handle with this use case: 
 
 *Cluster Worker Configuration:*
+
 ```java
 /**
  * Example of Cluster Worker Spring Configuration
@@ -182,7 +183,7 @@ public class ClusterWorkerConfiguration {
 	
 	@Bean
 	public HazelcastQueueConsumer<Integer> hazelcastQueueConsumer(ClusterWorkerFactory cwFactory){
-		return cwFactory.getHazelcastQueueConsumer();
+		return cwFactory.getHazelcastQueueConsumer("cw.example.queue");
 	}
 	
 	@Bean
@@ -193,6 +194,7 @@ public class ClusterWorkerConfiguration {
 ```
 
 *Spring ItemReader:*
+
 ```java
 /**
  * Example of Cluster Worker Spring ItemReader
@@ -213,6 +215,7 @@ public class ClusterWorkerItemReader implements ItemReader<Integer>{
 ```
 
 *On startup application:*
+
 ```java
 @Autowired
 private ClusterWorkerFactory cwFactory;
@@ -232,7 +235,7 @@ try {
 ```
 
 ## From API Perspective: Producer vs Consumer
-As said, Cluster Worker is an API based on `producer vs consumer architecture`. It uses hazelcast distributed queue to exchange data through the cluster members. It's internals uses `Callable's` that encapsulate the client's implementation of `ItemProducer` and `ItemConsumer`. 
+As said, Cluster Worker is an API based on `producer vs consumer architecture`. It uses hazelcast distributed queue to exchange data through the cluster members. It's internals uses `Callable's` that encapsulate the client's implementation of `ItemProducer` and `ItemProcessor`. 
 
 <p align="center">
 	<img alt="From Client Perspective: Producer vs Processor" src="https://raw.githubusercontent.com/rs-renato/repository-images/master/cluster-worker/ClusterWorker-Component%20Diagram.png">
@@ -250,7 +253,7 @@ As said, Cluster Worker is an API based on `producer vs consumer architecture`. 
 
 ## Configurations
 ### Default CW Configurations
-Cw defines a file `cw-config.properties` with the following mandatory property values:
+Cw defines a file `cw-config.properties` with the following properties:
 
 ```properties
 # The port which Hazelcast member will try to bind on
@@ -278,6 +281,7 @@ cw.rest.api.enable.groups=
 
 ### Default Hazelcast Configurations
 For opmization, CW defines the following hazelcast system configurations:
+
 ```properties
 # Number of event handler threads (default is 2)
 hazelcast.event.thread.count=
